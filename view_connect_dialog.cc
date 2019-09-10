@@ -6,11 +6,11 @@
 #include <QGridLayout>
 #include <QDialogButtonBox>
 
-#include "ui_connect_dialog.h"
+#include "view_connect_dialog.h"
 
 namespace Seville
 {
-   namespace Ui
+   namespace View
    {
       ConnectDialog::ConnectDialog(QWidget* parent)
          : QDialog(parent)

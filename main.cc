@@ -3,7 +3,7 @@
 #include <QApplication>
 
 #include "main.h"
-#include "ui_main_window.h"
+#include "view_main_window.h"
 #include "applog.h"
 
 /*
@@ -20,11 +20,11 @@ void msgHandler(QtMsgType type, const QMessageLogContext& context, const QString
 int main(int argc, char *argv[])
 {
     QLoggingCategory::setFilterRules("*.debug=false\n"
-                                         "alcazarnik.io.debug=true");
+                                         "seville.io.debug=true");
     qCDebug(appLcIo) << "Starting " << argv[0] << "...";
     QApplication app(argc, argv);
-    Seville::Ui::MainWindow win;
-    win.show();
+    Seville::View::MainWindow mainWindow;
+    mainWindow.show();
     qCDebug(appLcIo) << argv[0] << " Started.";
 
     return app.exec();

@@ -1,8 +1,8 @@
-#include "ui_log_window.h"
+#include "view_log_window.h"
 
 namespace Seville
 {
-   namespace Ui
+   namespace View
    {
       LogWindow::LogWindow()
       {

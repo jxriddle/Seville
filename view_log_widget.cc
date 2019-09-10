@@ -1,8 +1,8 @@
-#include "ui_log_widget.h"
+#include "view_log_widget.h"
 
 namespace Seville
 {
-   namespace Ui
+   namespace View
    {
       LogWidget::LogWidget(QWidget *parent) : QDockWidget(parent)
       {

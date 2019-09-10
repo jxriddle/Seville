@@ -25,7 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cc \
-    ui_app_tab_widget.cc \
+    view_app_tab_widget.cc \
     pal_client.cc \
     pal_crypto.cc \
     pal_msg.cc \
@@ -34,30 +34,30 @@ SOURCES += \
     pal_user.cc \
     pal_common.cc \
     applog.cc \
-    ui_connect_dialog.cc \
-    ui_log_widget.cc \
-    ui_main_window.cc \
-    ui_about_dialog.cc \
-    ui_log_window.cc \
-    ui_pal_client_widget.cc
+    view_connect_dialog.cc \
+    view_log_widget.cc \
+    view_main_window.cc \
+    view_about_dialog.cc \
+    view_log_window.cc \
+    view_pal_client_widget.cc
 
 HEADERS += \
-    ui_app_tab_widget.h \
+    view_app_tab_widget.h \
     pal_client.h \
     pal_crypto.h \
     pal_msg.h \
     pal_room.h \
     pal_server.h \
     pal_user.h \
-    ui_main_window.h \
+    view_main_window.h \
     pal_common.h \
     applog.h \
-    ui_connect_dialog.h \
-    ui_log_widget.h \
-    ui_about_dialog.h \
+    view_connect_dialog.h \
+    view_log_widget.h \
+    view_about_dialog.h \
     main.h \
-    ui_log_window.h \
-    ui_pal_client_widget.h
+    view_log_window.h \
+    view_pal_client_widget.h
 
 DISTFILES +=
 

@@ -1,5 +1,5 @@
 //#include "uiapptabbar.h"
-#include "ui_app_tab_widget.h"
+#include "view_app_tab_widget.h"
 
 #include <iostream>
 
@@ -11,7 +11,7 @@
 
 namespace Seville
 {
-   namespace Ui
+   namespace View
    {
       AppTabWidget::AppTabWidget(QWidget* parent) : QTabWidget(parent)
       {

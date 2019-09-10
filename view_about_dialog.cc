@@ -1,8 +1,8 @@
-#include "ui_about_dialog.h"
+#include "view_about_dialog.h"
 
 namespace Seville
 {
-   namespace Ui
+   namespace View
    {
       AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
       {

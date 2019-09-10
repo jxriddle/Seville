@@ -14,15 +14,15 @@
 #include <QVBoxLayout>
 #include <QScreen>
 
-#include "ui_app_tab_widget.h"
-#include "ui_main_window.h"
-#include "ui_connect_dialog.h"
-#include "ui_pal_client_widget.h"
-#include "ui_about_dialog.h"
+#include "view_app_tab_widget.h"
+#include "view_main_window.h"
+#include "view_connect_dialog.h"
+#include "view_pal_client_widget.h"
+#include "view_about_dialog.h"
 
 namespace Seville
 {
-   namespace Ui
+   namespace View
    {
       MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
       {
@@ -150,19 +150,19 @@ namespace Seville
          // Connect Action Signals to Slots
          connect(
             myNewHostConnectionAction, &QAction::triggered,
-            this, &Seville::Ui::MainWindow::onNewHostConnectionActionTriggered);
+            this, &Seville::View::MainWindow::onNewHostConnectionActionTriggered);
 
          connect(
             myCloseHostConnectionAction, &QAction::triggered,
-            this, &Seville::Ui::MainWindow::onCloseHostConnectionActionTriggered);
+            this, &Seville::View::MainWindow::onCloseHostConnectionActionTriggered);
 
          connect(
             myQuitAppAction, &QAction::triggered,
-            this, &Seville::Ui::MainWindow::onQuitAppActionTriggered);
+            this, &Seville::View::MainWindow::onQuitAppActionTriggered);
 
          connect(
             myAboutAppAction, &QAction::triggered,
-            this, &Seville::Ui::MainWindow::onAboutAppActionTriggered);
+            this, &Seville::View::MainWindow::onAboutAppActionTriggered);
       }
 
       void MainWindow::resizeEvent(QResizeEvent* event)

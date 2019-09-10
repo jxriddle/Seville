@@ -6,12 +6,12 @@
 
 #include "applog.h"
 #include "pal_client.h"
-#include "ui_connect_dialog.h"
-#include "ui_pal_client_widget.h"
+#include "view_connect_dialog.h"
+#include "view_pal_client_widget.h"
 
 namespace Seville
 {
-   namespace Ui
+   namespace View
    {
       PalClientWidget::PalClientWidget(QWidget *parent) : QWidget(parent)
       {
@@ -75,7 +75,7 @@ namespace Seville
       {
          connect(
             this, &PalClientWidget::mousePressEvent,
-            this, &Ui::PalClientWidget::mousePressEvent);
+            this, &Seville::View::PalClientWidget::mousePressEvent);
       }
 
       void PalClientWidget::doSetBackgroundImage(QString imagePath)
