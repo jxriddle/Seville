@@ -24,40 +24,47 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cc \
-    view_app_tab_widget.cc \
-    pal_client.cc \
-    pal_crypto.cc \
-    pal_msg.cc \
-    pal_room.cc \
-    pal_server.cc \
-    pal_user.cc \
-    pal_common.cc \
-    applog.cc \
-    view_connect_dialog.cc \
-    view_log_widget.cc \
-    view_main_window.cc \
-    view_about_dialog.cc \
-    view_log_window.cc \
-    view_pal_client_widget.cc
+    Palace_Client.cc \
+    Palace_Crypto.cc \
+    Palace_Host.cc \
+    Palace_Room.cc \
+    Palace_Server.cc \
+    Palace_User.cc \
+    View_AboutDialog.cc \
+    View_AppTabWidget.cc \
+    View_ConnectDialog.cc \
+    View_LogWidget.cc \
+    View_LogWindow.cc \
+    View_MainWindow.cc \
+    View_ClientWidget.cc \
+    QtApp_ByteArray.cc \
+    Log.cc \
+    Main.cc \
+    Palace_NetMsg_AltLogon.cc \
+    Palace_NetMsg_Logon.cc \
+    Palace_NetMsg_Generic.cc
 
 HEADERS += \
-    view_app_tab_widget.h \
-    pal_client.h \
-    pal_crypto.h \
-    pal_msg.h \
-    pal_room.h \
-    pal_server.h \
-    pal_user.h \
-    view_main_window.h \
-    pal_common.h \
-    applog.h \
-    view_connect_dialog.h \
-    view_log_widget.h \
-    view_about_dialog.h \
-    main.h \
-    view_log_window.h \
-    view_pal_client_widget.h
+    View_AboutDialog.h \
+    View_AppTabWidget.h \
+    View_ClientWidget.h \
+    View_ConnectDialog.h \
+    View_LogWidget.h \
+    View_LogWindow.h \
+    View_MainWindow.h \
+    Palace_Client.h \
+    Palace_Crypto.h \
+    Palace_Host.h \
+    Palace_Room.h \
+    Palace_Server.h \
+    Palace_User.h \
+    QtApp_ByteArray.h \
+    Common.h \
+    Log.h \
+    Main.h \
+    Palace_NetMsg_AltLogon.h \
+    Palace_NetMsg_Logon.h \
+    Palace_NetMsg_Generic.h
 
 DISTFILES +=
 
