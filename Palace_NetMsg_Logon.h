@@ -1,7 +1,7 @@
 #ifndef PALACE_NETMSG_LOGON_H
 #define PALACE_NETMSG_LOGON_H
 
-#include "Palace_NetMsg_NetMsgBase.h"
+#include "Palace_NetMsg_Generic.h"
 
 namespace Seville
 {
@@ -9,7 +9,7 @@ namespace Seville
    {
       namespace NetMsg
       {
-         class Logon : public NetMsgBase
+         class Logon : public Generic
          {
             private:
                void doInit();

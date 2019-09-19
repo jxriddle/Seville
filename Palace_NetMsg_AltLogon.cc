@@ -16,7 +16,7 @@ namespace Seville
 
          }
 
-         AltLogon::AltLogon(const NetMsgBase& netMsg)
+         AltLogon::AltLogon(const Generic& netMsg)
          {
             //TODO move
             reset();

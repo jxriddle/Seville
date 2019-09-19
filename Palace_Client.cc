@@ -61,6 +61,14 @@ namespace Seville
          myNetMsg.reset();
       }
 
+      void Client::doResetReceiveTimer()
+      {
+         if (myTransferTimerId) {
+            killTimer(myTransferTimerId);
+            myTransferTimerId = 0;
+         }
+      }
+
       void Client::doDisconnectFromHost()
       {
          if (myConnectionState != Client::ConnectionState::Disconnected) {
@@ -104,7 +112,7 @@ namespace Seville
          NetMsg::Generic& netMsg = myNetMsg;
 
          if (myTransferTimerId) {
-            //TODO killTimer(myTransferTimerId);
+            killTimer(myTransferTimerId);
             myTransferTimerId = 0;
          }
 
@@ -159,20 +167,20 @@ namespace Seville
 
       int Client::doReadDataIntoNetMsg(NetMsg::Generic& netMsg, i32 maxSize)
       {
-         if (NetMsg::Generic::kByteSizeOfLongestNetMsg < maxSize) {
+         if (NetMsg::kByteSizeOfLongestNetMsg < maxSize) {
             return 0;
          }
 
          auto nBytesBeforeRead = netMsg.size();
-         if (nBytesBeforeRead == NetMsg::Generic::kByteSizeOfLongestNetMsg) {
+         if (nBytesBeforeRead == NetMsg::kByteSizeOfLongestNetMsg) {
             return 0;
          }
 
          auto nBytesAvailable = mySocket.bytesAvailable();
          auto netMsgSize = netMsg.size();
-         int isHeader = netMsgSize < NetMsg::Generic::kByteSizeOfHeader;
+         int isHeader = netMsgSize < NetMsg::kByteSizeOfHeader;
          i64 chunkReadSize =
-               (isHeader * NetMsg::Generic::kByteSizeOfHeader) |
+               (isHeader * NetMsg::kByteSizeOfHeader) |
                (!isHeader * kByteSizeOfDefaultChunkRead);
 
          while (0 < nBytesAvailable && netMsgSize < maxSize) {
@@ -199,7 +207,7 @@ namespace Seville
 
          auto initialNetMsgSize = incomingMsg.size();
          auto nExpectedBytesToRead =
-               NetMsg::Generic::kByteSizeOfHeader - initialNetMsgSize;
+               NetMsg::kByteSizeOfHeader - initialNetMsgSize;
          if (0 == nExpectedBytesToRead)
             return 1;
          else if (nExpectedBytesToRead < 0)
@@ -217,7 +225,7 @@ namespace Seville
             myTransferTimerId = startTimer(kIntervalToTimeoutForTransferInMs);
          }
 
-         return finalNetMsgSize == NetMsg::Generic::kByteSizeOfHeader;
+         return finalNetMsgSize == NetMsg::kByteSizeOfHeader;
       }
 
       int Client::doReadNetMsgBody(NetMsg::Generic& netMsg)
@@ -228,11 +236,11 @@ namespace Seville
          }
 
          auto initialNetMsgSize = netMsg.size();
-         if (initialNetMsgSize < NetMsg::Generic::kByteSizeOfHeader)
+         if (initialNetMsgSize < NetMsg::kByteSizeOfHeader)
             return 0;
 
          auto nExpectedBytesToRead = netMsg.len() -
-               (initialNetMsgSize - NetMsg::Generic::kByteSizeOfHeader);
+               (initialNetMsgSize - NetMsg::kByteSizeOfHeader);
          if (0 == nExpectedBytesToRead)
             return 1;
          else if (nExpectedBytesToRead < 0)
@@ -254,7 +262,7 @@ namespace Seville
          }
 
          auto nExpectedTotalBytes =
-               NetMsg::Generic::kByteSizeOfHeader + netMsg.len();
+               NetMsg::kByteSizeOfHeader + netMsg.len();
          return finalNetMsgSize == nExpectedTotalBytes;
       /*
          if (0 < nNet::MsgBytesExpected)
@@ -270,10 +278,15 @@ namespace Seville
 
       int Client::doReadNetMsg(NetMsg::Generic& netMsg)
       {
+         doResetReceiveTimer();
          // read in header
-         int readHeaderOk = doReadNetMsgHeader(netMsg);
+         if (myReceiveState == ReceiveState::NewNetMsg) {
+            netMsg.append(mySocket.read);
+            myReceiveState = ReceiveState::ContinueNetMsg;
+         }
+
          int readBodyOk = doReadNetMsgBody(netMsg);
-         int minNetMsgOk = NetMsg::Generic::kByteSizeOfHeader <= netMsg.size();
+         int minNetMsgOk = NetMsg::kByteSizeOfHeader <= netMsg.size();
          return readHeaderOk && readBodyOk && minNetMsgOk;
       }
 
@@ -301,19 +314,19 @@ namespace Seville
                (static_cast<u32>(!isLE) * netMsg.id());
 
          switch (netMsgId) {
-            case NetMsg::Generic::UnknownServerKind: {
+            case NetMsg::Kind::UnknownServerKind: {
                qCDebug(appLcIo) << "Server has Unknown Byte Order";
                myServer.setByteOrder(Host::ByteOrder::Unknown);
                res = 0;
                break;
             }
-            case NetMsg::Generic::BigEndianServerKind: {
+            case NetMsg::Kind::BigEndianServerKind: {
                qCDebug(appLcIo) << "Server has Big Endian Byte Order";
                myServer.setByteOrder(Host::ByteOrder::BigEndian);
                res = 1;
                break;
             }
-            case NetMsg::Generic::LittleEndianServerKind: {
+            case NetMsg::Kind::LittleEndianServerKind: {
                qCDebug(appLcIo) << "Server has Little Endian Byte Order";
                myServer.setByteOrder(Host::ByteOrder::LittleEndian);
                res = 1;
@@ -339,213 +352,213 @@ namespace Seville
             //case Net::Msg::LogonKind:
             //    res = sendLogon_();
             //    break;
-            case NetMsg::Generic::AltLogonKind: {
+            case NetMsg::Kind::AltLogonKind: {
                qCDebug(appLcIo) << "Received AltLogon Net::Msg";
                auto netMsgAltLogon = dynamic_cast<const NetMsg::AltLogon&>(netMsg);
                res = doReceiveAltLogon(netMsgAltLogon);
                break;
             }
-            case NetMsg::Generic::ConnectionErrorKind: {
+            case NetMsg::Kind::ConnectionErrorKind: {
                qCDebug(appLcIo) << "Received ConnectionError Net::Msg";
                res = doReceiveConnectionError(netMsg);
                break;
             }
-            case NetMsg::Generic::ServerVersionKind: {
+            case NetMsg::Kind::ServerVersionKind: {
                qCDebug(appLcIo) << "Received ServerVersion Net::Msg";
                res = doReceiveServerVersion(netMsg);
                break;
             }
-            case NetMsg::Generic::ServerInfoKind: {
+            case NetMsg::Kind::ServerInfoKind: {
                qCDebug(appLcIo) << "Received ServerInfo Net::Msg";
                res = doReceiveServerInfo(netMsg);
                break;
             }
-            case NetMsg::Generic::UserStatusKind: {
+            case NetMsg::Kind::UserStatusKind: {
                qCDebug(appLcIo) << "Received UserStatus Net::Msg";
                res = doReceiveUserStatus(netMsg);
                break;
             }
-            case NetMsg::Generic::UserLoggedOnAndMaxKind: {
+            case NetMsg::Kind::UserLoggedOnAndMaxKind: {
                qCDebug(appLcIo) << "Received UserLoggedOnAndMax Net::Msg";
                res = doReceiveUserLoggedOnAndMax(netMsg);
                break;
             }
-            case NetMsg::Generic::HttpServerLocationKind: {
+            case NetMsg::Kind::HttpServerLocationKind: {
                qCDebug(appLcIo) << "Received HttpServerLocation Net::Msg";
                res = doReceiveHttpServerLocation(netMsg);
                break;
             }
-            case NetMsg::Generic::RoomUserListKind: {
+            case NetMsg::Kind::RoomUserListKind: {
                qCDebug(appLcIo) << "Received RoomUserList Net::Msg";
                res = doReceiveRoomUserList(netMsg);
                break;
             }
-            case NetMsg::Generic::ServerUserListKind: {
+            case NetMsg::Kind::ServerUserListKind: {
                qCDebug(appLcIo) << "Received ServerUserList Net::Msg";
                res = doReceiveServerUserList(netMsg);
                break;
             }
-            case NetMsg::Generic::ServerRoomListKind: {
+            case NetMsg::Kind::ServerRoomListKind: {
                qCDebug(appLcIo) << "Received ServerRoomList Net::Msg";
                res = doReceiveServerRoomList(netMsg);
                break;
             }
-            case NetMsg::Generic::RoomDescendKind: {
+            case NetMsg::Kind::RoomDescendKind: {
                qCDebug(appLcIo) << "Received RoomDescend Net::Msg";
                res = doReceiveRoomDescend(netMsg);
                break;
             }
-            case NetMsg::Generic::UserNewKind: {
+            case NetMsg::Kind::UserNewKind: {
                qCDebug(appLcIo) << "Received UserNew Net::Msg";
                res = doReceiveUserNew(netMsg);
                break;
             }
-            case NetMsg::Generic::PingKind: {
+            case NetMsg::Kind::PingKind: {
                qCDebug(appLcIo) << "Received Ping Net::Msg";
                res = doReceivePing(netMsg);
                break;
             }
-            case NetMsg::Generic::PongKind: {
+            case NetMsg::Kind::PongKind: {
                qCDebug(appLcIo) << "Received Pong Net::Msg";
                res = doReceivePong(netMsg);
                break;
             }
-            case NetMsg::Generic::XTalkKind: {
+            case NetMsg::Kind::XTalkKind: {
                qCDebug(appLcIo) << "Received XTalk Net::Msg";
                res = doReceiveXTalk(netMsg);
                break;
             }
-            case NetMsg::Generic::XWhisperKind: {
+            case NetMsg::Kind::XWhisperKind: {
                qCDebug(appLcIo) << "Received XWhisper Net::Msg";
                res = doReceiveXWhisper(netMsg);
                break;
             }
-            case NetMsg::Generic::TalkKind: {
+            case NetMsg::Kind::TalkKind: {
                qCDebug(appLcIo) << "Received Talk Net::Msg";
                res = doReceiveTalk(netMsg);
                break;
             }
-            case NetMsg::Generic::WhisperKind: {
+            case NetMsg::Kind::WhisperKind: {
                qCDebug(appLcIo) << "Recieved Whisper Net::Msg";
                res = doReceiveWhisper(netMsg);
                break;
             }
-            case NetMsg::Generic::AssetIncomingKind: {
+            case NetMsg::Kind::AssetIncomingKind: {
                qCDebug(appLcIo) << "Received AssetIncoming Net::Msg";
                res = doReceiveAssetIncoming(netMsg);
                break;
             }
-            case NetMsg::Generic::AssetQueryKind: {
+            case NetMsg::Kind::AssetQueryKind: {
                qCDebug(appLcIo) << "Received AssetQuery Net::Msg";
                res = doReceiveAssetQuery(netMsg);
                break;
             }
-            case NetMsg::Generic::MovementKind: {
+            case NetMsg::Kind::MovementKind: {
                qCDebug(appLcIo) << "Received Movement Net::Msg";
                res = doReceiveMovement(netMsg);
                break;
             }
-            case NetMsg::Generic::UserColorKind: {
+            case NetMsg::Kind::UserColorKind: {
                qCDebug(appLcIo) << "Received UserColor Net::Msg";
                res = doReceiveUserColor(netMsg);
                break;
             }
-            case NetMsg::Generic::UserFaceKind: {
+            case NetMsg::Kind::UserFaceKind: {
                qCDebug(appLcIo) << "Received UserFace Net::Msg";
                res = doReceiveUserFace(netMsg);
                break;
             }
-            case NetMsg::Generic::UserPropKind: {
+            case NetMsg::Kind::UserPropKind: {
                qCDebug(appLcIo) << "Received UserProp Net::Msg";
                res = doReceiveUserProp(netMsg);
                break;
             }
-            case NetMsg::Generic::UserDescriptionKind: {
+            case NetMsg::Kind::UserDescriptionKind: {
                qCDebug(appLcIo) << "Received UserDescription Net::Msg";
                res = doReceiveUserDescription(netMsg);
                break;
             }
-            case NetMsg::Generic::UserRenameKind: {
+            case NetMsg::Kind::UserRenameKind: {
                qCDebug(appLcIo) << "Received UserRename Net::Msg";
                res = doReceiveUserRename(netMsg);
                break;
             }
-            case NetMsg::Generic::UserLeavingKind: {
+            case NetMsg::Kind::UserLeavingKind: {
                qCDebug(appLcIo) << "Received UserLeaving Net::Msg";
                res = doReceiveUserLeaving(netMsg);
                break;
             }
-            case NetMsg::Generic::UserExitRoomKind: {
+            case NetMsg::Kind::UserExitRoomKind: {
                qCDebug(appLcIo) << "Received UserExitRoom Net::Msg";
                res = doReceiveUserExitRoom(netMsg);
                break;
             }
-            case NetMsg::Generic::PropMoveKind: {
+            case NetMsg::Kind::PropMoveKind: {
                qCDebug(appLcIo) << "Received PropMove Net::Msg";
                res = doReceivePropMove(netMsg);
                break;
             }
-            case NetMsg::Generic::PropDeleteKind: {
+            case NetMsg::Kind::PropDeleteKind: {
                qCDebug(appLcIo) << "Received PropDelete Net::Msg";
                res = doReceivePropDelete(netMsg);
                break;
             }
-            case NetMsg::Generic::PropNewKind: {
+            case NetMsg::Kind::PropNewKind: {
                qCDebug(appLcIo) << "Received PropNew Net::Msg";
                res = doReceivePropNew(netMsg);
                break;
             }
-            case NetMsg::Generic::DoorLockKind: {
+            case NetMsg::Kind::DoorLockKind: {
                qCDebug(appLcIo) << "Received DoorLock Net::Msg";
                res = doReceiveDoorLock(netMsg);
                break;
             }
-            case NetMsg::Generic::DoorUnlockKind: {
+            case NetMsg::Kind::DoorUnlockKind: {
                qCDebug(appLcIo) << "Received DoorUnlock Net::Msg";
                res = doReceiveDoorUnlock(netMsg);
                break;
             }
-            case NetMsg::Generic::PictMoveKind: {
+            case NetMsg::Kind::PictMoveKind: {
                qCDebug(appLcIo) << "Received PictMove Net::Msg";
                res = doReceivePictMove(netMsg);
                break;
             }
-            case NetMsg::Generic::SpotStateKind: {
+            case NetMsg::Kind::SpotStateKind: {
                qCDebug(appLcIo) << "Received SpotState Net::Msg";
                res = doReceiveSpotState(netMsg);
                break;
             }
-            case NetMsg::Generic::SpotMoveKind: {
+            case NetMsg::Kind::SpotMoveKind: {
                qCDebug(appLcIo) << "Received SpotMove Net::Msg";
                res = doReceiveSpotMove(netMsg);
                break;
             }
-            case NetMsg::Generic::DrawKind: {
+            case NetMsg::Kind::DrawKind: {
                qCDebug(appLcIo) << "Received Draw Net::Msg";
                res = doReceiveDraw(netMsg);
                break;
             }
-            case NetMsg::Generic::NavErrorKind: {
+            case NetMsg::Kind::NavErrorKind: {
                qCDebug(appLcIo) << "Received NavError Net::Msg";
                res = doReceiveNavError(netMsg);
                break;
             }
-            case NetMsg::Generic::BlowThruKind: {
+            case NetMsg::Kind::BlowThruKind: {
                qCDebug(appLcIo) << "Received BlowThru Net::Msg";
                res = doReceiveBlowThru(netMsg);
                break;
             }
-            case NetMsg::Generic::AuthenticateKind: {
+            case NetMsg::Kind::AuthenticateKind: {
                qCDebug(appLcIo) << "Received Authenticate Net::Msg";
                res = doReceiveAuthenticate(netMsg);
                break;
             }
-            case NetMsg::Generic::AltRoomDescriptionKind: {
+            case NetMsg::Kind::AltRoomDescriptionKind: {
                qCDebug(appLcIo) << "Received AltRoomDescription Net::Msg";
                res = doReceiveRoomDescription(netMsg);
                break;
             }
-            case NetMsg::Generic::RoomDescriptionKind: {
+            case NetMsg::Kind::RoomDescriptionKind: {
                qCDebug(appLcIo) << "Received RoomDescription Net::Msg";
                res = doReceiveRoomDescription(netMsg);
                break;
@@ -574,7 +587,7 @@ namespace Seville
          //u32 crc; ds >> crc;
          //u32 counter; ds >> counter;
          //u8 usernameLen; ds >> usernameLen;
-         int offset = NetMsg::Generic::kByteSizeOfHeader;
+         int offset = NetMsg::kByteSizeOfHeader;
          u32 crc = netMsg.u32At(offset);
          offset += sizeof(crc);
          u32 counter = netMsg.u32At(offset);
@@ -980,8 +993,8 @@ namespace Seville
          //if (ds.skipRawData(Net::Msg::kNet::MsgHeaderSize) < 0) { return false; }
 
          /* Header */
-         msg.appendU32(NetMsg::Generic::LogonKind);
-         msg.appendI32(NetMsg::Generic::kByteSizeOfLogon);
+         msg.appendU32(NetMsg::Kind::LogonKind);
+         msg.appendI32(NetMsg::kByteSizeOfLogon);
          msg.appendU32(0);
 
          msg.appendU32(myUser.regCrc());
@@ -1056,13 +1069,13 @@ namespace Seville
          NetMsg::Generic netMsg;
 
          // TODO stub
-         netMsg.appendU32(NetMsg::Generic::AuthResponseKind);
+         netMsg.appendU32(NetMsg::Kind::AuthResponseKind);
          //netMsg.appendDw();
 
          return res;
       }
 
-      void Client::doOnGotBackgroundAsync(QNetworkReply* reply)
+      void Client::onGotBackgroundAsync(QNetworkReply* reply)
       {
          QByteArray ba = reply->readAll();
          myCurrentRoom.backgroundImage().loadFromData(ba);
@@ -1080,7 +1093,7 @@ namespace Seville
          // setup error handling
          //connect(&request, SIGNAL(onError(QNetworkReply::NetworkError)), this, SLOT(onError(QNetworkReply::NetworkError)));
 
-         connect(&myHttpGetMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(doOnGotBackgroundAsync(QNetworkReply*)));
+         connect(&myHttpGetMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(onGotBackgroundAsync(QNetworkReply*)));
 
          // add headers
          //headers

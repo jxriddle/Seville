@@ -14,7 +14,7 @@ namespace Seville
          void Generic::doReset()
          {
             truncate(0);
-            reserve(Generic::kByteSizeOfHeader);
+            reserve(NetMsg::kByteSizeOfHeader);
          }
 
          i64 Generic::doSwapI64(i64 value)

@@ -8,8 +8,8 @@ namespace Seville
       {
          void Logon::doInit()
          {
-            setId(NetMsg::NetMsgBase::LogonKind);
-            setLen(NetMsg::NetMsgBase::kByteSizeOfLogon);
+            setId(NetMsg::Kind::LogonKind);
+            setLen(NetMsg::kByteSizeOfLogon);
             setRef(0);
          }
 

@@ -86,16 +86,39 @@ namespace Seville
             static const quint32 kDlCapsExtendPkt           = 0x00000200;
 
          private:
+            QImage myBackgroundImg;
+            QNetworkAccessManager myHttpGetMgr;
+            //NetMsg myNetMsgRx;
+            //QDataStream *myNetMsgRxDs;
+            //NetMsg myNetMsgTx;
+            //QDataStream *myNetMsgTxDs;
+            NetMsg::Generic myNetMsg;
+            int myPransferTimerId;
+            QTimer myPingTimer;
+            QTime myPongTime;
+            //QByteArray myBuffer;
+            Host::ByteOrder myByteOrder;
+            Client::ConnectionState myConnectionState;
+            Client::ReceiveState myReceiveState;
+            QTcpSocket mySocket;
+            QString myUsername;
+            QString myHost;
+            quint16 myPort;
+            Server myServer;
+            User myUser;
+            Room myCurrentRoom;
+            Crypto myCrypto;
+            QTimer myTimer;
+            int myTransferTimerId;
+
             void doSetupEvents();
-
             void doReset();
-
+            void doResetReceiveTimer();
             void doConnectToHost(
                   QString host,
                   int port = 9998,
                   QString username = "Seville User",
                   int initialRoom = 0);
-
             void doDisconnectFromHost();
 
             int doReadNetMsgHeader(NetMsg::Generic& netMsg);
@@ -103,7 +126,7 @@ namespace Seville
             int doReadNetMsg(NetMsg::Generic& netMsg);
             int doReadDataIntoNetMsg(
                   NetMsg::Generic& netMsg,
-                  i32 maxSize = NetMsg::Generic::kByteSizeOfLongestNetMsg);
+                  i32 maxSize = NetMsg::kByteSizeOfLongestNetMsg);
             //bool doGetHasEnoughData();
             void doDetermineClientByteOrder();
             int doDetermineServerByteOrder(const NetMsg::Generic& netMsg);
@@ -162,36 +185,11 @@ namespace Seville
             //int doHttpPutAsync_(QString& url);
             //int doHttpPostAsync_(QString& url);
 
-            QImage myBackgroundImg;
-            QNetworkAccessManager myHttpGetMgr;
-            //NetMsg myNetMsgRx;
-            //QDataStream *myNetMsgRxDs;
-            //NetMsg myNetMsgTx;
-            //QDataStream *myNetMsgTxDs;
-            NetMsg::Generic myNetMsg;
-            int myPransferTimerId;
-            QTimer myPingTimer;
-            QTime myPongTime;
-            //QByteArray myBuffer;
-            Host::ByteOrder myByteOrder;
-            Client::ConnectionState myConnectionState;
-            Client::ReceiveState myReceiveState;
-            QTcpSocket mySocket;
-            QString myUsername;
-            QString myHost;
-            quint16 myPort;
-            Server myServer;
-            User myUser;
-            Room myCurrentRoom;
-            Crypto myCrypto;
-            QTimer myTimer;
-            int myTransferTimerId;
-
          private slots:
             void doOnReadyRead();
             void doOnSocketError();
-            void doOnPingTimer(QTimerEvent *pingTimeEvent);
-            void doOnGotBackgroundAsync(QNetworkReply *reply);
+            void doOnPingTimer(QTimerEvent* pingTimeEvent);
+            void onGotBackgroundAsync(QNetworkReply* reply);
 
          //signals:
 

@@ -1,7 +1,7 @@
 #ifndef PALACE_NETMSG_ALTLOGON_H
 #define PALACE_NETMSG_ALTLOGON_H
 
-#include "Palace_NetMsg_NetMsgBase.h"
+#include "Palace_NetMsg_Generic.h"
 
 namespace Seville
 {
@@ -9,13 +9,16 @@ namespace Seville
    {
       namespace NetMsg
       {
-         class AltLogon : public NetMsgBase
+         class AltLogon : public Generic
          {
+            public:
+               static const u32 kByteSize = 128; // 0x80
+
             public:
                virtual ~AltLogon();
 
                AltLogon();
-               AltLogon(const NetMsgBase& msg);
+               AltLogon(const Generic& msg);
          };
       }
    }

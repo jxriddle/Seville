@@ -17,90 +17,91 @@ namespace Seville
    {
       namespace NetMsg
       {
+         enum Kind {
+            // == Server ====================================================
+            NoKind                 = 0x00000000, // 0x6E696C20 // "nil "
+            UnknownServerKind      = 0x70736572, // "pser"
+            LittleEndianServerKind = 0x72796974, // "ryit"
+            BigEndianServerKind    = 0x74697972, // "tiyr"
+            AltLogonKind           = 0x72657032, // "rep2"
+            ServerVersionKind      = 0x76657273, // "vers"
+            ServerInfoKind         = 0x73696E66, // "sinf"
+            UserStatusKind         = 0x75537461, // "uSta"
+            UserLoggedOnAndMaxKind = 0x6C6F6720, // "log "
+            HttpServerLocationKind = 0x48545450, // "HTTP"
+            RoomDescriptionKind    = 0x726F6F6D, // "room"
+            AltRoomDescriptionKind = 0x73526F6D, // "sRom"
+            RoomUserListKind       = 0x72707273, // "rprs"
+            ServerRoomListKind     = 0x724C7374, // "rLst"
+            RoomDescendKind        = 0x656E6472, // "endr"
+            UserNewKind            = 0x6E707273, // "nprs"
+            PingKind               = 0x70696E67, // "ping"
+            PongKind               = 0x706F6E67, // "pong"
+            XTalkKind              = 0x78746C6B, // "xtlk" (encrypted)
+            XWhisperKind           = 0x78776973, // "xwis" (encrypted)
+            TalkKind               = 0x74616C6B, // "talk" (unencrypted)
+            WhisperKind            = 0x77686973, // "whis" (unencrypted)
+            MovementKind           = 0x754C6F63, // "uLoc"
+            UserColorKind          = 0x75737243, // "usrC"
+            UserDescriptionKind    = 0x75737244, // "usrD"
+            UserFaceKind           = 0x75737246, // "usrF"
+            UserPropKind           = 0x75737250, // "usrP"
+            UserRenameKind         = 0x7573724E, // "usrN"
+            UserLeavingKind        = 0x62796520, // "bye "
+            FileIncomingKind       = 0x7346696C, // "sFil"
+            AssetIncomingKind      = 0x73417374, // "sAst"
+            UserExitRoomKind       = 0x65707273, // "eprs"
+            ServerUserListKind     = 0x754C7374, // "uLst"
+            DoorLockKind           = 0x6C6F636B, // "lock"
+            DoorUnlockKind         = 0x756E6C6F, // "unlo"
+            SpotStateKind          = 0x73537461, // "sSta"
+            SpotMoveKind           = 0x636F4C73, // "coLs"
+            PictMoveKind           = 0x704C6F63, // "pLoc"
+            DrawKind               = 0x64726177, // "draw"
+            PropMoveKind           = 0x6D507270, // "mPrp"
+            PropDeleteKind         = 0x64507270, // "dPrp"
+            PropNewKind            = 0x6E507270, // "nPrp"
+            AssetQueryKind         = 0x71417374, // "qAst"
+            NavErrorKind           = 0x73457272, // "sErr"
+            ConnectionErrorKind    = 0x646F776E, // "down"
+            BlowThruKind           = 0x626C6F77, // "blow"
+            AuthenticateKind       = 0x61757468, // "auth"
+            // == Room =======================================================
+            GotoRoomKind           = 0x6E617652, // "navR"
+            RoomKind               = 0x30C6015D, // "0..]"
+            SuperUserKind          = 0x73757372, // "susr"
+            LogonKind              = 0x72656769, // "regi"
+            AssetRegiKind          = 0x72417374, // "rAst"
+            GlobalMessageKind      = 0x676D7367, // "gmsg"
+            RoomMessageKind        = 0x726D7367, // "rmsg"
+            SuperUserMessageKind   = 0x736D7367, // "smsg"
+            AuthResponseKind       = 0x61757472, // "autr"
+         };
+
+         // Record Sizes (excludes header size)
+         //static const u32 kAuthResponseSize =
+
+         // in i32
+         static const i32 kI32SizeOfHeader = 3;
+         static const i32 kI32OffsetForId = 0;
+         static const i32 kI32OffsetForLen = 1;
+         static const i32 kI32OffsetForRef = 2;
+         static const i32 kI32OffsetForPayload = 3;
+
+         // in Bytes
+         static const i32 kByteSizeOfLongestNetMsg = 1024000;
+         static const i32 kByteSizeOfHeader = 12;
+
+         static const i32 kByteOffsetForId = 0;
+         static const i32 kByteOffsetForLen = 4;
+         static const i32 kByteOffsetForRef = 8;
+         static const i32 kByteOffsetForPayload = 12;
+
+         static const u32 kByteSizeOfLogon = 128; // 0x80
+         static const u32 kByteSizeOfAltLogon = 0;
+
          class Generic : public QtApp::ByteArray // public QObject, public QByteArray {};
          {
-            public:
-               enum Kind {
-                  // == Server ====================================================
-                  NoKind                 = 0x00000000, // 0x6E696C20 // "nil "
-                  UnknownServerKind      = 0x70736572, // "pser"
-                  LittleEndianServerKind = 0x72796974, // "ryit"
-                  BigEndianServerKind    = 0x74697972, // "tiyr"
-                  AltLogonKind           = 0x72657032, // "rep2"
-                  ServerVersionKind      = 0x76657273, // "vers"
-                  ServerInfoKind         = 0x73696E66, // "sinf"
-                  UserStatusKind         = 0x75537461, // "uSta"
-                  UserLoggedOnAndMaxKind = 0x6C6F6720, // "log "
-                  HttpServerLocationKind = 0x48545450, // "HTTP"
-                  RoomDescriptionKind    = 0x726F6F6D, // "room"
-                  AltRoomDescriptionKind = 0x73526F6D, // "sRom"
-                  RoomUserListKind       = 0x72707273, // "rprs"
-                  ServerRoomListKind     = 0x724C7374, // "rLst"
-                  RoomDescendKind        = 0x656E6472, // "endr"
-                  UserNewKind            = 0x6E707273, // "nprs"
-                  PingKind               = 0x70696E67, // "ping"
-                  PongKind               = 0x706F6E67, // "pong"
-                  XTalkKind              = 0x78746C6B, // "xtlk" (encrypted)
-                  XWhisperKind           = 0x78776973, // "xwis" (encrypted)
-                  TalkKind               = 0x74616C6B, // "talk" (unencrypted)
-                  WhisperKind            = 0x77686973, // "whis" (unencrypted)
-                  MovementKind           = 0x754C6F63, // "uLoc"
-                  UserColorKind          = 0x75737243, // "usrC"
-                  UserDescriptionKind    = 0x75737244, // "usrD"
-                  UserFaceKind           = 0x75737246, // "usrF"
-                  UserPropKind           = 0x75737250, // "usrP"
-                  UserRenameKind         = 0x7573724E, // "usrN"
-                  UserLeavingKind        = 0x62796520, // "bye "
-                  FileIncomingKind       = 0x7346696C, // "sFil"
-                  AssetIncomingKind      = 0x73417374, // "sAst"
-                  UserExitRoomKind       = 0x65707273, // "eprs"
-                  ServerUserListKind     = 0x754C7374, // "uLst"
-                  DoorLockKind           = 0x6C6F636B, // "lock"
-                  DoorUnlockKind         = 0x756E6C6F, // "unlo"
-                  SpotStateKind          = 0x73537461, // "sSta"
-                  SpotMoveKind           = 0x636F4C73, // "coLs"
-                  PictMoveKind           = 0x704C6F63, // "pLoc"
-                  DrawKind               = 0x64726177, // "draw"
-                  PropMoveKind           = 0x6D507270, // "mPrp"
-                  PropDeleteKind         = 0x64507270, // "dPrp"
-                  PropNewKind            = 0x6E507270, // "nPrp"
-                  AssetQueryKind         = 0x71417374, // "qAst"
-                  NavErrorKind           = 0x73457272, // "sErr"
-                  ConnectionErrorKind    = 0x646F776E, // "down"
-                  BlowThruKind           = 0x626C6F77, // "blow"
-                  AuthenticateKind       = 0x61757468, // "auth"
-                  // == Room =======================================================
-                  GotoRoomKind           = 0x6E617652, // "navR"
-                  RoomKind               = 0x30C6015D, // "0..]"
-                  SuperUserKind          = 0x73757372, // "susr"
-                  LogonKind              = 0x72656769, // "regi"
-                  AssetRegiKind          = 0x72417374, // "rAst"
-                  GlobalMessageKind      = 0x676D7367, // "gmsg"
-                  RoomMessageKind        = 0x726D7367, // "rmsg"
-                  SuperUserMessageKind   = 0x736D7367, // "smsg"
-                  AuthResponseKind       = 0x61757472, // "autr"
-                };
-
-                // Record Sizes (excludes header size)
-                static const u32 kByteSizeOfLogon = 128; // 0x80
-                //static const u32 kAuthResponseSize =
-
-                // in i32
-                static const i32 kI32SizeOfHeader = 3;
-                static const i32 kI32OffsetForId = 0;
-                static const i32 kI32OffsetForLen = 1;
-                static const i32 kI32OffsetForRef = 2;
-                static const i32 kI32OffsetForPayload = 3;
-
-                // in Bytes
-                static const i32 kByteSizeOfLongestNetMsg = 1024000;
-                static const i32 kByteSizeOfHeader = 12;
-
-                static const i32 kByteOffsetForId = 0;
-                static const i32 kByteOffsetForLen = 4;
-                static const i32 kByteOffsetForRef = 8;
-                static const i32 kByteOffsetForPayload = 12;
-
             private:
                Host::ByteOrder myClientByteOrder;
                Host::ByteOrder myServerByteOrder;
