@@ -280,9 +280,10 @@ namespace Seville
       {
          doResetReceiveTimer();
          // read in header
-         if (myReceiveState == ReceiveState::NewNetMsg) {
+         if (netMsgBytesRead < NetMsg::kByteSizeOfHeader) {
             netMsg.append(mySocket.read);
-            myReceiveState = ReceiveState::ContinueNetMsg;
+            netMsgBytesExpected = len;
+            // set timer?
          }
 
          int readBodyOk = doReadNetMsgBody(netMsg);

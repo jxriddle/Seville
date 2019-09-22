@@ -38,7 +38,7 @@ namespace Seville
 
             static const int kDefaultServerPort = 9998;
 
-            static constexpr int kIntervalToTimeoutForTransferInMs = 30 * 1000;
+            static constexpr int kIntervalTimeoutForTransferInMs = 30 * 1000;
             static constexpr int kIntervalToTimeoutForPongInMs = 60 * 1000;
             static constexpr int kIntervalToPingInMs = 5 * 1000;
 
