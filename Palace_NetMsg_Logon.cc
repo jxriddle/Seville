@@ -8,9 +8,9 @@ namespace Seville
       {
          void Logon::doInit()
          {
-            setId(NetMsg::Kind::LogonKind);
-            setLen(NetMsg::kByteSizeOfLogon);
-            setRef(0);
+            setKind(NetMsg::Kind::LogonKind);
+            setSizeExpected(kByteSizeOfLogon);
+            setObjectId(0);
          }
 
          Logon::~Logon()
@@ -18,16 +18,19 @@ namespace Seville
 
          }
 
-         Logon::Logon()
+         Logon::Logon(bool shouldSwapEndianness)
+            : Generic(shouldSwapEndianness)
          {
-
+            doInit();
          }
 
-         Logon::Logon(Host::ByteOrder clientByteOrder,
-                            Host::ByteOrder serverByteOrder)
+         Logon::Logon(const Generic& netMsg, bool shouldSwapEndianness)
+            : Generic(netMsg, shouldSwapEndianness)
          {
-            setClientByteOrder(clientByteOrder);
-            setServerByteOrder(serverByteOrder);
+            //TODO move
+            doInit();
+            //reset();
+            //append(netMsg);
          }
       }
    }

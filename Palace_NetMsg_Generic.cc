@@ -78,7 +78,8 @@ namespace Seville
 
          i64 Generic::doMaybeSwapI64(i64 value) const
          {
-            auto cond = doDetermineShouldSwap();
+            //auto cond = doDetermineShouldSwapEndianness();
+            auto cond = myShouldSwapEndiannessFlag;
             i64 swappedValue = doSwapI64(value);
             auto result =
                   static_cast<i64>(cond) * swappedValue |
@@ -89,7 +90,8 @@ namespace Seville
 
          u64 Generic::doMaybeSwapU64(u64 value) const
          {
-            auto cond = doDetermineShouldSwap();
+            //auto cond = doDetermineShouldSwapEndianness();
+            auto cond = myShouldSwapEndiannessFlag;
             u64 swappedValue = doSwapU64(value);
             auto result =
                   static_cast<u64>(cond) * swappedValue |
@@ -100,7 +102,8 @@ namespace Seville
 
          i32 Generic::doMaybeSwapI32(i32 value) const
          {
-            auto cond = doDetermineShouldSwap();
+            //auto cond = doDetermineShouldSwapEndianness();
+            auto cond = myShouldSwapEndiannessFlag;
             i32 swappedValue = doSwapI32(value);
             auto result =
                   static_cast<i32>(cond) * swappedValue |
@@ -111,7 +114,8 @@ namespace Seville
 
          u32 Generic::doMaybeSwapU32(u32 unswapped) const
          {
-            auto cond = doDetermineShouldSwap();
+            //auto cond = doDetermineShouldSwapEndianness();
+            auto cond = myShouldSwapEndiannessFlag;
             u32 swapped = doSwapU32(unswapped);
             auto value =
                   static_cast<u32>(cond) * swapped |
@@ -122,7 +126,8 @@ namespace Seville
 
          u16 Generic::doMaybeSwapU16(u16 unswapped) const
          {
-            auto cond = doDetermineShouldSwap();
+            //auto cond = doDetermineShouldSwapEndianness();
+            auto cond = myShouldSwapEndiannessFlag;
             auto swapped = doSwapU16(unswapped);
             auto value = static_cast<u16>(
                      static_cast<u16>(cond) * swapped |
@@ -133,7 +138,8 @@ namespace Seville
 
          i16 Generic::doMaybeSwapI16(i16 unswapped) const
          {
-            auto cond = doDetermineShouldSwap();
+            //auto cond = doDetermineShouldSwapEndianness();
+            auto cond = myShouldSwapEndiannessFlag;
             auto swapped = doSwapI16(unswapped);
             auto value = static_cast<i16>(
                      static_cast<i16>(cond) * swapped |
@@ -308,25 +314,111 @@ namespace Seville
             ByteArray::appendU8(value);
          }
 
+         int Generic::doReadHeaderFrom(QTcpSocket* socket)
+         {
+            auto nExpectedBytesToRead =
+                  NetMsg::kByteSizeOfHeader - this->size();
+            if (0 == nExpectedBytesToRead)
+               return 1;
+            else if (nExpectedBytesToRead < 0)
+               return 1;
+
+            auto nBytesAvailable = socket->bytesAvailable();
+            auto shouldReadPartial = nBytesAvailable < nExpectedBytesToRead;
+            auto nBytesToRead =
+                  (shouldReadPartial * nBytesAvailable) |
+                  (!shouldReadPartial * nExpectedBytesToRead);
+
+            this->append(socket->read(nBytesToRead));
+
+            //auto netMsgSizeN = this->size();
+            //auto nBytesRead = finalNetMsgSize - initialNetMsgSize;
+
+            return this->size() == NetMsg::kByteSizeOfHeader;
+         }
+
+         int Generic::doReadBodyFrom(QTcpSocket* socket)
+         {
+            auto size0 = this->size();
+            if (size0 < NetMsg::kByteSizeOfHeader)
+               return 0;
+
+            auto bodySize = size0 - NetMsg::kByteSizeOfHeader;
+            auto nBytesExpected = this->sizeExpected() - bodySize;
+
+            if (0 == nBytesExpected)
+               return 1;
+            else if (nBytesExpected < 0)
+               return 0;
+
+            auto nBytesAvailable = socket->bytesAvailable();
+            auto shouldReadPartial = nBytesAvailable < nBytesExpected;
+            auto nBytesToRead =
+                  (shouldReadPartial * nBytesAvailable) |
+                  (!shouldReadPartial * nBytesExpected);
+
+            // maybe reads should be chunked?
+            this->append(socket->read(nBytesToRead));
+
+            //auto sizeN = this->size();
+            //auto nBytesRead = finalNetMsgSize - initialNetMsgSize;
+
+            auto nExpectedTotalBytes =
+                  NetMsg::kByteSizeOfHeader + this->sizeExpected();
+
+            return this->size() == nExpectedTotalBytes;
+         /*
+            if (0 < nNet::MsgBytesExpected)
+            {
+               doReadDataIntoNet::Msg(netMsg, Net::Msg::kHeaderSize + nNet::MsgBytesExpected);
+            }
+
+            auto nNet::MsgBytesReadTotal = netMsg.size();
+            auto nPayloadBytesReadTotal = nNet::MsgBytesReadTotal - Net::Msg::kHeaderSize;
+            return nPayloadBytesReadTotal == nNet::MsgBytesExpected;
+            */
+         }
+
+         int Generic::readFrom(QTcpSocket* socket)
+         {
+            // read in header
+            auto readHeaderOk = false;
+            if (this->size() < NetMsg::kByteSizeOfHeader)
+               readHeaderOk = doReadHeaderFrom(socket);
+
+            int readBodyOk = doReadBodyFrom(socket);
+            int minNetMsgOk = NetMsg::kByteSizeOfHeader <= this->size();
+
+            return readHeaderOk && readBodyOk && minNetMsgOk;
+         }
+
          Generic::~Generic()
          {
 
          }
 
-         Generic::Generic() : ByteArray::ByteArray()
+         Generic::Generic(bool shouldSwapEndianness)
+            : ByteArray::ByteArray()
          {
             doReset();
+
+            myShouldSwapEndiannessFlag = shouldSwapEndianness;
          }
 
-         Generic::Generic(Host::ByteOrder clientByteOrder,
-                  Host::ByteOrder serverByteOrder)
+         Generic::Generic(
+               Host::ByteOrder clientByteOrder,
+               Host::ByteOrder serverByteOrder,
+               bool shouldSwapEndianness)
          {
             doReset();
+
             myClientByteOrder = clientByteOrder;
             myServerByteOrder = serverByteOrder;
+            myShouldSwapEndiannessFlag = shouldSwapEndianness;
          }
 
-         Generic::Generic(const char* data) : ByteArray()
+         Generic::Generic(const char* data, bool shouldSwapEndianness)
+            : ByteArray()
          {
             doReset();
             //int *p = static_cast<int *>(data);
@@ -334,21 +426,26 @@ namespace Seville
             //id_ = p[kPalMsgIdOffset];
             //len_ = p[kPalMsgLenOffset];
             //ref_ = p[kPalMsgRefOffset];
+            myShouldSwapEndiannessFlag = shouldSwapEndianness;
             append(data);
          }
 
-         Generic::Generic(QByteArray& ba) : ByteArray()
+         Generic::Generic(QByteArray& ba, bool shouldSwapEndianness)
+            : ByteArray()
          {
             doReset();
+            myShouldSwapEndiannessFlag = shouldSwapEndianness;
             append(ba);
          }
 
-         Generic::Generic(Generic& netMsg) : ByteArray()
+         Generic::Generic(Generic& netMsg, bool shouldSwapEndianness)
+            : ByteArray()
          {
             doReset();
             //id_ = palMsg.id_;
             //len_ = palMsg.len_;
             //ref_ = palMsg.ref_;
+            myShouldSwapEndiannessFlag = shouldSwapEndianness;
             append(netMsg);
          }
       }

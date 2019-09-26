@@ -21,7 +21,7 @@ namespace Seville
             static qint16 swapInt16(const qint16 unswapped);
             static quint16 swapUInt16(const quint16 unswapped);
             static qint32 swapInt32(const qint32 unswapped);
-            static quint32 swapUInt32(const quint32 unswapped);
+            static quint32 swapU32(const quint32 unswapped);
       };
    }
 }

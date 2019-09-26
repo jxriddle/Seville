@@ -11,13 +11,14 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
+#include "App_Fraction.h"
 #include "Common.h"
 #include "Palace_Server.h"
 #include "Palace_User.h"
 #include "Palace_Room.h"
 #include "Palace_Crypto.h"
 #include "Palace_NetMsg_Generic.h"
-#include "Palace_NetMsg_AltLogon.h"
+#include "Palace_NetMsg_Logon.h"
 
 namespace Seville
 {
@@ -30,10 +31,6 @@ namespace Seville
          public:
             enum class ConnectionState {
                Disconnected, Handshaking, Connected
-            };
-
-            enum class ReceiveState {
-               NewNetMsg, ContinueNetMsg
             };
 
             static const int kDefaultServerPort = 9998;
@@ -98,8 +95,7 @@ namespace Seville
             QTime myPongTime;
             //QByteArray myBuffer;
             Host::ByteOrder myByteOrder;
-            Client::ConnectionState myConnectionState;
-            Client::ReceiveState myReceiveState;
+            ConnectionState myConnectionState;
             QTcpSocket mySocket;
             QString myUsername;
             QString myHost;
@@ -110,6 +106,12 @@ namespace Seville
             Crypto myCrypto;
             QTimer myTimer;
             int myTransferTimerId;
+
+            bool myPuidChanged    = false;
+            u32 myPuidCounter = 0xf5dc385e;
+            u32 myPuidCrc     = 0xc144c580;
+            u32 myRegCounter  = 0xcf07309c;
+            u32 myRegCrc      = 0x5905f923;
 
             void doSetupEvents();
             void doReset();
@@ -124,14 +126,15 @@ namespace Seville
             int doReadNetMsgHeader(NetMsg::Generic& netMsg);
             int doReadNetMsgBody(NetMsg::Generic& netMsg);
             int doReadNetMsg(NetMsg::Generic& netMsg);
-            int doReadDataIntoNetMsg(
-                  NetMsg::Generic& netMsg,
-                  i32 maxSize = NetMsg::kByteSizeOfLongestNetMsg);
+            //int doReadDataIntoNetMsg(
+            //      NetMsg::Generic& netMsg,
+            //      i32 maxSize = NetMsg::kByteSizeMaximum);
             //bool doGetHasEnoughData();
             void doDetermineClientByteOrder();
-            int doDetermineServerByteOrder(const NetMsg::Generic& netMsg);
-            int doRouteNetMsg(const NetMsg::Generic& netMsg);
+            int doDetermineServerByteOrder();
+            int doRouteReceivedNetMsg();
             bool doDetermineIsConnected() const;
+            bool doDetermineShouldSwapEndianness() const;
 
             int doReceiveBlowThru(const NetMsg::Generic& netMsg);
             int doReceiveRoomDescription(const NetMsg::Generic& netMsg);
@@ -171,7 +174,7 @@ namespace Seville
             int doReceiveSpotState(const NetMsg::Generic& netMsg);
             int doReceiveSpotMove(const NetMsg::Generic& netMsg);
             int doReceiveDraw(const NetMsg::Generic& netMsg);
-            int doReceiveAltLogon(const NetMsg::AltLogon& netMsg);
+            int doReceiveAltLogon(); // const NetMsg::AltLogon& netMsg);
             int doReceiveAuthenticate(const NetMsg::Generic& netMsg);
             int doReceiveNavError(const NetMsg::Generic& netMsg);
             int doReceiveConnectionError(const NetMsg::Generic& netMsg);
@@ -205,6 +208,21 @@ namespace Seville
 
                return bi.ch[0] == 0x01;
             }
+
+//            u32 puidCounter() const { return myPuidCounter; }
+//            void setPuidCounter(u32 value) { myPuidCounter = value; }
+
+//            u32 regCounter() const { return myRegCounter; }
+//            void setRegCounter(u32 value) { myRegCounter = value; }
+
+//            u32 regCrc() const { return myRegCrc; }
+//            void setRegCrc(u32 value) { myRegCrc = value; }
+
+//            bool puidChanged() const { return myPuidChanged; }
+//            void setPuidChanged(bool value) { myPuidChanged = value; }
+
+//            u32 puidCrc() const { return myPuidCrc; }
+//            void setPuidCrc(u32 value) { myPuidCrc = value; }
 
             void reset() { doReset(); }
 

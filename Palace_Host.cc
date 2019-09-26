@@ -42,7 +42,7 @@ namespace Seville
           return static_cast<qint32>(doSwapDword(static_cast<quint32>(unswapped)));
       }
 
-      quint32 Host::swapUInt32(const quint32 unswapped)
+      quint32 Host::swapU32(const quint32 unswapped)
       {
           return doSwapDword(unswapped);
       }

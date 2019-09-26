@@ -1,11 +1,12 @@
-#ifndef PALACE_NETMSG_NETMSGBASE_H
-#define PALACE_NETMSG_NETMSGBASE_H
+#ifndef PALACE_NETMSG_GENERIC_H
+#define PALACE_NETMSG_GENERIC_H
 
 #include <stdint.h>
 
 #include <QObject>
 #include <QByteArray>
 #include <QDataStream>
+#include <QTcpSocket>
 
 #include "Common.h"
 #include "Palace_Host.h"
@@ -89,37 +90,69 @@ namespace Seville
          static const i32 kI32OffsetForPayload = 3;
 
          // in Bytes
-         static const i32 kByteSizeOfLongestNetMsg = 1024000;
          static const i32 kByteSizeOfHeader = 12;
+         static const i32 kByteSizeMinimum = kByteSizeOfHeader;
+         static const i32 kByteSizeMaximum = 1024000;
 
          static const i32 kByteOffsetForId = 0;
          static const i32 kByteOffsetForLen = 4;
          static const i32 kByteOffsetForRef = 8;
          static const i32 kByteOffsetForPayload = 12;
 
-         static const u32 kByteSizeOfLogon = 128; // 0x80
-         static const u32 kByteSizeOfAltLogon = 0;
+         static const i32 kByteSizeOfGeneric = kByteSizeOfHeader;
+         static const i32 kByteSizeOfLogon = 128; // 0x80
+         static const i32 kByteSizeOfAltLogon = 0;
+         static const i32 kByteSizeOfConnectionError = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfServerVersion = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfServerInfo = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserStatus = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserLoggedOnAndMax = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfHttpServerLocation = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfRoomUserList = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfServerUserList = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfServerRoomList = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfRoomDescended = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserNew = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfPing = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfPong = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfXTalk = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfXWhisper = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfTalk = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfWhisper = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfAssetIncoming = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfAssetQuery = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfMovement = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserColor = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserFace = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserProp = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserDescription = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserRename = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserLeaving = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfUserExitRoom = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfPropMove = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfPropDelete = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfPropNew = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfDoorLock = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfDoorUnlock = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfPictMove = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfSpotState = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfSpotMove = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfDraw = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfNavError = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfBlowThru = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfAuthenticate = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfAltRoomDescription = kByteSizeOfGeneric;
+         static const i32 kByteSizeOfRoomDescriptionBody = 40;
+         static const i32 kByteSizeOfRoomDescription = kByteSizeOfHeader + kByteSizeOfRoomDescriptionBody;
 
          class Generic : public QtApp::ByteArray // public QObject, public QByteArray {};
          {
             private:
+               bool myShouldSwapEndiannessFlag;
                Host::ByteOrder myClientByteOrder;
                Host::ByteOrder myServerByteOrder;
 
-               bool myPuidChanged    = false;
-               u32 myPuidCounter = 0xf5dc385e;
-               u32 myPuidCrc     = 0xc144c580;
-               u32 myRegCounter  = 0xcf07309c;
-               u32 myRegCrc      = 0x5905f923;
-
                void doReset();
-
-               bool doDetermineShouldSwap() const {
-                  int notUnknownClientByteOrder = myClientByteOrder != Host::ByteOrder::Unknown;
-                  int notUnknownServerByteOrder = myServerByteOrder != Host::ByteOrder::Unknown;
-                  int notSameByteOrder = myClientByteOrder != myServerByteOrder;
-                  return notUnknownClientByteOrder && notUnknownServerByteOrder && notSameByteOrder;
-               }
 
                i64 doGetI64At(int offset) const;
                void doSetI64At(int offset, i64 value);
@@ -177,91 +210,90 @@ namespace Seville
 //               i64 doCsbolecI64(i64 unswapped) const;
 //               u64 doCsbolecU64(u64 unswapped) const;
 
+               int doReadHeaderFrom(QTcpSocket* socket);
+               int doReadBodyFrom(QTcpSocket* socket);
+
             public:
-                u32 puidCounter() const { return myPuidCounter; }
-                void setPuidCounter(u32 value) { myPuidCounter = value; }
+               bool shouldSwapEndiannessFlag()
+                  { return myShouldSwapEndiannessFlag; }
+               void setShouldSwapEndiannessFlag(bool value)
+                  { myShouldSwapEndiannessFlag = value; }
 
-                u32 regCounter() const { return myRegCounter; }
-                void setRegCounter(u32 value) { myRegCounter = value; }
-
-                u32 regCrc() const { return myRegCrc; }
-                void setRegCrc(u32 value) { myRegCrc = value; }
-
-                bool puidChanged() const { return myPuidChanged; }
-                void setPuidChanged(bool value) { myPuidChanged = value; }
-
-                u32 puidCrc() const { return myPuidCrc; }
-                void setPuidCrc(u32 value) { myPuidCrc = value; }
-
-                Host::ByteOrder clientByteOrder() const
+               Host::ByteOrder clientByteOrder() const
                   { return myClientByteOrder; }
-                void setClientByteOrder(Host::ByteOrder value)
+               void setClientByteOrder(Host::ByteOrder value)
                   { myClientByteOrder = value; }
 
-                Host::ByteOrder serverByteOrder() const
+               Host::ByteOrder serverByteOrder() const
                   { return myServerByteOrder; }
-                void setServerByteOrder(Host::ByteOrder value)
+               void setServerByteOrder(Host::ByteOrder value)
                   { myServerByteOrder = value; }
 
-                u32 id() const { return u32At(kByteOffsetForId); }
-                void setId(u32 value) { setU32At(kByteOffsetForId, value); }
+               u32 kind() const { return u32At(kByteOffsetForId); }
+               void setKind(u32 value) { setU32At(kByteOffsetForId, value); }
 
-                i32 len() const { return i32At(kByteOffsetForLen); }
-                void setLen(i32 value) { setI32At(kByteOffsetForLen, value); }
+               i32 sizeExpected() const { return i32At(kByteOffsetForLen); }
+               void setSizeExpected(i32 value)
+               {
+                  setI32At(kByteOffsetForLen, value);
+               }
 
-                u32 ref() const { return u32At(kByteOffsetForRef); }
-                void setRef(u32 value) { setU32At(kByteOffsetForRef, value); }
+               u32 objectId() const { return u32At(kByteOffsetForRef); }
+               void setObjectId(u32 value) { setU32At(kByteOffsetForRef, value); }
 
-                i64 i64At(int offset) const;
-                void setI64At(int offset, i64 value);
+               i64 i64At(int offset) const;
+               void setI64At(int offset, i64 value);
 
-                u64 u64At(int offset) const;
-                void setU64At(int offset, u64 value);
+               u64 u64At(int offset) const;
+               void setU64At(int offset, u64 value);
 
-                i32 i32At(int offset) const;
-                void setI32At(int offset, i32 value);
+               i32 i32At(int offset) const;
+               void setI32At(int offset, i32 value);
 
-                u32 u32At(int offset) const;
-                void setU32At(int offset, u32 value);
+               u32 u32At(int offset) const;
+               void setU32At(int offset, u32 value);
 
-                i16 i16At(int offset) const;
-                void setI16At(int offset, i16 value);
+               i16 i16At(int offset) const;
+               void setI16At(int offset, i16 value);
 
-                u16 u16At(int offset) const;
-                void setU16At(int offset, u16 value);
+               u16 u16At(int offset) const;
+               void setU16At(int offset, u16 value);
 
-                i8 i8At(int offset) const;
-                void setI8At(int offset, i8 value);
+               i8 i8At(int offset) const;
+               void setI8At(int offset, i8 value);
 
-                u8 u8At(int offset) const;
-                void setU8At(int offset, u8 value);
+               u8 u8At(int offset) const;
+               void setU8At(int offset, u8 value);
 
-                void appendI64(i64 value);
-                void appendU64(u64 value);
-                void appendI32(i32 value);
-                void appendU32(u32 value);
-                void appendI16(i16 value);
-                void appendU16(u16 value);
-                void appendI8(i8 value);
-                void appendU8(u8 value);
+               void appendI64(i64 value);
+               void appendU64(u64 value);
+               void appendI32(i32 value);
+               void appendU32(u32 value);
+               void appendI16(i16 value);
+               void appendU16(u16 value);
+               void appendI8(i8 value);
+               void appendU8(u8 value);
 
-                void reset() { doReset(); }
+               int readFrom(QTcpSocket* socket);
 
-                virtual ~Generic();
+               void reset() { doReset(); }
 
-                explicit Generic();
+               virtual ~Generic();
 
-                Generic(Host::ByteOrder clientByteOrder,
-                    Host::ByteOrder serverByteOrder);
+               explicit Generic(bool shouldSwapEndianness = false);
 
-                Generic(const char* data);
+               Generic(Host::ByteOrder clientByteOrder,
+                       Host::ByteOrder serverByteOrder,
+                       bool shouldSwapEndianness = false);
 
-                Generic(QByteArray& ba);
+               Generic(const char* data, bool shouldSwapEndianness = false);
 
-                Generic(Generic& netMsg);
+               Generic(QByteArray& ba, bool shouldSwapEndianness = false);
+
+               Generic(Generic& netMsg, bool shouldSwapEndianness = false);
          };
       }
    }
 }
 
-#endif // PALACE_NETMSG_NETMSGBASE_H
+#endif // PALACE_NETMSG_GENERIC_H

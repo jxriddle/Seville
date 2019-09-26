@@ -40,9 +40,11 @@ SOURCES += \
     QtApp_ByteArray.cc \
     Log.cc \
     Main.cc \
-    Palace_NetMsg_AltLogon.cc \
+    Palace_NetMsg_Generic.cc \
+    App_Fraction.cc \
     Palace_NetMsg_Logon.cc \
-    Palace_NetMsg_Generic.cc
+    Palace_NetMsg_Room.cc \
+    App_PascalString.cc
 
 HEADERS += \
     View_AboutDialog.h \
@@ -62,9 +64,11 @@ HEADERS += \
     Common.h \
     Log.h \
     Main.h \
-    Palace_NetMsg_AltLogon.h \
+    Palace_NetMsg_Generic.h \
+    App_Fraction.h \
     Palace_NetMsg_Logon.h \
-    Palace_NetMsg_Generic.h
+    Palace_NetMsg_Room.h \
+    App_PascalString.h
 
 DISTFILES +=
 
