@@ -41,7 +41,6 @@ SOURCES += \
     Log.cc \
     Main.cc \
     Palace_NetMsg_Generic.cc \
-    App_Fraction.cc \
     Palace_NetMsg_Logon.cc \
     Palace_NetMsg_Room.cc \
     App_PascalString.cc
@@ -65,7 +64,6 @@ HEADERS += \
     Log.h \
     Main.h \
     Palace_NetMsg_Generic.h \
-    App_Fraction.h \
     Palace_NetMsg_Logon.h \
     Palace_NetMsg_Room.h \
     App_PascalString.h

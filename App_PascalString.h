@@ -2,17 +2,24 @@
 #define APP_PASCALSTRING_H
 
 #include "Common.h"
+#include <memory>
+#include <string>
 
 namespace App
 {
-   class U8PascalString
+   class PascalString
    {
       private:
-         u8 length;
-         char* myBytes;
+         u8 myLength;
+         std::string myString;
 
       public:
-         U8PascalString();
+         u8 length() { return myLength; }
+         void setLength(u8 value) { myLength = value; }
+         std::string string() { return myString; }
+         void setBytes(std::string value) { myString = value; }
+
+         PascalString();
    };
 }
 
