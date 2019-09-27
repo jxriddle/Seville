@@ -1,5 +1,5 @@
-#ifndef UI_CONNECTDIALOG_H
-#define UI_CONNECTDIALOG_H
+#ifndef VIEW_CONNECTDIALOG_H
+#define VIEW_CONNECTDIALOG_H
 
 #include <QObject>
 #include <QWidget>
@@ -18,35 +18,34 @@ namespace Seville
       {
          Q_OBJECT
 
-      public:
-         explicit ConnectDialog(QWidget *parent = nullptr);
-         //virtual ~ConnectDialog();
-         QString address();
-         QString host();
-         quint16 port();
-         QString username();
+         private:
+            QGridLayout* myLayout;
+            QLabel* myLabelUsername;
+            QLineEdit* myLineEditUsername;
+            QLabel* myLabelUrl;
+            QLineEdit* myLineEditUrl;
+            QPushButton* myPushButtonConnect;
+            QPushButton* myPushButtonCancel;
+            QDialogButtonBox* myButtonBox;
 
-         void doSetupView();
-         QGridLayout* myLayout = nullptr;
-         QLabel* myLabelUsername = nullptr;
-         QLineEdit* myLineEditUsername = nullptr;
-         QLabel* myLabelUrl = nullptr;
-         QLineEdit* myLineEditUrl = nullptr;
-         QPushButton* myPushButtonConnect = nullptr;
-         QPushButton* myPushButtonCancel = nullptr;
-         QDialogButtonBox* myButtonBox = nullptr;
+            void doSetupView();
+            void doSetupEvents();
 
-      public slots:
+         public:
+            QString address();
+            QString host();
+            quint16 port();
+            QString username();
+            //virtual ~ConnectDialog();
+            explicit ConnectDialog(QWidget* parent = nullptr);
 
-      signals:
+         signals:
 
-      private:
-
-      private slots:
-         void doOnPushButtonConnectClicked();
-         void doOnPushButtonCancelClicked();
+         public slots:
+//            void onPushButtonConnectClicked();
+//            void onPushButtonCancelClicked();
       };
    }
 }
 
-#endif // UICONNECTDIALOG_H
+#endif // VIEW_CONNECTDIALOG_H

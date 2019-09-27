@@ -14,6 +14,7 @@ namespace Seville
 
          private:
              quint16 myId;
+             QByteArray myBackgroundImageBytes;
              QImage myBackgroundImage;
 
              void doReset();
@@ -26,6 +27,9 @@ namespace Seville
 
              QImage backgroundImage();
              void setBackgroundImage(QImage image);
+
+             QByteArray backgroundImageBytes();
+             void setBackgroundImageBytes(QByteArray imageBytes);
 
              void reset() { doReset(); }
 

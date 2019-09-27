@@ -7,13 +7,13 @@
 #include <QtNetwork/QNetworkReply>
 
 #include "Log.h"
+#include "Palace_Host.h"
 #include "Palace_Client.h"
 #include "Palace_Server.h"
 #include "Palace_Room.h"
 #include "Palace_User.h"
 
 #include "Palace_NetMsg_Generic.h"
-#include "Palace_NetMsg_Logon.h"
 #include "Palace_NetMsg_Logon.h"
 
 namespace Seville
@@ -986,22 +986,39 @@ namespace Seville
          NetMsg::Logon logon(doDetermineShouldSwapEndianness());
          logon.setRegCrc(myUser.regCrc());
          logon.setRegCounter(myUser.regCounter());
-         logon.setUsername(myUser.username());
-         logon.setWizpass(myUser.wizpass());
-         logon.setFlags();
+         logon.setUsername(myUser.username().toStdString());
+         logon.setWizardPassword(myUser.wizpass().toStdString());
+         logon.setFlags(
+                  static_cast<u32>(FlagAuxOptions::Authenticate) |
+                  static_cast<u32>(FlagAuxOptions::Win32)  // lies
+               );
          logon.setPuidCounter(myPuidCounter);
          logon.setPuidCrc(myPuidCrc);
-         logon.setDemoElapsed();
-         logon.setTotalElapsed();
-         logon.setDemoLimit();
+         logon.setDemoElapsed(magicFromPChat);
+         logon.setTotalElapsed(magicFromPChat);
+         logon.setDemoLimit(magicFromPChat);
          logon.setInitialRoomId(myCurrentRoom.id());
-         logon.setReserved();
-         logon.setUploadRequestedProtocolVersion();
-         logon.setUploadCapabilities();
-         logon.setDownloadCapabilities();
-         logon.setEngineCapabilities2d();
-         logon.setGraphicsCapabilities2d();
-         logon.setGraphicsCapabilities3d();
+         logon.setReserved(kIdent.toStdString());
+         logon.setUploadRequestedProtocolVersion(0);
+         logon.setUploadCapabilities(
+                  static_cast<u32>(CapabilitiesForUpload::PalaceAssetUpload) |
+                  static_cast<u32>(CapabilitiesForUpload::HttpFileUpload)
+               );
+         logon.setDownloadCapabilities(
+                  static_cast<u32>(CapabilitiesForDownload::PalaceAssetDownload) |
+                  static_cast<u32>(CapabilitiesForDownload::PalaceFileDownload) |
+                  static_cast<u32>(CapabilitiesForDownload::HttpFileDownload) |
+                  static_cast<u32>(CapabilitiesForDownload::HttpFileExtendedDownload)
+               );
+         logon.setEngineCapabilities2d(
+                  static_cast<u32>(CapabilitiesFor2dEngine::Palace2dEngine)
+               );
+         logon.setGraphicsCapabilities2d(
+                  static_cast<u32>(CapabilitiesFor2dGraphics::Gif87)
+               );
+         logon.setGraphicsCapabilities3d(
+                  static_cast<u32>(CapabilitiesFor3dGraphics::No3dGraphics)
+               );
 
          //netMsgRxDs_->setByteOrder(myServer.byteOrder());
          //if (ds.skipRawData(Net::Msg::kNet::MsgHeaderSize) < 0) { return false; }
@@ -1090,13 +1107,15 @@ namespace Seville
          return res;
       }
 
-      void Client::onGotBackgroundAsync(QNetworkReply* reply)
+      void Client::onReceivedBackgroundAsync(QNetworkReply* reply)
       {
-         QByteArray ba = reply->readAll();
-         myCurrentRoom.backgroundImage().loadFromData(ba);
+         QByteArray bytesOfBackgroundImage = reply->readAll();
+         myCurrentRoom.setBackgroundImageBytes(bytesOfBackgroundImage);
+
+         emit backgroundChanged();
       }
 
-      void Client::doGetBackgroundAsync(const QString& url, QMap<QString, QString> headers)
+      void Client::doFetchBackgroundAsync(const QString& url, QMap<QString, QString> headers)
       {
          //myHttpGetMgr = new QNetworkAccessManager(this);
 
@@ -1106,9 +1125,11 @@ namespace Seville
          request.setRawHeader("User-Agent", "Seville 1.0");
 
          // setup error handling
-         //connect(&request, SIGNAL(onError(QNetworkReply::NetworkError)), this, SLOT(onError(QNetworkReply::NetworkError)));
+         //connect(&request, SIGNAL(onError(QNetworkReply::NetworkError)),
+         //this, SLOT(onError(QNetworkReply::NetworkError)));
 
-         connect(&myHttpGetMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(onGotBackgroundAsync(QNetworkReply*)));
+         connect(&myHttpGetMgr, &QNetworkAccessManager::finished,
+                 this, &Seville::Palace::Client::onReceivedBackgroundAsync);
 
          // add headers
          //headers
@@ -1117,7 +1138,10 @@ namespace Seville
             QMapIterator<QString, QString> iterator(headers);
             while (iterator.hasNext()) {
                iterator.next();
-               request.setRawHeader(QByteArray::fromStdString(iterator.key().toStdString()), QByteArray::fromStdString(iterator.value().toStdString()));
+               request.setRawHeader(
+                     QByteArray::fromStdString(iterator.key().toStdString()),
+                     QByteArray::fromStdString(iterator.value().toStdString())
+                  );
             }
          }
 

@@ -10,6 +10,12 @@ namespace QtApp
    class ByteArray : public QByteArray
    {
       private:
+         std::string doGetShortStdStringAt(int offset) const;
+         void doSetShortStdStringAt(int offset, std::string value);
+
+         std::string doGetStdStringAt(int offset, int maxlen) const;
+         void doSetStdStringAt(int offset, std::string value);
+
          i64 doGetI64At(int offset) const;
          void doSetI64At(int offset, i64 value);
 
@@ -44,6 +50,12 @@ namespace QtApp
          void doAppendU8(u8 value);
 
       public:
+         std::string shortStdStringAt(int offset) { return doGetShortStdStringAt(offset); }
+         void setShortStdStringAt(int offset, std::string value) { doSetShortStdStringAt(offset, value); }
+
+         std::string stdStringAt(int offset, int maxlen) { return doGetStdStringAt(offset, maxlen); }
+         void setStdStringAt(int offset, std::string value) { doSetStdStringAt(offset, value); }
+
          i64 i64At(int offset) const { return doGetI64At(offset); }
          void setI64At(int offset, i64 value) { doSetI64At(offset, value); }
 

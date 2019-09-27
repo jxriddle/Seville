@@ -6,7 +6,7 @@ namespace Seville
    {
       void Room::doReset()
       {
-          myId = 0;
+         myId = 0;
       }
 
       QImage Room::backgroundImage()
@@ -19,6 +19,17 @@ namespace Seville
          myBackgroundImage = image;
       }
 
+      QByteArray Room::backgroundImageBytes()
+      {
+         return myBackgroundImageBytes;
+      }
+
+      void Room::setBackgroundImageBytes(QByteArray imageBytes)
+      {
+         //myBackgroundImage
+         myBackgroundImageBytes = imageBytes;
+      }
+
       Room::~Room()
       {
 
@@ -26,7 +37,7 @@ namespace Seville
 
       Room::Room()
       {
-          doReset();
+         doReset();
       }
    }
 }

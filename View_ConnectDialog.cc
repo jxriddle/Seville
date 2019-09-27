@@ -16,6 +16,7 @@ namespace Seville
          : QDialog(parent)
       {
          doSetupView();
+         doSetupEvents();
       }
       /*
       UiConnectDialog::~UiNewPalaceConnectionDialog()
@@ -66,23 +67,16 @@ namespace Seville
 
          setLayout(myLayout);
 
-         // Events
-         connect(myPushButtonConnect, SIGNAL(clicked()), this, SLOT(doOnPushButtonConnectClicked()));
-         connect(myPushButtonCancel, SIGNAL(clicked()), this, SLOT(doOnPushButtonCancelClicked()));
-
          //pushButtonConnect_.setFocus();
       }
 
-      void ConnectDialog::doOnPushButtonConnectClicked()
+      void ConnectDialog::doSetupEvents()
       {
-         this->setResult(QDialog::Accepted);
-         this->accept();
-      }
+         connect(myPushButtonConnect, &QPushButton::clicked,
+                 this, &QDialog::accept);
 
-      void ConnectDialog::doOnPushButtonCancelClicked()
-      {
-         this->setResult(QDialog::Rejected);
-         this->reject();
+         connect(myPushButtonCancel, &QPushButton::clicked,
+                 this, &QDialog::reject);
       }
 
       QString ConnectDialog::address()

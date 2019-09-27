@@ -42,8 +42,7 @@ SOURCES += \
     Main.cc \
     Palace_NetMsg_Generic.cc \
     Palace_NetMsg_Logon.cc \
-    Palace_NetMsg_Room.cc \
-    App_PascalString.cc
+    Palace_NetMsg_Room.cc
 
 HEADERS += \
     View_AboutDialog.h \
@@ -65,8 +64,7 @@ HEADERS += \
     Main.h \
     Palace_NetMsg_Generic.h \
     Palace_NetMsg_Logon.h \
-    Palace_NetMsg_Room.h \
-    App_PascalString.h
+    Palace_NetMsg_Room.h
 
 DISTFILES +=
 

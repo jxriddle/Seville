@@ -11,7 +11,6 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
-#include "App_Fraction.h"
 #include "Common.h"
 #include "Palace_Server.h"
 #include "Palace_User.h"
@@ -29,8 +28,103 @@ namespace Seville
          Q_OBJECT
 
          public:
-            enum class ConnectionState {
-               Disconnected, Handshaking, Connected
+            enum class ConnectionState: u32 {
+               Disconnected,
+               Handshaking,
+               Connected,
+            };
+
+            enum class ReasonForTerminate: u32 {
+               Nil = 0x00000000,
+               Error = 0x00000001,
+               CommError = 0x00000002,
+               Flood = 0x00000003,
+               KilledByPlayer = 0x00000004,
+               ServerDown = 0x00000005,
+               Unresponsive = 0x00000006,
+               KilledBySysop = 0x0000007,
+               ServerFull = 0x00000008,
+               InvalidSerialNumber = 0x0000009,
+               DuplicateUser = 0x0000000a,
+               DeathPenaltyActive = 0x0000000b,
+               Banished = 0x0000000c,
+               BanishKill = 0x0000000d,
+               NoGuests = 0x0000000e,
+               DemoExpired = 0x0000000f,
+               Unknown = 0x00000010,
+            };
+
+            enum class ErrorForNavigation: u32 {
+               InternalError = 0x00000000,
+               UnknownRoom = 0x00000001,
+               RoomFull = 0x00000002,
+               RoomClosed = 0x00000003,
+               CantAuthor = 0x00000004,
+               PalaceFull = 0x00000005,
+            };
+
+            enum class FlagAuxOptions: u32 {
+               UnknownMachine = 0x00000000,
+               Mac68k = 0x00000001,
+               MacPowerPc = 0x00000002,
+               Win16 = 0x00000003,
+               Win32 = 0x00000004,
+               Java = 0x00000005,
+               MacIntel = 0x00000006,
+               IOS = 0x00000010,
+               Android = 0x00000011,
+               Linux = 0x00000032,
+               OSMask = 0x0000000F,
+               Authenticate = 0x80000000,
+            };
+
+            enum class CapabilitiesForUpload: u32 {
+               NoUpload = 0x00000000,
+               PalaceAssetUpload = 0x00000001,
+               FtpAssetUpload = 0x00000002,
+               HttpAssetUpload = 0x00000003,
+               OtherAssetUpload = 0x00000004,
+               PalaceFileUpload = 0x00000008,
+               FtpFileUpload = 0x000000010,
+               HttpFileUpload = 0x00000020,
+               OtherFileUpload = 0x00000080,
+               ExtendedUpload = 0x00000100,
+            };
+
+            enum class CapabilitiesForDownload: u32 {
+               NoDownload = 0x00000000,
+               PalaceAssetDownload = 0x00000001,
+               FtpAssetDownload = 0x00000002,
+               HttpAssetDownload = 0x00000004,
+               OtherAssetDownload = 0x00000008,
+               PalaceFileDownload = 0x00000010,
+               FtpFileDownload = 0x00000020,
+               HttpFileDownload = 0x00000040,
+               OtherFileDownload = 0x00000080,
+               HttpFileExtendedDownload = 0x00000100,
+               ExtendedDownload = 0x00000200,
+            };
+
+            enum class CapabilitiesFor2dEngine: u32 {
+               No2dEngine = 0x00000000,
+               Palace2dEngine = 0x00000001,
+            };
+
+            enum class CapabilitiesFor2dGraphics: u32 {
+               No2dGraphics = 0x00000000,
+               Gif87 = 0x00000001,
+               Gif89a = 0x00000002,
+               Jpg = 0x00000004,
+               Tiff = 0x00000008,
+               Targa = 0x00000010,
+               Bmp = 0x00000020,
+               Pct = 0x00000040,
+            };
+
+            enum class CapabilitiesFor3dGraphics: u32 {
+               No3dGraphics = 0x00000000,
+               Vrml1 = 0x0000001,
+               Vrml2 = 0x0000002,
             };
 
             static const int kDefaultServerPort = 9998;
@@ -39,6 +133,7 @@ namespace Seville
             static constexpr int kIntervalToTimeoutForPongInMs = 60 * 1000;
             static constexpr int kIntervalToPingInMs = 5 * 1000;
 
+            static const u32 magicFromPChat = 0x00011940;
             static const QString kIdent; // = "PC4237"
             static const int kByteSizeOfLongestUsername = 31;
             static const int kByteSizeOfLongestWizpass = 31;
@@ -46,44 +141,44 @@ namespace Seville
             static const int kByteSizeOfDefaultChunkRead = 100; /* NetMsg::kHeaderSize; */
             static const int kByteSizeOfShortestChunkRead = 1;
 
-            static const int kDemoElapsed = 0x00011940;
-            static const int kTotalElapsed = 0x00011940;
-            static const int kDemoLimit = 0x00011940;
+//            static const int kDemoElapsed = 0x00011940;
+//            static const int kTotalElapsed = 0x00011940;
+//            static const int kDemoLimit = 0x00011940;
 
-            static const quint32 kAuxFlagsUnknownMachine    = 0x00000000;
-            static const quint32 kAuxFlagsMac68k            = 0x00000001;
-            static const quint32 kAuxFlagsMacPpc            = 0x00000002;
-            static const quint32 kAuxFlagsWin16             = 0x00000003;
-            static const quint32 kAuxFlagsWin32             = 0x00000004;
-            static const quint32 kAuxFlagsJava              = 0x00000005;
-            static const quint32 kAuxFlagsBsd               = 0x00000006;
-            static const quint32 kAuxFlagsLinux             = 0x00000007;
-            static const quint32 kAuxFlagsOSMask            = 0x0000000F;
-            static const quint32 kAuxFlagsAuthenticate      = 0x80000000;
+//            static const quint32 kAuxFlagsUnknownMachine    = 0x00000000;
+//            static const quint32 kAuxFlagsMac68k            = 0x00000001;
+//            static const quint32 kAuxFlagsMacPpc            = 0x00000002;
+//            static const quint32 kAuxFlagsWin16             = 0x00000003;
+//            static const quint32 kAuxFlagsWin32             = 0x00000004;
+//            static const quint32 kAuxFlagsJava              = 0x00000005;
+//            static const quint32 kAuxFlagsBsd               = 0x00000006;
+//            static const quint32 kAuxFlagsLinux             = 0x00000007;
+//            static const quint32 kAuxFlagsOSMask            = 0x0000000F;
+//            static const quint32 kAuxFlagsAuthenticate      = 0x80000000;
 
-            static const quint32 kUlCapsAssetsPalace        = 0x00000001;
-            static const quint32 kUlCapsAssetsFtp           = 0x00000002;
-            static const quint32 kUlCapsAssetsHttp          = 0x00000004;
-            static const quint32 kUlCapsAssetsOther         = 0x00000008;
-            static const quint32 kUlCapsFilesPalace         = 0x00000010;
-            static const quint32 kUlCapsFilesFtp            = 0x00000020;
-            static const quint32 kUlCapsFilesHttp           = 0x00000040;
-            static const quint32 kUlCapsFilesOther          = 0x00000080;
-            static const quint32 kUlCapsExtendPkt           = 0x00000100;
+//            static const quint32 kUlCapsAssetsPalace        = 0x00000001;
+//            static const quint32 kUlCapsAssetsFtp           = 0x00000002;
+//            static const quint32 kUlCapsAssetsHttp          = 0x00000004;
+//            static const quint32 kUlCapsAssetsOther         = 0x00000008;
+//            static const quint32 kUlCapsFilesPalace         = 0x00000010;
+//            static const quint32 kUlCapsFilesFtp            = 0x00000020;
+//            static const quint32 kUlCapsFilesHttp           = 0x00000040;
+//            static const quint32 kUlCapsFilesOther          = 0x00000080;
+//            static const quint32 kUlCapsExtendPkt           = 0x00000100;
 
-            static const quint32 kDlCapsAssetsPalace        = 0x00000001;
-            static const quint32 kDlCapsAssetsFtp           = 0x00000002;
-            static const quint32 kDlCapsAssetsHttp          = 0x00000004;
-            static const quint32 kDlCapsAssetsOther         = 0x00000008;
-            static const quint32 kDlCapsFilesPalace         = 0x00000010;
-            static const quint32 kDlCapsFilesFtp            = 0x00000020;
-            static const quint32 kDlCapsFilesHttp           = 0x00000040;
-            static const quint32 kDlCapsFilesOther          = 0x00000080;
-            static const quint32 kDlCapsFilesHttpSvr        = 0x00000100;
-            static const quint32 kDlCapsExtendPkt           = 0x00000200;
+//            static const quint32 kDlCapsAssetsPalace        = 0x00000001;
+//            static const quint32 kDlCapsAssetsFtp           = 0x00000002;
+//            static const quint32 kDlCapsAssetsHttp          = 0x00000004;
+//            static const quint32 kDlCapsAssetsOther         = 0x00000008;
+//            static const quint32 kDlCapsFilesPalace         = 0x00000010;
+//            static const quint32 kDlCapsFilesFtp            = 0x00000020;
+//            static const quint32 kDlCapsFilesHttp           = 0x00000040;
+//            static const quint32 kDlCapsFilesOther          = 0x00000080;
+//            static const quint32 kDlCapsFilesHttpSvr        = 0x00000100;
+//            static const quint32 kDlCapsExtendPkt           = 0x00000200;
 
          private:
-            QImage myBackgroundImg;
+            //QImage myBackgroundImg;
             QNetworkAccessManager myHttpGetMgr;
             //NetMsg myNetMsgRx;
             //QDataStream *myNetMsgRxDs;
@@ -183,7 +278,7 @@ namespace Seville
             int doSendAuthenticate(
                   const QString& username, const QString& password);
 
-            void doGetBackgroundAsync(
+            void doFetchBackgroundAsync(
                   const QString& url, QMap<QString, QString> headers);
             //int doHttpPutAsync_(QString& url);
             //int doHttpPostAsync_(QString& url);
@@ -192,9 +287,11 @@ namespace Seville
             void doOnReadyRead();
             void doOnSocketError();
             void doOnPingTimer(QTimerEvent* pingTimeEvent);
-            void onGotBackgroundAsync(QNetworkReply* reply);
+            void onReceivedBackgroundAsync(QNetworkReply* reply);
 
-         //signals:
+         signals:
+            //void backgroundChanged(QByteArray bytesOfBackgroundImage);
+            void backgroundChanged();
 
          public slots:
 

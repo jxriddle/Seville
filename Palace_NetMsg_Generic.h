@@ -234,12 +234,16 @@ namespace Seville
 
                i32 sizeExpected() const { return i32At(kByteOffsetForLen); }
                void setSizeExpected(i32 value)
-               {
-                  setI32At(kByteOffsetForLen, value);
-               }
+                  { setI32At(kByteOffsetForLen, value); }
 
                u32 objectId() const { return u32At(kByteOffsetForRef); }
                void setObjectId(u32 value) { setU32At(kByteOffsetForRef, value); }
+
+               std::string shortStdStringAt(int offset);
+               void setShortStdStringAt(int offset, std::string value);
+
+               std::string stdStringAt(int offset, int maxlen);
+               void setStdStringAt(int offset, std::string value);
 
                i64 i64At(int offset) const;
                void setI64At(int offset, i64 value);

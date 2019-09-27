@@ -4,6 +4,7 @@
 #include "QtApp_ByteArray.h"
 #include "Palace_Host.h"
 #include "Palace_NetMsg_Generic.h"
+#include <string>
 
 namespace Seville
 {
@@ -193,6 +194,16 @@ namespace Seville
 //         {
 //            return doCsbolecDw(unswapped);
 //         }
+
+         std::string Generic::stdStringAt(int offset, int maxlen)
+         {
+            return ByteArray::stdStringAt(offset, maxlen);
+         }
+
+         void Generic::setStdStringAt(int offset, std::string value)
+         {
+            ByteArray::setStdStringAt(offset, value);
+         }
 
          i64 Generic::i64At(int offset) const
          {

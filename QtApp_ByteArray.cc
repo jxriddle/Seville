@@ -3,6 +3,56 @@
 
 namespace QtApp
 {
+   std::string ByteArray::doGetShortStdStringAt(int offset) const
+   {
+      std::string res;
+
+      int i = 0;
+      auto len = this->at(offset);
+      i++;
+      while (i < len) {
+         res.push_back(this->at(offset+i));
+         i++;
+      }
+
+      return res;
+   }
+
+   void ByteArray::doSetShortStdStringAt(int offset, std::string value)
+   {
+      doSetU8At(offset, static_cast<u8>(value.length()));
+      auto i = 0;
+      for (char c : value) {
+         ByteArray::setU8At(offset+i, static_cast<u8>(c));
+         i++;
+      }
+   }
+
+   std::string ByteArray::doGetStdStringAt(int offset, int maxlen) const
+   {
+      std::string res;
+
+      int i = 0;
+      auto c = this->at(offset);
+      while (i < maxlen && c != '\0') {
+         res.push_back(c);
+         i++;
+         c = this->at(offset+i);
+      }
+      res.push_back('\0');
+
+      return res;
+   }
+
+   void ByteArray::doSetStdStringAt(int offset, std::string value)
+   {
+      auto i = 0;
+      for (char c : value) {
+         ByteArray::setU8At(offset+i, static_cast<u8>(c));
+         i++;
+      }
+   }
+
    i64 ByteArray::doGetI64At(int offset) const
    {
       i64 value;

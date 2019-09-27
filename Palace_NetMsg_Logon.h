@@ -1,5 +1,5 @@
-#ifndef PALACE_NETMSG_ALTLOGON_H
-#define PALACE_NETMSG_ALTLOGON_H
+#ifndef PALACE_NETMSG_LOGON_H
+#define PALACE_NETMSG_LOGON_H
 
 #include "Palace_NetMsg_Generic.h"
 
@@ -15,12 +15,16 @@ namespace Seville
             //   static const u32 kByteSize = 128; // 0x80
 
             public:
+               static const int kByteSizeOfIdent = 6;
+               static const int kByteSizeOfUsernameMax = 31;
+               static const int kByteSizeOfWizardPasswordMax = 31;
+
                static const int kByteOffsetOfRegCrc = kByteSizeOfHeader;
                static const int kByteOffsetOfRegCounter = kByteSizeOfHeader+4;
                static const int kByteOffsetOfUsernameLen = kByteSizeOfHeader+8;
                static const int kByteOffsetOfUsername = kByteSizeOfHeader+9;
-               static const int kByteOffsetOfWizpassLen = kByteSizeOfHeader+40;
-               static const int kByteOffsetOfWizpass = kByteSizeOfHeader+41;
+               static const int kByteOffsetOfWizardPasswordLen = kByteSizeOfHeader+40;
+               static const int kByteOffsetOfWizardPassword = kByteSizeOfHeader+41;
                static const int kByteOffsetOfFlags = kByteSizeOfHeader+72;
                static const int kByteOffsetOfPuidCounter = kByteSizeOfHeader+76;
                static const int kByteOffsetOfPuidCrc = kByteSizeOfHeader+80;
@@ -44,11 +48,16 @@ namespace Seville
                void setRegCrc(u32 value) { setU32At(kByteOffsetOfRegCrc, value); }
                u32 regCounter() { return u32At(kByteOffsetOfRegCounter); }
                void setRegCounter(u32 value) { setU32At(kByteOffsetOfRegCounter, value); }
-               App::PascalString& username() { return pascalStringAt(kByteOffsetOfUsername); }
-               void setUsername(const App::PascalString& value) { setPascalStringAt(kByteOffsetOfUsername); }
-               //i8 usernameLen() { return i8At(kByteOffsetOfUsernameLen); }
-               //char* username() { return charsAt(kByteOffsetOfUsername); }
-               //pascalString wizpass() { return pascalStringAt(kByteOffsetOfWizpass); }
+               std::string username() { return stdStringAt(kByteOffsetOfUsername, kByteSizeOfUsernameMax); }
+               void setUsername(std::string value) { setStdStringAt(kByteOffsetOfUsername, value); }
+               std::string usernameAsShortStdString()
+                  { return shortStdStringAt(kByteOffsetOfUsernameLen); }
+               void setUsernameAsShortStdString(const std::string value)
+                  { setShortStdStringAt(kByteOffsetOfUsernameLen, value); }
+               u8 usernameLen() { return u8At(kByteOffsetOfUsernameLen); }
+               void setUsernameLen(u8 value) { setU8At(kByteOffsetOfUsernameLen, value); }
+               std::string wizardPassword() { return stdStringAt(kByteOffsetOfWizardPassword, kByteSizeOfWizardPasswordMax); }
+               void setWizardPassword(std::string value) { return setStdStringAt(kByteOffsetOfWizardPassword, value); }
                u32 flags() { return u32At(kByteOffsetOfFlags); }
                void setFlags(u32 value) { setU32At(kByteOffsetOfFlags, value); }
                u32 puidCounter() { return u32At(kByteOffsetOfPuidCounter); }
@@ -63,7 +72,8 @@ namespace Seville
                void setDemoLimit(u32 value) { setU32At(kByteOffsetOfDemoLimit, value); }
                u16 initialRoomId() { return u16At(kByteOffsetOfInitialRoomId); }
                void setInitialRoomId(u16 value) { setU16At(kByteOffsetOfInitialRoomId, value); }
-               //byte[6] reserved() { retun bytesAt(kByteOffsetOfReserved); }
+               std::string reserved() { return stdStringAt(kByteOffsetOfReserved, kByteSizeOfIdent); }
+               void setReserved(std::string value) { setStdStringAt(kByteOffsetOfReserved, value); }
                u32 uploadRequestedProtocolVersion() { return u32At(kByteOffsetOfUploadRequestedProtocolVersion); }
                void setUploadRequestedProtocolVersion(u32 value) { setU32At(kByteOffsetOfUploadRequestedProtocolVersion, value); }
                u32 uploadCapabilities() { return u32At(kByteOffsetOfUploadCapabilities); }
@@ -86,4 +96,4 @@ namespace Seville
    }
 }
 
-#endif // PALACE_NETMSG_ALTLOGON_H
+#endif // PALACE_NETMSG_LOGON_H
