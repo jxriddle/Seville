@@ -15,6 +15,8 @@ typedef qint32 i32;
 typedef quint32 u32;
 typedef qint64 i64;
 typedef quint64 u64;
+typedef float f32;
+typedef double f64;
 
 union bi64
 {

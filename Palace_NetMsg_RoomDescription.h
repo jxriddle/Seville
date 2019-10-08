@@ -9,7 +9,7 @@ namespace Seville
    {
       namespace NetMsg
       {
-         class Room : public Generic
+         class RoomDescription : public Generic
          {
             private:
                void doInit();
@@ -34,7 +34,8 @@ namespace Seville
                u16 reserved() { return u16At(kByteSizeOfHeader+36); }
                u16 roomDataLen() { return u16At(kByteSizeOfHeader+38); }
 
-               Room(bool shouldSwapEndianness = false);
+               RoomDescription(bool shouldSwapEndianness = false);
+               RoomDescription(Generic& netMsg, bool shouldSwapEndianness = false);
          };
       }
    }

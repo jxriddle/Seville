@@ -1,12 +1,21 @@
+#include <QVBoxLayout>
 #include "View_LogWidget.h"
 
 namespace Seville
 {
    namespace View
    {
-      LogWidget::LogWidget(QWidget *parent) : QDockWidget(parent)
+      void LogWidget::doSetupView()
       {
-         doSetupView();
+         //setGeometry(100, 100, 100, 500);
+         //myBaseLayout = new QVBoxLayout(this);
+
+         //setLayout(myBaseLayout);
+      }
+
+      void LogWidget::doSetupEvents()
+      {
+
       }
 
       LogWidget::~LogWidget()
@@ -14,9 +23,11 @@ namespace Seville
         // close all tabs?
       }
 
-      void LogWidget::doSetupView()
+      LogWidget::LogWidget(QWidget *parent)
+         : QWidget(parent)
       {
-
+         doSetupView();
+         doSetupEvents();
       }
    }
 }

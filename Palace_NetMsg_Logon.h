@@ -56,8 +56,8 @@ namespace Seville
                   { setShortStdStringAt(kByteOffsetOfUsernameLen, value); }
                u8 usernameLen() { return u8At(kByteOffsetOfUsernameLen); }
                void setUsernameLen(u8 value) { setU8At(kByteOffsetOfUsernameLen, value); }
-               std::string wizardPassword() { return stdStringAt(kByteOffsetOfWizardPassword, kByteSizeOfWizardPasswordMax); }
-               void setWizardPassword(std::string value) { return setStdStringAt(kByteOffsetOfWizardPassword, value); }
+               std::string wizardPassword() { return doGetStdStringAt(kByteOffsetOfWizardPassword, kByteSizeOfWizardPasswordMax); }
+               void setWizardPassword(std::string value) { return doSetStdStringAt(kByteOffsetOfWizardPassword, value); }
                u32 flags() { return u32At(kByteOffsetOfFlags); }
                void setFlags(u32 value) { setU32At(kByteOffsetOfFlags, value); }
                u32 puidCounter() { return u32At(kByteOffsetOfPuidCounter); }
@@ -90,7 +90,7 @@ namespace Seville
                virtual ~Logon();
 
                Logon(bool shouldSwapEndianness = false);
-               Logon(const Generic& netMsg, bool shouldSwapEndianness = false);
+               Logon(Generic& netMsg, bool shouldSwapEndianness = false);
          };
       }
    }

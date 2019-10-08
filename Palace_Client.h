@@ -1,5 +1,5 @@
-#ifndef PALCLIENT_H
-#define PALCLIENT_H
+#ifndef PALACE_CLIENT_H
+#define PALACE_CLIENT_H
 
 #include <QObject>
 #include <QImage>
@@ -29,9 +29,9 @@ namespace Seville
 
          public:
             enum class ConnectionState: u32 {
-               Disconnected,
-               Handshaking,
-               Connected,
+               Disconnected = 0x00000000,
+               Handshaking = 0x00000001,
+               Connected = 0x00000002,
             };
 
             enum class ReasonForTerminate: u32 {
@@ -187,6 +187,7 @@ namespace Seville
             NetMsg::Generic myNetMsg;
             int myPransferTimerId;
             QTimer myPingTimer;
+            QTimer myReceiveNetMsgTimer;
             QTime myPongTime;
             //QByteArray myBuffer;
             Host::ByteOrder myByteOrder;
@@ -208,92 +209,84 @@ namespace Seville
             u32 myRegCounter  = 0xcf07309c;
             u32 myRegCrc      = 0x5905f923;
 
-            void doSetupEvents();
-            void doReset();
-            void doResetReceiveTimer();
+            void doSetupEvents(void);
+            void doReset(void);
+            void doResetReceiveTimer(void);
             void doConnectToHost(
                   QString host,
                   int port = 9998,
                   QString username = "Seville User",
                   int initialRoom = 0);
-            void doDisconnectFromHost();
+            void doDisconnectFromHost(void);
 
-            int doReadNetMsgHeader(NetMsg::Generic& netMsg);
-            int doReadNetMsgBody(NetMsg::Generic& netMsg);
-            int doReadNetMsg(NetMsg::Generic& netMsg);
-            //int doReadDataIntoNetMsg(
-            //      NetMsg::Generic& netMsg,
-            //      i32 maxSize = NetMsg::kByteSizeMaximum);
-            //bool doGetHasEnoughData();
-            void doDetermineClientByteOrder();
-            int doDetermineServerByteOrder();
-            int doRouteReceivedNetMsg();
-            bool doDetermineIsConnected() const;
-            bool doDetermineShouldSwapEndianness() const;
+            void doDetermineClientByteOrder(void);
+            int doDetermineServerByteOrder(void);
+            int doRouteReceivedNetMsg(void);
+            bool doDetermineIsConnected(void) const;
+            bool doDetermineIfShouldSwapEndianness(void) const;
 
-            int doReceiveBlowThru(const NetMsg::Generic& netMsg);
-            int doReceiveRoomDescription(const NetMsg::Generic& netMsg);
-            int doReceiveServerVersion(const NetMsg::Generic& netMsg);
-            int doReceiveServerInfo(const NetMsg::Generic& netMsg);
-            int doReceiveUserStatus(const NetMsg::Generic& netMsg);
-            int doReceiveUserLoggedOnAndMax(const NetMsg::Generic& netMsg);
-            int doReceiveHttpServerLocation(const NetMsg::Generic& netMsg);
-            int doReceiveAltRoomDescription(const NetMsg::Generic& netMsg);
-            int doReceiveRoomUserList(const NetMsg::Generic& netMsg);
-            int doReceiveServerUserList(const NetMsg::Generic& netMsg);
-            int doReceiveServerRoomList(const NetMsg::Generic& netMsg);
-            int doReceiveRoomDescend(const NetMsg::Generic& netMsg);
-            int doReceiveUserNew(const NetMsg::Generic& netMsg);
-            int doReceivePing(const NetMsg::Generic& netMsg);
-            int doReceivePong(const NetMsg::Generic& netMsg);
-            int doReceiveXTalk(const NetMsg::Generic& netMsg);
-            int doReceiveXWhisper(const NetMsg::Generic& netMsg);
-            int doReceiveTalk(const NetMsg::Generic& netMsg);
-            int doReceiveWhisper(const NetMsg::Generic& netMsg);
-            int doReceiveAssetIncoming(const NetMsg::Generic& netMsg);
-            int doReceiveAssetQuery(const NetMsg::Generic& netMsg);
-            int doReceiveMovement(const NetMsg::Generic& netMsg);
-            int doReceiveUserColor(const NetMsg::Generic& netMsg);
-            int doReceiveUserFace(const NetMsg::Generic& netMsg);
-            int doReceiveUserProp(const NetMsg::Generic& netMsg);
-            int doReceiveUserDescription(const NetMsg::Generic& netMsg);
-            int doReceiveUserRename(const NetMsg::Generic& netMsg);
-            int doReceiveUserLeaving(const NetMsg::Generic& netMsg);
-            int doReceiveUserExitRoom(const NetMsg::Generic& netMsg);
-            int doReceivePropMove(const NetMsg::Generic& netMsg);
-            int doReceivePropDelete(const NetMsg::Generic& netMsg);
-            int doReceivePropNew(const NetMsg::Generic& netMsg);
-            int doReceiveDoorLock(const NetMsg::Generic& netMsg);
-            int doReceiveDoorUnlock(const NetMsg::Generic& netMsg);
-            int doReceivePictMove(const NetMsg::Generic& netMsg);
-            int doReceiveSpotState(const NetMsg::Generic& netMsg);
-            int doReceiveSpotMove(const NetMsg::Generic& netMsg);
-            int doReceiveDraw(const NetMsg::Generic& netMsg);
-            int doReceiveAltLogon(); // const NetMsg::AltLogon& netMsg);
-            int doReceiveAuthenticate(const NetMsg::Generic& netMsg);
-            int doReceiveNavError(const NetMsg::Generic& netMsg);
-            int doReceiveConnectionError(const NetMsg::Generic& netMsg);
+            int doReceiveAltLogon(void);
+            int doReceiveAltRoomDescription(void);
+            int doReceiveAssetIncoming(void);
+            int doReceiveAssetQuery(void);
+            int doReceiveAuthenticate(void);
+            int doReceiveBlowThru(void);
+            int doReceiveConnectionError(void);
+            int doReceiveDoorLock(void);
+            int doReceiveDoorUnlock(void);
+            int doReceiveDraw(void);
+            int doReceiveHttpServerLocation(void);
+            int doReceiveMovement(void);
+            int doReceiveNavigationError(void);
+            int doReceivePictMove(void);
+            int doReceivePing(void);
+            int doReceivePong(void);
+            int doReceivePropDelete(void);
+            int doReceivePropMove(void);
+            int doReceivePropNew(void);
+            int doReceiveRoomDescend(void);
+            int doReceiveRoomDescription(void);
+            int doReceiveRoomUserList(void);
+            int doReceiveServerVersion(void);
+            int doReceiveServerInfo(void);
+            int doReceiveUserNew(void);
+            int doReceiveUserColor(void);
+            int doReceiveUserExitRoom(void);
+            int doReceiveUserFace(void);
+            int doReceiveUserProp(void);
+            int doReceiveUserDescription(void);
+            int doReceiveUserRename(void);
+            int doReceiveUserLeaving(void);
+            int doReceiveUserLoggedOnAndMax(void);
+            int doReceiveUserStatus(void);
+            int doReceiveServerRoomList(void);
+            int doReceiveServerUserList(void);
+            int doReceiveSpotMove(void);
+            int doReceiveSpotState(void);
+            int doReceiveTalk(void);
+            int doReceiveWhisper(void);
+            int doReceiveXTalk(void);
+            int doReceiveXWhisper(void);
 
-            int doSendLogon();
+            int doSendLogon(void);
             int doSendAuthenticate(
                   const QString& username, const QString& password);
 
+            void doFetchBackgroundAsync(const QString& url);
             void doFetchBackgroundAsync(
-                  const QString& url, QMap<QString, QString> headers);
+                  const QString& url, QMap<QString, QString>& headers);
             //int doHttpPutAsync_(QString& url);
             //int doHttpPostAsync_(QString& url);
-
-         private slots:
-            void doOnReadyRead();
-            void doOnSocketError();
-            void doOnPingTimer(QTimerEvent* pingTimeEvent);
-            void onReceivedBackgroundAsync(QNetworkReply* reply);
 
          signals:
             //void backgroundChanged(QByteArray bytesOfBackgroundImage);
             void backgroundChanged();
 
          public slots:
+            void onReadyRead(void);
+            void onSocketError(void);
+            void onPingTimer(QTimerEvent* pingTimeEvent);
+            void onReceivedBackgroundAsync(QNetworkReply* reply);
 
          public:
             //const QString kIdent = "PC4237";
@@ -321,13 +314,14 @@ namespace Seville
 //            u32 puidCrc() const { return myPuidCrc; }
 //            void setPuidCrc(u32 value) { myPuidCrc = value; }
 
-            void reset() { doReset(); }
+            void reset(void) { doReset(); }
 
             void connectToHost(
                   QString host,
                   int port = 9998,
                   QString username = "Seville User",
-                  int initialRoom = 0) {
+                  int initialRoom = 0)
+            {
                doDisconnectFromHost();
                doConnectToHost(host, port, username, initialRoom);
             }
@@ -335,40 +329,40 @@ namespace Seville
             void connectToHost(
                   QUrl url,
                   QString username = "Seville User",
-                  int initialRoom = 0) {
+                  int initialRoom = 0)
+            {
                doDisconnectFromHost();
                doConnectToHost(url.host(), url.port(), username, initialRoom);
             }
 
-            void connectToHost(QUrl url, int initialRoom = 0) {
+            void connectToHost(QUrl url, int initialRoom = 0)
+            {
                doDisconnectFromHost();
                doConnectToHost(url.host(), url.port(), url.userName(), initialRoom);
             }
 
-               //{ doConnectToHost(url.toString(), Server::kDefaultServerPort, Client::kDefaultUsername, initialRoom); }
-            void disconnectFromHost() { doDisconnectFromHost(); }
+            //{ doConnectToHost(url.toString(), Server::kDefaultServerPort, Client::kDefaultUsername, initialRoom); }
+            void disconnectFromHost(void) { doDisconnectFromHost(); }
 
-            Host::ByteOrder byteOrder() { return myByteOrder; }
+            Host::ByteOrder byteOrder(void) { return myByteOrder; }
 
-            void setByteOrder(const Host::ByteOrder value) {
-               myByteOrder = value;
-            }
+            void setByteOrder(const Host::ByteOrder value)
+               { myByteOrder = value; }
 
-            Client::ConnectionState connectionState() {
-               return myConnectionState;
-            }
+            Client::ConnectionState connectionState(void)
+               { return myConnectionState; }
 
-            QString username() const { return myUsername; }
+            QString username(void) const { return myUsername; }
             void setUsername(QString &value) { myUsername = value; }
 
-            Server& server() { return myServer; }
-            User& user() { return myUser; }
-            Room& currentRoom() { return myCurrentRoom; }
+            Server& server(void) { return myServer; }
+            User& user(void) { return myUser; }
+            Room& currentRoom(void) { return myCurrentRoom; }
 
-            virtual ~Client();
+            virtual ~Client(void);
             explicit Client(QObject* parent = nullptr);
       };
    }
 }
 
-#endif
+#endif // PALACE_CLIENT_H

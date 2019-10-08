@@ -229,54 +229,70 @@ namespace Seville
                void setServerByteOrder(Host::ByteOrder value)
                   { myServerByteOrder = value; }
 
-               u32 kind() const { return u32At(kByteOffsetForId); }
-               void setKind(u32 value) { setU32At(kByteOffsetForId, value); }
+               u32 kind() const { return doGetU32At(kByteOffsetForId); }
+               void setKind(u32 value) { doSetU32At(kByteOffsetForId, value); }
 
-               i32 sizeExpected() const { return i32At(kByteOffsetForLen); }
+               i32 sizeExpected() const { return doGetI32At(kByteOffsetForLen); }
                void setSizeExpected(i32 value)
-                  { setI32At(kByteOffsetForLen, value); }
+                  { doSetI32At(kByteOffsetForLen, value); }
 
-               u32 objectId() const { return u32At(kByteOffsetForRef); }
-               void setObjectId(u32 value) { setU32At(kByteOffsetForRef, value); }
+               u32 objectId() const { return doGetU32At(kByteOffsetForRef); }
+               void setObjectId(u32 value) { doSetU32At(kByteOffsetForRef, value); }
 
                std::string shortStdStringAt(int offset);
                void setShortStdStringAt(int offset, std::string value);
 
-               std::string stdStringAt(int offset, int maxlen);
-               void setStdStringAt(int offset, std::string value);
+               std::string doGetStdStringAt(int offset, int maxlen);
+               void doSetStdStringAt(int offset, std::string value);
 
-               i64 i64At(int offset) const;
-               void setI64At(int offset, i64 value);
+               i64 i64At(int offset) const
+                  { return doGetI64At(offset); }
+               void setI64At(int offset, i64 value)
+                  { doSetI64At(offset, value); }
 
-               u64 u64At(int offset) const;
-               void setU64At(int offset, u64 value);
+               u64 u64At(int offset) const
+                  { return doGetU64At(offset); }
+               void setU64At(int offset, u64 value)
+                  { doSetU64At(offset, value); }
 
-               i32 i32At(int offset) const;
-               void setI32At(int offset, i32 value);
+               i32 i32At(int offset) const
+                  { return doGetI32At(offset); }
+               void setI32At(int offset, i32 value)
+                  { doSetI32At(offset, value); }
 
-               u32 u32At(int offset) const;
-               void setU32At(int offset, u32 value);
+               u32 u32At(int offset) const
+                  { return doGetU32At(offset); }
+               void setU32At(int offset, u32 value)
+                  { doSetU32At(offset, value); }
 
-               i16 i16At(int offset) const;
-               void setI16At(int offset, i16 value);
+               i16 i16At(int offset) const
+                  { return doGetI16At(offset); }
+               void setI16At(int offset, i16 value)
+                  { doSetI16At(offset, value); }
 
-               u16 u16At(int offset) const;
-               void setU16At(int offset, u16 value);
+               u16 u16At(int offset) const
+                  { return doGetU16At(offset); }
+               void setU16At(int offset, u16 value)
+                  { doSetU16At(offset, value); }
 
-               i8 i8At(int offset) const;
-               void setI8At(int offset, i8 value);
+               i8 i8At(int offset) const
+                  { return doGetI8At(offset); }
+               void setI8At(int offset, i8 value)
+                  { doSetI8At(offset, value); }
 
-               u8 u8At(int offset) const;
-               void setU8At(int offset, u8 value);
+               u8 u8At(int offset) const
+                  { return doGetU8At(offset); }
+               void setU8At(int offset, u8 value)
+                  { doSetU8At(offset, value); }
 
-               void appendI64(i64 value);
-               void appendU64(u64 value);
-               void appendI32(i32 value);
-               void appendU32(u32 value);
-               void appendI16(i16 value);
-               void appendU16(u16 value);
-               void appendI8(i8 value);
-               void appendU8(u8 value);
+               void appendI64(i64 value) { doAppendI64(value); }
+               void appendU64(u64 value) { doAppendU64(value); }
+               void appendI32(i32 value) { doAppendI32(value); }
+               void appendU32(u32 value) { doAppendU32(value); }
+               void appendI16(i16 value) { doAppendI16(value); }
+               void appendU16(u16 value) { doAppendU16(value); }
+               void appendI8(i8 value) { doAppendI8(value); }
+               void appendU8(u8 value) { doAppendU8(value); }
 
                int readFrom(QTcpSocket* socket);
 

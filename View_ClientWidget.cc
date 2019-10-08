@@ -64,7 +64,7 @@ namespace Seville
          //PalRoom& room = myPalClient->currentRoom();
          auto imageFilename = QString(":/assets/images/test-pattern.png"); //.arg("test-pattern.png");
          qCDebug(appLcIo) << imageFilename;
-         doSetBackgroundImage(imageFilename);
+         doSetBackgroundImageFromFile(imageFilename);
 
          setLayout(myWidgetLayout);
       }
@@ -74,11 +74,14 @@ namespace Seville
          //connect(
             //this, &Seville::View::ClientWidget::mousePressEvent,
             //this, &Seville::View::ClientWidget::onMousePressEvent);
+         connect(
+               myPalaceClient, &Seville::Palace::Client::backgroundChanged,
+               this, &Seville::View::ClientWidget::onBackgroundChanged
+            );
       }
 
-      void ClientWidget::doSetBackgroundImage(QString imagePath)
+      void ClientWidget::doSetBackgroundImage(QPixmap& pixmap)
       {
-         QPixmap pixmap = QPixmap(imagePath);
          myBackgroundImageLabel->setBackgroundRole(QPalette::Base);
          myBackgroundImageLabel->setSizePolicy(
                   QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -93,6 +96,12 @@ namespace Seville
          //myScrollArea->setGeometry(pixmap.rect());
          //myScrollArea->setGeometry(myBackgroundImageLabel->geometry());
          myScrollArea->setVisible(true);
+      }
+
+      void ClientWidget::doSetBackgroundImageFromFile(QString imagePath)
+      {
+         QPixmap pixmap = QPixmap(imagePath);
+         doSetBackgroundImage(pixmap);
       }
 
       void ClientWidget::doPromptNewConnection(QWidget* parent)
@@ -130,6 +139,15 @@ namespace Seville
              Palace::Client::ConnectionState::Disconnected) {
             doPromptNewConnection(this);
          }
+      }
+
+      void ClientWidget::onBackgroundChanged()
+      {
+         auto backgroundImage = myPalaceClient->currentRoom().backgroundImage();
+         myBackgroundImageLabel->setGeometry(
+                  0, 0, backgroundImage.width(), backgroundImage.height());
+         auto pixmap = QPixmap::fromImage(backgroundImage);
+         doSetBackgroundImage(pixmap);
       }
    }
 }

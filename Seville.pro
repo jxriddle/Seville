@@ -27,6 +27,8 @@ SOURCES += \
     Palace_Client.cc \
     Palace_Crypto.cc \
     Palace_Host.cc \
+    Palace_NetMsg_HttpServerLocation.cc \
+    Palace_NetMsg_RoomDescription.cc \
     Palace_Room.cc \
     Palace_Server.cc \
     Palace_User.cc \
@@ -34,23 +36,22 @@ SOURCES += \
     View_AppTabWidget.cc \
     View_ConnectDialog.cc \
     View_LogWidget.cc \
-    View_LogWindow.cc \
     View_MainWindow.cc \
     View_ClientWidget.cc \
     QtApp_ByteArray.cc \
     Log.cc \
     Main.cc \
     Palace_NetMsg_Generic.cc \
-    Palace_NetMsg_Logon.cc \
-    Palace_NetMsg_Room.cc
+    Palace_NetMsg_Logon.cc
 
 HEADERS += \
+    Palace_NetMsg_HttpServerLocation.h \
+    Palace_NetMsg_RoomDescription.h \
     View_AboutDialog.h \
     View_AppTabWidget.h \
     View_ClientWidget.h \
     View_ConnectDialog.h \
     View_LogWidget.h \
-    View_LogWindow.h \
     View_MainWindow.h \
     Palace_Client.h \
     Palace_Crypto.h \
@@ -63,8 +64,7 @@ HEADERS += \
     Log.h \
     Main.h \
     Palace_NetMsg_Generic.h \
-    Palace_NetMsg_Logon.h \
-    Palace_NetMsg_Room.h
+    Palace_NetMsg_Logon.h
 
 DISTFILES +=
 

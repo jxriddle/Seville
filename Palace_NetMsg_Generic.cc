@@ -195,132 +195,132 @@ namespace Seville
 //            return doCsbolecDw(unswapped);
 //         }
 
-         std::string Generic::stdStringAt(int offset, int maxlen)
+         std::string Generic::doGetStdStringAt(int offset, int maxlen)
          {
             return ByteArray::stdStringAt(offset, maxlen);
          }
 
-         void Generic::setStdStringAt(int offset, std::string value)
+         void Generic::doSetStdStringAt(int offset, std::string value)
          {
             ByteArray::setStdStringAt(offset, value);
          }
 
-         i64 Generic::i64At(int offset) const
+         i64 Generic::doGetI64At(int offset) const
          {
             return doMaybeSwapI64(ByteArray::i64At(offset));
          }
 
-         void Generic::setI64At(int offset, i64 value)
+         void Generic::doSetI64At(int offset, i64 value)
          {
             ByteArray::setI64At(offset, doMaybeSwapI64(value));
          }
 
-         u64 Generic::u64At(int offset) const
+         u64 Generic::doGetU64At(int offset) const
          {
             return doMaybeSwapU64(ByteArray::u64At(offset));
          }
 
-         void Generic::setU64At(int offset, u64 value)
+         void Generic::doSetU64At(int offset, u64 value)
          {
             ByteArray::setU64At(offset, doMaybeSwapU64(value));
          }
 
-         i32 Generic::i32At(int offset) const
+         i32 Generic::doGetI32At(int offset) const
          {
             return doMaybeSwapI32(ByteArray::i32At(offset));
          }
 
-         void Generic::setI32At(int offset, i32 value)
+         void Generic::doSetI32At(int offset, i32 value)
          {
             ByteArray::setI32At(offset, doMaybeSwapI32(value));
          }
 
-         u32 Generic::u32At(int offset) const
+         u32 Generic::doGetU32At(int offset) const
          {
             return doMaybeSwapU32(ByteArray::u32At(offset));
          }
 
-         void Generic::setU32At(int offset, u32 value)
+         void Generic::doSetU32At(int offset, u32 value)
          {
             ByteArray::setU32At(offset, doMaybeSwapU32(value));
          }
 
-         i16 Generic::i16At(int offset) const
+         i16 Generic::doGetI16At(int offset) const
          {
             return doMaybeSwapI16(ByteArray::i16At(offset));
          }
 
-         void Generic::setI16At(int offset, i16 value)
+         void Generic::doSetI16At(int offset, i16 value)
          {
             ByteArray::setI16At(offset, doMaybeSwapI16(value));
          }
 
-         u16 Generic::u16At(int offset) const
+         u16 Generic::doGetU16At(int offset) const
          {
             return doMaybeSwapU16(ByteArray::u16At(offset));
          }
 
-         void Generic::setU16At(int offset, u16 value)
+         void Generic::doSetU16At(int offset, u16 value)
          {
             ByteArray::setU16At(offset, doMaybeSwapU16(value));
          }
 
-         i8 Generic::i8At(int offset) const
+         i8 Generic::doGetI8At(int offset) const
          {
             return ByteArray::i8At(offset);
          }
 
-         void Generic::setI8At(int offset, i8 value)
+         void Generic::doSetI8At(int offset, i8 value)
          {
             ByteArray::setI8At(offset, value);
          }
 
-         u8 Generic::u8At(int offset) const
+         u8 Generic::doGetU8At(int offset) const
          {
             return ByteArray::u8At(offset);
          }
 
-         void Generic::setU8At(int offset, u8 value)
+         void Generic::doSetU8At(int offset, u8 value)
          {
             ByteArray::setU8At(offset, value);
          }
 
-         void Generic::appendI64(i64 value)
+         void Generic::doAppendI64(i64 value)
          {
             ByteArray::appendI64(doMaybeSwapI64(value));
          }
 
-         void Generic::appendU64(u64 value)
+         void Generic::doAppendU64(u64 value)
          {
             ByteArray::appendU64(doMaybeSwapU64(value));
          }
 
-         void Generic::appendI32(i32 value)
+         void Generic::doAppendI32(i32 value)
          {
             ByteArray::appendI32(doMaybeSwapI32(value));
          }
 
-         void Generic::appendU32(u32 value)
+         void Generic::doAppendU32(u32 value)
          {
             ByteArray::appendU32(doMaybeSwapU32(value));
          }
 
-         void Generic::appendI16(i16 value)
+         void Generic::doAppendI16(i16 value)
          {
             ByteArray::appendI16(doMaybeSwapI16(value));
          }
 
-         void Generic::appendU16(u16 value)
+         void Generic::doAppendU16(u16 value)
          {
             ByteArray::appendU16(doMaybeSwapU16(value));
          }
 
-         void Generic::appendI8(i8 value)
+         void Generic::doAppendI8(i8 value)
          {
             ByteArray::appendI8(value);
          }
 
-         void Generic::appendU8(u8 value)
+         void Generic::doAppendU8(u8 value)
          {
             ByteArray::appendU8(value);
          }
@@ -329,10 +329,12 @@ namespace Seville
          {
             auto nExpectedBytesToRead =
                   NetMsg::kByteSizeOfHeader - this->size();
+
+            //auto readHeaderOk = 0 <= nExpectedBytesToRead;
             if (0 == nExpectedBytesToRead)
                return 1;
             else if (nExpectedBytesToRead < 0)
-               return 1;
+               return 0;
 
             auto nBytesAvailable = socket->bytesAvailable();
             auto shouldReadPartial = nBytesAvailable < nExpectedBytesToRead;
@@ -344,8 +346,11 @@ namespace Seville
 
             //auto netMsgSizeN = this->size();
             //auto nBytesRead = finalNetMsgSize - initialNetMsgSize;
+            if (NetMsg::kByteSizeOfHeader == this->size())
+               this->reserve(NetMsg::kByteSizeOfHeader +
+                             doGetI32At(NetMsg::kByteOffsetForLen));
 
-            return this->size() == NetMsg::kByteSizeOfHeader;
+            return NetMsg::kByteSizeOfHeader == this->size();
          }
 
          int Generic::doReadBodyFrom(QTcpSocket* socket)
@@ -377,7 +382,7 @@ namespace Seville
             auto nExpectedTotalBytes =
                   NetMsg::kByteSizeOfHeader + this->sizeExpected();
 
-            return this->size() == nExpectedTotalBytes;
+            return nExpectedTotalBytes == this->size();
          /*
             if (0 < nNet::MsgBytesExpected)
             {
@@ -398,9 +403,9 @@ namespace Seville
                readHeaderOk = doReadHeaderFrom(socket);
 
             int readBodyOk = doReadBodyFrom(socket);
-            int minNetMsgOk = NetMsg::kByteSizeOfHeader <= this->size();
+            //int minNetMsgOk = NetMsg::kByteSizeOfHeader <= this->size();
 
-            return readHeaderOk && readBodyOk && minNetMsgOk;
+            return readHeaderOk && readBodyOk; //&& minNetMsgOk;
          }
 
          Generic::~Generic()
@@ -432,6 +437,7 @@ namespace Seville
             : ByteArray()
          {
             doReset();
+
             //int *p = static_cast<int *>(data);
             ////id_ = static_cast<int *>(p)[kPalMsgIdOffset];
             //id_ = p[kPalMsgIdOffset];
@@ -441,12 +447,13 @@ namespace Seville
             append(data);
          }
 
-         Generic::Generic(QByteArray& ba, bool shouldSwapEndianness)
+         Generic::Generic(QByteArray& bytesOfNetMsg, bool shouldSwapEndianness)
             : ByteArray()
          {
             doReset();
+
             myShouldSwapEndiannessFlag = shouldSwapEndianness;
-            append(ba);
+            append(bytesOfNetMsg);
          }
 
          Generic::Generic(Generic& netMsg, bool shouldSwapEndianness)

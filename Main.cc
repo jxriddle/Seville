@@ -1,10 +1,11 @@
 #include <iostream>
 
 #include <QApplication>
+#include <QCoreApplication>
 
 #include "Main.h"
-#include "View_MainWindow.h"
 #include "Log.h"
+#include "View_MainWindow.h"
 
 /*
 void msgHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
@@ -17,15 +18,28 @@ void msgHandler(QtMsgType type, const QMessageLogContext& context, const QString
 }
 */
 
+namespace Seville
+{
+   int main(int argc, char* argv[])
+   {
+      QCoreApplication::setOrganizationName("Orkey");
+      QCoreApplication::setApplicationName("Seville");
+      QCoreApplication::setApplicationVersion(kAppVersion);
+
+      QLoggingCategory::setFilterRules("*.debug=false\n"
+                                           "seville.io.debug=true");
+      qCDebug(appLcIo) << "Starting " << argv[0]; // << "...";
+      QApplication app(argc, argv);
+      View::MainWindow mainWindow;
+      mainWindow.show();
+
+      qCDebug(appLcIo) << argv[0] << " Started.";
+
+      return app.exec();
+   }
+}
+
 int main(int argc, char *argv[])
 {
-    QLoggingCategory::setFilterRules("*.debug=false\n"
-                                         "seville.io.debug=true");
-    qCDebug(appLcIo) << "Starting " << argv[0] << "...";
-    QApplication app(argc, argv);
-    Seville::View::MainWindow mainWindow;
-    mainWindow.show();
-    qCDebug(appLcIo) << argv[0] << " Started.";
-
-    return app.exec();
+   return Seville::main(argc, argv);
 }

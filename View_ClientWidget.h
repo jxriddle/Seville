@@ -28,13 +28,14 @@ namespace Seville
             QScrollArea* myScrollArea;
             QVBoxLayout* myWidgetLayout;
 
-            QImage myBackgroundImage;
+            QPixmap myBackgroundImage;
             double myScaleFactor;
 
             void doSetupView();
             void doSetupEvents();
 
-            void doSetBackgroundImage(QString imagePath);
+            void doSetBackgroundImage(QPixmap& pixmap);
+            void doSetBackgroundImageFromFile(QString imagePath);
             //void doResizeBackgroundImage(QSize size);
             void doPromptNewConnection(QWidget* parent);
             void doFetchBackgroundImage(QString fileUrl);
@@ -48,6 +49,7 @@ namespace Seville
          public slots:
             //void updateGeometry();
             //void onBackgroundImageLabelResized(QResizeEvent *event);
+            void onBackgroundChanged();
 
          public:
             Palace::Client* palaceClient() { return myPalaceClient; }

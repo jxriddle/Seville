@@ -1,15 +1,17 @@
 #ifndef UI_MAINWINDOW_H
 #define UI_MAINWINDOW_H
 
-#include <QObject>
+#include <QDockWidget>
+#include <QGridLayout>
 #include <QMainWindow>
+#include <QMenuBar>
+#include <QObject>
 #include <QScrollArea>
 #include <QTabBar>
 #include <QTabWidget>
-#include <QMenuBar>
-#include <QGridLayout>
 
 #include "View_AppTabWidget.h"
+#include "View_LogWidget.h"
 
 namespace Seville
 {
@@ -19,37 +21,16 @@ namespace Seville
       {
          Q_OBJECT
 
-         public:
-            explicit MainWindow(QWidget *parent = nullptr);
-            virtual ~MainWindow() override;
-
-         public slots:
-            void onNewHostConnectionActionTriggered();
-            void onCloseHostConnectionActionTriggered();
-            void onQuitAppActionTriggered();
-            //void onPalRoomWidgetClicked();
-            //void onTabWidgetTabBarClicked(int index);
-            //void onLineEditAddressReturnPressed();
-            //void onTabWidgetTabCloseRequested(int index);
-            void onAboutAppActionTriggered();
-
-         protected:
-            void resizeEvent(QResizeEvent *event) override;
-            void closeEvent(QCloseEvent *event) override;
-
          private:
-            void doSetupView();
-            void doSetupActions();
-            void doSetupMenus();
-            void doSetupEvents();
-
+            QDockWidget* myDockWidgetForLog;
+            LogWidget* myLogWidget;
             QVBoxLayout* myMainLayout;
             AppTabWidget* myTabWidget;
             QTabBar* myTabBar;
             QMenuBar* myMenuBar;
             QMenu* myFileMenu;
             QMenu* myEditMenu;
-            QMenu* myViewMenu;
+            QMenu* myWindowMenu;
             QMenu* myHelpMenu;
             QAction* myNewHostConnectionAction;
             QAction* myCloseHostConnectionAction;
@@ -60,6 +41,32 @@ namespace Seville
             QAction* myPasteContentAction;
             QAction* myQuitAppAction;
             QAction* myAboutAppAction;
+            QAction* myToggleLogAction;
+
+            void doSetupView(void);
+            void doSetupActions(void);
+            void doSetupMenus(void);
+            void doSetupDocks(void);
+            void doSetupEvents(void);
+
+         protected:
+            void resizeEvent(QResizeEvent* event) override;
+            void closeEvent(QCloseEvent* event) override;
+
+         public slots:
+            void onNewHostConnectionActionTriggered(void);
+            void onCloseHostConnectionActionTriggered(void);
+            void onQuitAppActionTriggered(void);
+            //void onPalRoomWidgetClicked(void);
+            //void onTabWidgetTabBarClicked(int index);
+            //void onLineEditAddressReturnPressed(void);
+            //void onTabWidgetTabCloseRequested(int index);
+            void onAboutAppActionTriggered(void);
+            void onToggleLogWindowActionTriggered(void);
+
+         public:
+            virtual ~MainWindow(void) override;
+            explicit MainWindow(QWidget* parent = nullptr);
       };
    }
 }

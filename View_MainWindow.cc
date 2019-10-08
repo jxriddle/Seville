@@ -19,38 +19,18 @@
 #include "View_ConnectDialog.h"
 #include "View_ClientWidget.h"
 #include "View_AboutDialog.h"
+#include "View_LogWidget.h"
 
 namespace Seville
 {
    namespace View
    {
-      MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
-      {
-          doSetupView();
-          doSetupActions();
-          doSetupMenus();
-          doSetupEvents();
-      }
-
-      MainWindow::~MainWindow()
-      {
-         /*
-         if (this->menuBar != nullptr)
-         {
-            delete this->menuBar;
-         }
-         if (this->tabWidget != nullptr)
-         {
-            delete this->tabWidget;
-         }
-         */
-      }
-
-      void MainWindow::doSetupView()
+      void MainWindow::doSetupView(void)
       {
          // Window
          setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
          setUnifiedTitleAndToolBarOnMac(true);
+
          QScreen *primaryScreen = QGuiApplication::primaryScreen();
          auto screen = primaryScreen->geometry();
 
@@ -87,13 +67,19 @@ namespace Seville
 
          // Set Main Window to Tab Widget
          setCentralWidget(myTabWidget);
+
+         QSettings settings;
+         restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+         restoreState(settings.value("mainWindowState").toByteArray());
       }
 
-      void MainWindow::doSetupActions()
+      void MainWindow::doSetupActions(void)
       {
          // Create Actions
-         myNewHostConnectionAction = new QAction(tr("&New Connection"), this);
-         myCloseHostConnectionAction = new QAction(tr("&Close Connection"), this);
+         myNewHostConnectionAction =
+               new QAction(tr("&New Connection"), this);
+         myCloseHostConnectionAction =
+               new QAction(tr("&Close Connection"), this);
          myQuitAppAction = new QAction(tr("E&xit"), this);
          myUndoContentAction = new QAction(tr("&Undo"), this);
          myRedoContentAction = new QAction(tr("&Redo"), this);
@@ -101,6 +87,7 @@ namespace Seville
          myCopyContentAction = new QAction(tr("&Copy"), this);
          myPasteContentAction = new QAction(tr("&Paste"), this);
          myAboutAppAction = new QAction(tr("&About Seville"), this);
+         myToggleLogAction = new QAction(tr("&Log"), this);
 
          // Assign Action Shortcut Keys
          myNewHostConnectionAction->setShortcut(QKeySequence::New);
@@ -112,15 +99,16 @@ namespace Seville
          myCutContentAction->setShortcut(QKeySequence::Cut);
          myCopyContentAction->setShortcut(QKeySequence::Copy);
          myPasteContentAction->setShortcut(QKeySequence::Paste);
+         myToggleLogAction->setShortcut(Qt::CTRL | Qt::Key_L);
       }
 
-      void MainWindow::doSetupMenus()
+      void MainWindow::doSetupMenus(void)
       {
          // Create Menu Bar
          myMenuBar = new QMenuBar(this);
          myFileMenu = myMenuBar->addMenu(tr("&File"));
          myEditMenu = myMenuBar->addMenu(tr("&Edit"));
-         myViewMenu = myMenuBar->addMenu(tr("&View"));
+         myWindowMenu = myMenuBar->addMenu(tr("&Window"));
          myHelpMenu = myMenuBar->addMenu(tr("&Help"));
 
          // File Menu
@@ -138,6 +126,10 @@ namespace Seville
          myEditMenu->addAction(myPasteContentAction);
          myEditMenu->addSeparator();
 
+         // Window Menu
+         //myWindowMenu->addAction(myToggleLogAction);
+         myWindowMenu->addAction(myDockWidgetForLog->toggleViewAction());
+
          // About Menu
          myHelpMenu->addSeparator();
          myHelpMenu->addAction(myAboutAppAction);
@@ -145,7 +137,22 @@ namespace Seville
          setMenuBar(myMenuBar);
       }
 
-      void MainWindow::doSetupEvents()
+      void MainWindow::doSetupDocks(void)
+      {
+         myLogWidget = new LogWidget(this);
+
+         myDockWidgetForLog = new QDockWidget(tr("Log"), this);
+         myDockWidgetForLog->setAllowedAreas(
+                  Qt::LeftDockWidgetArea |
+                  Qt::BottomDockWidgetArea |
+                  Qt::RightDockWidgetArea
+         );
+
+         myDockWidgetForLog->setWidget(myLogWidget);
+         addDockWidget(Qt::RightDockWidgetArea, myDockWidgetForLog);
+      }
+
+      void MainWindow::doSetupEvents(void)
       {
          // Connect Action Signals to Slots
          connect(
@@ -163,6 +170,10 @@ namespace Seville
          connect(
             myAboutAppAction, &QAction::triggered,
             this, &Seville::View::MainWindow::onAboutAppActionTriggered);
+
+         connect(
+            myToggleLogAction, &QAction::triggered,
+            this, &Seville::View::MainWindow::onToggleLogWindowActionTriggered);
       }
 
       void MainWindow::resizeEvent(QResizeEvent* event)
@@ -179,16 +190,20 @@ namespace Seville
       void MainWindow::closeEvent(QCloseEvent* event)
       {
          (void)event;
+         QSettings settings;
+         settings.setValue("mainWindowGeometry", saveGeometry());
+         settings.setValue("mainWindowState", saveState());
+         QApplication::quit();
       }
 
-      void MainWindow::onNewHostConnectionActionTriggered()
+      void MainWindow::onNewHostConnectionActionTriggered(void)
       {
          ClientWidget *activeClientWidget = static_cast<ClientWidget *>(myTabWidget->currentWidget());
          //connect(palTabWidget, resize);
          activeClientWidget->promptNewConnection();
       }
 
-      void MainWindow::onCloseHostConnectionActionTriggered()
+      void MainWindow::onCloseHostConnectionActionTriggered(void)
       {
          // if last tab is closed, quit application
          if (myTabWidget->count() <= 2) {
@@ -197,7 +212,7 @@ namespace Seville
          myTabWidget->removeTab(myTabWidget->currentIndex());
       }
 
-      void MainWindow::onQuitAppActionTriggered()
+      void MainWindow::onQuitAppActionTriggered(void)
       {
          QApplication::quit();
       }
@@ -226,14 +241,47 @@ namespace Seville
          }
       }
       */
-      void MainWindow::onAboutAppActionTriggered()
+      void MainWindow::onAboutAppActionTriggered(void)
       {
-         AboutDialog* aboutDialog = new AboutDialog(this);
+         auto aboutDialog = new AboutDialog(this);
          aboutDialog->exec();
+      }
+
+      void MainWindow::onToggleLogWindowActionTriggered(void)
+      {
+         if (!myLogWidget->isVisible())
+            myLogWidget->show();
+         else
+            myLogWidget->hide();
+      }
+
+      MainWindow::~MainWindow(void)
+      {
+         if (myLogWidget != nullptr)
+            delete(myLogWidget);
+         /*
+         if (this->menuBar != nullptr)
+         {
+            delete this->menuBar;
+         }
+         if (this->tabWidget != nullptr)
+         {
+            delete this->tabWidget;
+         }
+         */
       }
 
       //void MainWindow::onPalRoomWidgetClicked()
       //{
       //}
+      MainWindow::MainWindow(QWidget* parent)
+         : QMainWindow(parent)
+      {
+          doSetupView();
+          doSetupActions();
+          doSetupDocks();
+          doSetupMenus();
+          doSetupEvents();
+      }
    }
 }

@@ -8,6 +8,9 @@ namespace Seville
       {
          void Logon::doInit()
          {
+            truncate(kByteSizeOfHeader);
+            reserve(kByteSizeOfLogon);
+
             setKind(NetMsg::Kind::LogonKind);
             setSizeExpected(kByteSizeOfLogon);
             setObjectId(0);
@@ -40,11 +43,11 @@ namespace Seville
             doInit();
          }
 
-         Logon::Logon(const Generic& netMsg, bool shouldSwapEndianness)
+         Logon::Logon(Generic& netMsg, bool shouldSwapEndianness)
             : Generic(netMsg, shouldSwapEndianness)
          {
             //TODO move
-            doInit();
+            //doInit();
             //reset();
             //append(netMsg);
          }
