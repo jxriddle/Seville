@@ -17,6 +17,8 @@ TEMPLATE = app
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
+CONFIG += c++17
+
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -24,47 +26,55 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    Palace_Client.cc \
-    Palace_Crypto.cc \
-    Palace_Host.cc \
-    Palace_NetMsg_HttpServerLocation.cc \
-    Palace_NetMsg_RoomDescription.cc \
-    Palace_Room.cc \
-    Palace_Server.cc \
-    Palace_User.cc \
-    View_AboutDialog.cc \
-    View_AppTabWidget.cc \
-    View_ConnectDialog.cc \
-    View_LogWidget.cc \
-    View_MainWindow.cc \
-    View_ClientWidget.cc \
-    QtApp_ByteArray.cc \
-    Log.cc \
-    Main.cc \
-    Palace_NetMsg_Generic.cc \
-    Palace_NetMsg_Logon.cc
+    seville/base/app.cc \
+    seville/base/log.cc \
+    seville/base/bytearray.cc \
+    seville/palace/base/cipher.cc \
+    seville/palace/base/client.cc \
+    seville/palace/base/crypto.cc \
+    seville/palace/base/host.cc \
+    seville/palace/base/logger.cc \
+    seville/palace/base/logmessage.cc \
+    seville/palace/base/prop.cc \
+    seville/palace/base/room.cc \
+    seville/palace/base/server.cc \
+    seville/palace/base/user.cc \
+    seville/palace/netmsg/generic.cc \
+    seville/palace/netmsg/httpserverlocation.cc \
+    seville/palace/netmsg/logon.cc \
+    seville/palace/netmsg/roomdescription.cc \
+    seville/view/dialog/aboutdialog.cc \
+    seville/view/dialog/connectdialog.cc \
+    seville/view/widget/clientwidget.cc \
+    seville/view/widget/logwidget.cc \
+    seville/view/widget/tabwidget.cc
+    seville/view/window/mainwindow.cc \
 
 HEADERS += \
-    Palace_NetMsg_HttpServerLocation.h \
-    Palace_NetMsg_RoomDescription.h \
-    View_AboutDialog.h \
-    View_AppTabWidget.h \
-    View_ClientWidget.h \
-    View_ConnectDialog.h \
-    View_LogWidget.h \
-    View_MainWindow.h \
-    Palace_Client.h \
-    Palace_Crypto.h \
-    Palace_Host.h \
-    Palace_Room.h \
-    Palace_Server.h \
-    Palace_User.h \
-    QtApp_ByteArray.h \
-    Common.h \
-    Log.h \
-    Main.h \
-    Palace_NetMsg_Generic.h \
-    Palace_NetMsg_Logon.h
+    seville/base/app.h \
+    seville/base/log.h \
+    seville/base/types.h \
+    seville/base/bytearray.h \
+    seville/palace/base/cipher.h \
+    seville/palace/base/client.h \
+    seville/palace/base/crypto.h \
+    seville/palace/base/host.h \
+    seville/palace/base/logger.h \
+    seville/palace/base/logmessage.h \
+    seville/palace/base/prop.h \
+    seville/palace/base/room.h \
+    seville/palace/base/server.h \
+    seville/palace/base/user.h \
+    seville/palace/netmsg/generic.h \
+    seville/palace/netmsg/httpserverlocation.h \
+    seville/palace/netmsg/logon.h \
+    seville/palace/netmsg/roomdescription.h \
+    seville/view/dialog/aboutdialog.h \
+    seville/view/dialog/connectdialog.h \
+    seville/view/widget/clientwidget.h \
+    seville/view/widget/logwidget.h \
+    seville/view/widget/tabwidget.h \
+    seville/view/window/mainwindow.h
 
 DISTFILES +=
 
