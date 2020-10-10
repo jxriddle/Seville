@@ -494,7 +494,7 @@ namespace seville
             my_pong_time_.start();
          }
 
-         void do_set_connection_state_(ConnectionState connection_state)
+         void do_setConnectionState(ConnectionState connection_state)
          {
             my_connection_state_ = connection_state;
             // TODO signal?
@@ -505,24 +505,24 @@ namespace seville
                QString host,
                int port = 9998,
                QString username = "Seville User",
-               int initialRoom = 0)
+               int initial_room = 0)
          {
-            int dHostTcpPortCond = (0 == port);
-            u16 dHostTcpPort = static_cast<u16>(
-                     (dHostTcpPortCond * kDefaultServerPort) |
-                     ((!dHostTcpPortCond) * port)
+            auto cond_host_tcp_port = (0 == port);
+            auto actual_host_tcp_port = static_cast<u16>(
+                     (cond_host_tcp_port * kDefaultServerPort) |
+                     ((!cond_host_tcp_port) * port)
             );
 
-            u16 dInitialRoom = static_cast<u16>(initialRoom);
+            auto actual_initial_room = static_cast<u16>(initial_room);
             qCDebug(log_seville, "Connecting to palace://%s@%s:%d/%d",
                     username.toUtf8().data(),
                     host.toUtf8().data(),
-                    dHostTcpPort, dInitialRoom);
+                    actual_host_tcp_port, actual_initial_room);
 
             my_user_.setUsername(username);
             my_server_.setHost(host);
-            my_server_.setPort(dHostTcpPort);
-            my_current_room_.setId(dInitialRoom);
+            my_server_.setPort(actual_host_tcp_port);
+            my_current_room_.setId(actual_initial_room);
 
             qCDebug(log_seville) << "Client Connection is now in Handshaking State";
             my_connection_state_ = ConnectionState::kHandshaking;
@@ -1066,7 +1066,7 @@ namespace seville
             my_socket_.write(msgLogon);
             res = my_socket_.flush();
 
-            do_set_connection_state_(ConnectionState::kConnected);
+            do_setConnectionState(ConnectionState::kConnected);
 
             return res;
          }
