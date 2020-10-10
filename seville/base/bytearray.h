@@ -1,6 +1,8 @@
 #ifndef SEVILLE_BYTEARRAY_H_
 #define SEVILLE_BYTEARRAY_H_
 
+#include <optional>
+
 #include <QByteArray>
 #include <QChar>
 #include <QString>
@@ -13,90 +15,171 @@ namespace seville
    {
    public:
       ByteArray(void);
+      static auto New(void) -> std::unique_ptr<ByteArray>;
+      //std::optional<ByteArray*>;
 
-      void setStringU8At(int offset, std::string value)
-         { do_setStringU8At(offset, value); }
-      std::string stringU8At(int offset, u8 maxlen) const
-         { return do_stringU8At(offset, maxlen); }
+      inline auto pascal_string_at(int offset, u8 maxlen) const -> std::string {
+         return do_pascalStringAt(offset, maxlen);
+      }
 
-      void setStringU32At(int offset, std::string value)
-         { do_setStringU32At(offset, value); }
-      std::string stringU32At(int offset, u32 maxlen) const
-         { return do_stringU32At(offset, maxlen); }
+      inline auto set_pascal_string_at(int offset, std::string value) -> void {
+         do_setPascalStringAt(offset, value);
+      }
 
-      void setStringAt(int offset, const std::string& value)
-         { do_setStringAt(offset, value); }
-      std::string stringAt(int offset, int len) const
-         { return do_stringAt(offset, len); }
+//      inline auto stringU32At(int offset, u32 maxlen) const -> std::string {
+//         return do_stringU32At_(offset, maxlen);
+//      }
 
-      void setQStringU8At(int offset, const QString& value)
-         { do_setQStringU8At(offset, value); }
-      QString qStringU8At(int offset, u8 maxlen) const
-         { return do_qStringU8At(offset, maxlen); }
+//      inline auto setStringU32At(int offset, std::string value) -> void {
+//         do_setStringU32At_(offset, value);
+//      }
 
-      void setQStringU32At(int offset, const QString& value)
-         { do_setQStringU32At(offset, value); }
-      QString qStringU32At(int offset, u32 maxlen) const
-         { return do_qStringU32At(offset, maxlen); }
+      inline auto string_at(int offset, int len) const -> std::string {
+         return do_stringAt(offset, len);
+      }
 
-      void setQStringAt(int offset, const QString& value)
-         { do_setQStringAt(offset, value); }
-      QString qStringAt(int offset, int maxlen) const
-         { return do_qStringAt(offset, maxlen); }
+      inline auto set_string_at(int offset, const std::string& value) -> void {
+         do_setStringAt(offset, value);
+      }
 
-      i64 i64At(int offset) const { return do_i64At(offset); }
-      void setI64At(int offset, i64 value) { do_setI64At(offset, value); }
+      inline auto pascal_qstring_at(int offset, u8 maxlen) const -> QString {
+         return do_pascalQStringAt(offset, maxlen);
+      }
 
-      u64 u64At(int offset) const { return do_u64At(offset); }
-      void setU64At(int offset, u64 value) { do_setU64At(offset, value); }
+      inline auto set_pascal_qstring_at(int offset, const QString& value) -> void {
+         do_setPascalQStringAt(offset, value);
+      }
 
-      i32 i32At(int offset) const { return do_i32At(offset); }
-      void setI32At(int offset, i32 value) { do_setI32At(offset, value); }
+//      inline auto qStringU32At(int offset, u32 maxlen) const -> QString {
+//         return qStringU32At_(offset, maxlen);
+//      }
 
-      u32 u32At(int offset) const { return do_u32At(offset); }
-      void setU32At(int offset, u32 value) { do_setU32At(offset, value); }
+//      inline auto setQStringU32At(int offset, const QString& value) -> void {
+//         setQStringU32At_(offset, value);
+//      }
 
-      i16 i16At(int offset) const { return do_i16At(offset); }
-      void setI16At(int offset, i16 value) { do_setI16At(offset, value); }
+      inline auto qstring_at(int offset, int maxlen) const -> QString {
+         return do_qStringAt(offset, maxlen);
+      }
 
-      u16 u16At(int offset) const { return do_u16At(offset); }
-      void setU16At(int offset, u16 value) { do_setU16At(offset, value); }
+      inline auto set_qstring_at(int offset, const QString& value) -> void {
+         do_setQStringAt(offset, value);
+      }
 
-      i8 i8At(int offset) const { return do_i8At(offset); }
-      void setI8At(int offset, i8 value) { do_setI8At(offset, value); }
+      inline auto i64_at(int offset) const -> i64 {
+         return do_i64At(offset);
+      }
 
-      u8 u8At(int offset) const { return do_u8At(offset); }
-      void setU8At(int offset, u8 value) { do_setU8At(offset, value); }
+      inline auto set_i64_at(int offset, i64 value) -> void {
+         do_setI64At(offset, value);
+      }
 
-      void appendI64(i64 value) { do_appendI64(value); }
-      void appendU64(u64 value) { do_appendU64(value); }
-      void appendI32(i32 value) { do_appendI32(value); }
-      void appendU32(u32 value) { do_appendU32(value); }
-      void appendI16(i16 value) { do_appendI16(value); }
-      void appendU16(u16 value) { do_appendU16(value); }
-      void appendI8(i8 value) { append(value); }
-      void appendU8(u8 value) { append(static_cast<char>(value)); }
+      inline auto u64At(int offset) const -> u64 {
+         return do_u64At(offset);
+      }
+
+      inline auto set_u64_at(int offset, u64 value) -> void {
+         do_setU64At(offset, value);
+      }
+
+      inline auto i32At(int offset) const -> i32 {
+         return do_i32At(offset);
+      }
+
+      inline auto set_i32_at(int offset, i32 value) -> void {
+         do_setI32At(offset, value);
+      }
+
+      inline auto u32At(int offset) const -> u32 {
+         return do_u32At(offset);
+      }
+
+      inline auto set_u32_at(int offset, u32 value) -> void {
+         do_setU32At(offset, value);
+      }
+
+      inline auto i16At(int offset) const -> i16 {
+         return do_i16At(offset);
+      }
+
+      inline auto set_i16_at(int offset, i16 value) -> void {
+         do_setI16At(offset, value);
+      }
+
+      inline auto u16At(int offset) const -> u16 {
+         return do_u16At(offset);
+      }
+
+      inline auto set_u16_at(int offset, u16 value) -> void {
+         do_setU16At(offset, value);
+      }
+
+      inline auto i8_at(int offset) const -> i8 {
+         return i8At_(offset);
+      }
+
+      inline auto set_i8_at(int offset, i8 value) -> void {
+         do_setI8At(offset, value);
+      }
+
+      inline auto u8_at(int offset) const -> u8 {
+         return u8At_(offset);
+      }
+
+      inline auto set_u8_at(int offset, u8 value) -> void {
+         do_setU8At(offset, value);
+      }
+
+      inline auto append_i64(i64 value) -> void {
+         do_appendI64(value);
+      }
+
+      inline auto append_u64(u64 value) -> void {
+         do_appendU64(value);
+      }
+
+      inline auto append_i32(i32 value) -> void {
+         do_appendI32(value);
+      }
+
+      inline auto append_u32(u32 value) -> void {
+         do_appendU32(value);
+      }
+
+      inline auto append_i16(i16 value) -> void {
+         do_appendI16(value);
+      }
+
+      inline auto append_u16(u16 value) -> void {
+         do_appendU16(value);
+      }
+
+      inline auto append_i8(i8 value) -> void {
+         do_appendI8(value);
+      }
+
+      inline auto append_u8(u8 value) -> void {
+         do_appendU8(static_cast<char>(value));
+      }
 
    private:
-      void do_setStringU8At(int offset, const std::string& value)
-      {
+      auto do_setPascalStringAt(int offset, const std::string& value) -> void {
          auto len = static_cast<u8>(value.length());
          do_setU8At(offset, len);
          for (u8 i = 1; i < len; i++)
-            setU8At(offset+i, static_cast<u8>(value.at(i)));
+            set_u8_at(offset+i, static_cast<u8>(value.at(i)));
       }
 
-      std::string do_stringU8At(int offset, u8 maxlen) const
-      {
+      auto do_pascalStringAt(int offset, u8 maxlen) const -> std::string {
          std::string value;
 
-         auto len = this->u8At(offset);
+         auto len = u8At_(offset);
          u8 i = 1;
-         auto c = this->i8At(offset+i);
+         auto c = this->i8_at(offset+i);
          while (i < maxlen && i < len && c != '\0') {
             value.push_back(c);
             i++;
-            c = this->i8At(offset+i);
+            c = i8At_(offset+i);
          }
 
          if (value.size() == sizeof(u8) || value.size() == maxlen)
@@ -107,44 +190,40 @@ namespace seville
          return value;
       }
 
-      void do_setStringU32At(int offset, const std::string& value)
-      {
+//      auto do_setStringU32At(int offset, const std::string& value) -> void {
+//         auto len = static_cast<u32>(value.length());
+//         setU32At_(offset, len);
+//         for (u32 i = 1; i < len; i++)
+//            setU8At_(offset+static_cast<i32>(i), static_cast<u8>(value.at(i)));
+//      }
+
+//      auto do_stringU32At(int offset, u32 maxlen) const -> std::string {
+//         std::string value;
+
+//         auto len = u32At_(offset);
+//         u32 i = 1;
+//         auto c = i8At_(offset+static_cast<i32>(i));
+//         while (i < maxlen && i < len && c != '\0') {
+//            value.push_back(c);
+//            i++;
+//            c = this->at(offset+static_cast<i32>(i));
+//         }
+
+//         if (value.size() == sizeof(u32) || value.size() == maxlen)
+//            value.pop_back();
+
+//         value.push_back('\0');
+
+//         return value;
+//      }
+
+      auto do_setStringAt(int offset, const std::string& value) -> void {
          auto len = static_cast<u32>(value.length());
-         do_setU32At(offset, len);
-         for (u32 i = 1; i < len; i++)
-            setU8At(offset+static_cast<i32>(i), static_cast<u8>(value.at(i)));
+         for (auto i = u32{0}; i < len; i++)
+            set_u8_at(offset+static_cast<i32>(i), static_cast<u8>(value.at(i)));
       }
 
-      std::string do_stringU32At(int offset, u32 maxlen) const
-      {
-         std::string value;
-
-         auto len = this->u32At(offset);
-         u32 i = 1;
-         auto c = this->i8At(offset+static_cast<i32>(i));
-         while (i < maxlen && i < len && c != '\0') {
-            value.push_back(c);
-            i++;
-            c = this->at(offset+static_cast<i32>(i));
-         }
-
-         if (value.size() == sizeof(u32) || value.size() == maxlen)
-            value.pop_back();
-
-         value.push_back('\0');
-
-         return value;
-      }
-
-      void do_setStringAt(int offset, const std::string& value)
-      {
-         auto len = static_cast<u32>(value.length());
-         for (u32 i = 0; i < len; i++)
-            setU8At(offset+static_cast<i32>(i), static_cast<u8>(value.at(i)));
-      }
-
-      std::string do_stringAt(int offset, int len) const
-      {
+      auto do_stringAt(int offset, int len) const -> std::string {
          std::string value;
 
          for (auto i = 0; i < len; i++)
@@ -153,41 +232,34 @@ namespace seville
          return value;
       }
 
-      void do_setQStringU8At(int offset, const QString& value)
-      {
-         do_setStringU8At(offset, value.toStdString());
+      auto do_setPascalQStringAt(int offset, const QString& value) -> void {
+         do_setPascalStringAt(offset, value.toStdString());
       }
 
-      QString do_qStringU8At(int offset, u8 maxlen) const
-      {
-         auto s = do_stringU8At(offset, maxlen);
+      auto do_pascalQStringAt(int offset, u8 maxlen) const -> QString {
+         auto s = do_pascalStringAt(offset, maxlen);
          return QString::fromStdString(s);
       }
 
-      void do_setQStringU32At(int offset, const QString& value)
-      {
-         do_setStringU32At(offset, value.toStdString());
-      }
+//      auto do_setQStringU32At(int offset, const QString& value) -> void {
+//         do_setStringU32At(offset, value.toStdString());
+//      }
 
-      QString do_qStringU32At(int offset, u32 maxlen) const
-      {
-         auto s = do_stringU32At(offset, maxlen);
-         return QString::fromStdString(s);
-      }
+//      auto do_qStringU32At(int offset, u32 maxlen) const -> QString {
+//         auto s = do_stringU32At(offset, maxlen);
+//         return QString::fromStdString(s);
+//      }
 
-      void do_setQStringAt(int offset, const QString& value)
-      {
+      auto do_setQStringAt(int offset, const QString& value) -> void {
          do_setStringAt(offset, value.toStdString());
       }
 
-      QString do_qStringAt(int offset, int len) const
-      {
+      auto do_qStringAt(int offset, int len) const -> QString {
          auto s = do_stringAt(offset, len);
          return QString::fromStdString(s);
       }
 
-      i64 do_i64At(int offset) const
-      {
+      auto do_i64At(int offset) const -> i64 {
          i64 value;
          bi64 bi;
 
@@ -200,8 +272,7 @@ namespace seville
          return value;
       }
 
-      void do_setI64At(int offset, i64 value)
-      {
+      auto do_setI64At(int offset, i64 value) -> void {
          bi64 bi;
          bi.qword = static_cast<i64>(value);
          auto z = static_cast<int>(sizeof(i64));
@@ -211,8 +282,7 @@ namespace seville
          }
       }
 
-      u64 do_u64At(int offset) const
-      {
+      auto do_u64At(int offset) const -> u64 {
          u64 value;
          bi64 bi;
 
@@ -225,8 +295,7 @@ namespace seville
          return value;
       }
 
-      void do_setU64At(int offset, u64 value)
-      {
+      auto do_setU64At(int offset, u64 value) -> void {
          bi64 bi;
          bi.qword = static_cast<i64>(value);
          auto z = static_cast<int>(sizeof(u64));
@@ -236,8 +305,7 @@ namespace seville
          }
       }
 
-      i32 do_i32At(int offset) const
-      {
+      auto do_i32At(int offset) const -> i32 {
          i32 value;
          //u32 value = at(offset) << 24;
          //value |= at(offset+1) << 16;
@@ -260,8 +328,7 @@ namespace seville
          return value;
       }
 
-      void do_setI32At(int offset, i32 value)
-      {
+      auto do_setI32At(int offset, i32 value) -> void {
          bi32 bi;
          bi.dword = static_cast<i32>(value);
          auto z = static_cast<int>(sizeof(i32));
@@ -271,8 +338,7 @@ namespace seville
          }
       }
 
-      u32 do_u32At(int offset) const
-      {
+      auto do_u32At(int offset) const -> u32 {
          u32 value;
          //u32 value = at(offset) << 24;
          //value |= at(offset+1) << 16;
@@ -295,8 +361,7 @@ namespace seville
          return value;
       }
 
-      void do_setU32At(int offset, u32 value)
-      {
+      auto do_setU32At(int offset, u32 value) -> void {
          bi32 bi;
          bi.dword = static_cast<i32>(value);
          auto z = static_cast<int>(sizeof(u32));
@@ -306,8 +371,7 @@ namespace seville
          }
       }
 
-      i16 do_i16At(int offset) const
-      {
+      auto do_i16At(int offset) const -> i16 {
          i16 value;
          //i16 value = at(offset) << 8;
          //value |= at(offset+1);
@@ -328,8 +392,7 @@ namespace seville
          return value;
       }
 
-      void do_setI16At(int offset, i16 value)
-      {
+      auto do_setI16At(int offset, i16 value) -> void {
          bi16 bi;
           //doCsboW(static_cast<u16>(value));
          bi.word = static_cast<i16>(value);
@@ -340,8 +403,7 @@ namespace seville
          }
       }
 
-      u16 do_u16At(int offset) const
-      {
+      auto do_u16At(int offset) const -> u16 {
          u16 value;
          //u16 value = at(offset) << 8;
          //value |= at(offset+1);
@@ -362,8 +424,7 @@ namespace seville
          return value;
       }
 
-      void do_setU16At(int offset, u16 value)
-      {
+      auto do_setU16At(int offset, u16 value) -> void {
          bi16 bi;
          bi.word = static_cast<i16>(value);
          auto z = static_cast<int>(sizeof(u16));
@@ -373,8 +434,7 @@ namespace seville
          }
       }
 
-      i8 do_i8At(int offset) const
-      {
+      auto i8At_(int offset) const -> i8 {
          i8 value = at(offset);
          /*
          QDataStream ds(this, QIODevice::ReadOnly);
@@ -384,13 +444,11 @@ namespace seville
          return value;
       }
 
-      void do_setI8At(int offset, i8 value)
-      {
+      auto do_setI8At(int offset, i8 value) -> void {
          insert(static_cast<int>(offset), static_cast<char>(value));
       }
 
-      u8 do_u8At(int offset) const
-      {
+      auto u8At_(int offset) const -> u8 {
          u8 value = static_cast<u8>(at(static_cast<int>(offset)));
          /*
          QDataStream ds(this, QIODevice::ReadOnly);
@@ -400,13 +458,11 @@ namespace seville
          return value;
       }
 
-      void do_setU8At(int offset, u8 value)
-      {
+      auto do_setU8At(int offset, u8 value) -> void {
          insert(static_cast<int>(offset), static_cast<char>(value));
       }
 
-      void do_appendI64(i64 value)
-      {
+      auto do_appendI64(i64 value) -> void {
          bi64 bi;
          bi.qword = static_cast<i64>(value);
          int z = static_cast<int>(sizeof(i64));
@@ -415,8 +471,7 @@ namespace seville
          }
       }
 
-      void do_appendU64(u64 value)
-      {
+      auto do_appendU64(u64 value) -> void {
          bi64 bi;
          bi.qword = static_cast<i64>(value);
          int z = static_cast<int>(sizeof(u64));
@@ -425,8 +480,7 @@ namespace seville
          }
       }
 
-      void do_appendI32(i32 value)
-      {
+      auto do_appendI32(i32 value) -> void {
          bi32 bi;
          bi.dword = static_cast<i32>(value);
          int z = static_cast<int>(sizeof(i32));
@@ -435,8 +489,7 @@ namespace seville
          }
       }
 
-      void do_appendU32(u32 value)
-      {
+      auto do_appendU32(u32 value) -> void {
          //append(static_cast<char>((value) & 0xff));
          //append(static_cast<char>((value >> 8) & 0xff));
          //append(static_cast<char>((value >> 16) & 0xff));
@@ -449,8 +502,7 @@ namespace seville
          }
       }
 
-      void do_appendI16(i16 value)
-      {
+      auto do_appendI16(i16 value) -> void {
          bi16 bi;
          bi.word = static_cast<i16>(value);
          int z = static_cast<int>(sizeof(i16));
@@ -459,8 +511,7 @@ namespace seville
          }
       }
 
-      void do_appendU16(u16 value)
-      {
+      auto do_appendU16(u16 value) -> void {
          //append(static_cast<char>(value & 0xff));
          //append(static_cast<char>((value >> 8) & 0xff));
          bi16 bi;
@@ -472,21 +523,14 @@ namespace seville
          }
       }
 
-      void do_appendI8(i8 value)
-      {
+      auto do_appendI8(i8 value) -> void {
          append(value);
       }
 
-      void do_appendU8(u8 value)
-      {
+      auto do_appendU8(u8 value) -> void {
          append(static_cast<i8>(value));
       }
-
-      void do_init()
-      {
-      }
-
    };
 }
 
-#endif // SEVILLE_BYTEARRAY_H_
+#endif   // SEVILLE_BYTEARRAY_H_

@@ -18,8 +18,8 @@ namespace seville
       {
       Q_OBJECT
 
-      private:
-         void do_setupView()
+      protected:
+         void ok_setupView()
          {
             setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
             QVBoxLayout* pLayout = new QVBoxLayout(this);
@@ -55,4 +55,4 @@ namespace seville
    }
 }
 
-#endif //SEVILLE_VIEW_ABOUTDIALOG_H_
+#endif  // SEVILLE_VIEW_ABOUTDIALOG_H_

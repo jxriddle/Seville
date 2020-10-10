@@ -8,8 +8,12 @@
 
 namespace seville
 {
+   struct app_struct {
+
+   } app_;
+
    const char app_kAppVersion[] = "1.0";
-   extern view::MainWindow* app_pMainWindow;
+   extern view::MainWindow* app_window_main_ptr;
 }
 
-#endif // SEVILLE_APP_H_
+#endif   // SEVILLE_APP_H_

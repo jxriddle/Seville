@@ -1,9 +1,9 @@
 #ifndef SEVILLE_PALACE_NETMSG_HTTPSERVERLOCATION_H_
 #define SEVILLE_PALACE_NETMSG_HTTPSERVERLOCATION_H_
 
-#include "generic.h"
-
 #include "seville/base/types.h"
+
+#include "seville/palace/base/genericnetmsg.h"
 
 namespace seville
 {
@@ -11,16 +11,26 @@ namespace seville
    {
       namespace netmsg
       {
-         class HttpServerLocation : public netmsg::Generic
+         class HttpServerLocation : public GenericNetMsg
          {
             private:
-               void do_init(void);
+               auto do_init(void) -> void;
 
             public:
-               void setUrl(const QString& value) { setQStringU8At(netmsg::kOffsetForPayloadInBytes, value); }
-               QString url() { return qStringAt(netmsg::kOffsetForPayloadInBytes, 4096); }
+               auto url(void) -> QString {
+                  return qstring_at( \
+                           palace::kOffsetForNetMsgPayloadInBytes, 4096);
+               }
 
-               HttpServerLocation(const netmsg::Generic& netMsg, NetMsgOptions options = NetMsgOptions::kShouldNotSwapEndianness);
+               auto setUrl(const QString& value) -> void {
+                  set_pascal_qstring_at( \
+                           palace::kOffsetForNetMsgPayloadInBytes, value);
+               }
+
+               HttpServerLocation( \
+                     const GenericNetMsg& netmsg, \
+                     NetMsgOptions options = \
+                        NetMsgOptions::kDoNotSwapEndianness);
          };
       }
    }

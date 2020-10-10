@@ -12,13 +12,13 @@ namespace seville
          }
 
          Logon::Logon(bool shouldSwapEndianness)
-            : Generic(shouldSwapEndianness)
+            : GenericNetMsg(shouldSwapEndianness)
          {
             do_init();
          }
 
-         Logon::Logon(const Generic& netMsg, bool shouldSwapEndianness)
-            : Generic(netMsg, shouldSwapEndianness)
+         Logon::Logon(const GenericNetMsg& netMsg, bool shouldSwapEndianness)
+            : GenericNetMsg(netMsg, shouldSwapEndianness)
          {
             do_init();
          }

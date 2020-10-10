@@ -33,4 +33,4 @@ namespace seville
 }
 
 
-#endif // SEVILLE_TYPES_H_
+#endif  // SEVILLE_TYPES_H_

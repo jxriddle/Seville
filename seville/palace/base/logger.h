@@ -1,5 +1,5 @@
-#ifndef PALACE_LOGGER_H
-#define PALACE_LOGGER_H
+#ifndef SEVILLE_PALACE_LOGGER_H_
+#define SEVILLE_PALACE_LOGGER_H_
 
 #include <memory>
 #include <optional>
@@ -19,75 +19,85 @@ namespace seville
    {
       class Logger : public QObject
       {
-      Q_OBJECT
+         Q_OBJECT
 
       public:
-         std::vector<LogMessage>* messagesP() { return my_puMessages.get(); }
+         enum LoggerMode: i32 {
+            kNoMode = 0,
+            kDefaultMode = 1,
+            kProductionMode = 2,
+            kDebugMode = 5,
+         };
 
-         void log(const LogMessage& logMessage)
-         {
-            do_logMessage(logMessage);
-         }
-
-         void log(LogMessage::Kind kind, const QString& message, const QString& usernameFrom, const QString& usernameTo)
-         {
-            do_logMessage(LogMessage(kind, message, usernameFrom, usernameTo));
-         }
-
-         void whisper(const QString& usernameFrom, const QString& usernameTo, const QString& message)
-         {
-            do_logMessage(LogMessage(LogMessage::Kind::WhisperKind, message, usernameFrom, usernameTo));
-         }
-
-         void chat(const QString& usernameFrom, const QString& message)
-         {
-            do_logMessage(LogMessage(LogMessage::Kind::ChatKind, message, usernameFrom, ""));
-         }
-
-         void global(const QString& message)
-         {
-            do_logMessage(LogMessage(LogMessage::Kind::GlobalKind, message, "", ""));
-         }
-
-         void info(const QString& message)
-         {
-            do_logMessage(LogMessage(LogMessage::Kind::InfoKind, message, "", ""));
-         }
-
-         void warning(const QString& message)
-         {
-            do_logMessage(LogMessage(LogMessage::Kind::WarningKind, message, "", ""));
-         }
-
-         void error(const QString& message)
-         {
-            messageLogged(LogMessage(LogMessage::Kind::ErrorKind, message, "", ""));
-         }
-
-         void debug(const QString& message)
-         {
-            if (my_isDebugMode)
-               messageLogged(LogMessage(LogMessage::Kind::DebugKind, message, "", ""));
-         }
-
-         void setIsDebugMode(const bool& isDebugMode)
-         {
-            my_isDebugMode = isDebugMode;
-         }
-
-         bool isDebugMode(void)
-         {
-            return my_isDebugMode;
-         }
-
+         //Logger(bool isDebugMode = false);
+         Logger(void) = delete;
          virtual ~Logger(void);
-         Logger(bool isDebugMode = false);
+
+         static auto New(void) -> std::unique_ptr<Logger>;
+
+         inline auto mode(void) const -> LoggerMode {
+            return my_logger_mode_;
+         }
+
+         inline auto setMode(LoggerMode value) -> void {
+            my_logger_mode_ = value;
+         }
+
+         inline auto messagesPtr(void) -> std::vector<LogMessage>* {
+            return my_messages_unique_ptr_.get();
+         }
+
+         inline auto takeMessagesPtr(void) -> \
+               std::unique_ptr<std::vector<LogMessage>> {
+            return std::move(my_messages_unique_ptr_);
+         }
+
+         inline auto log(const LogMessage& message) -> void {
+            logMessage(message);
+         }
+
+         inline auto log(LogMessage::Kind kind, const QString& message, const QString& username_from, const QString& username_to) -> void {
+            logMessage(LogMessage(kind, message, username_from, username_to));
+         }
+
+         inline auto whisper(const QString& username_from, const QString& username_to, const QString& message) -> void {
+            logMessage(LogMessage(LogMessage::Kind::kWhisperKind, message, username_from, username_to));
+         }
+
+         inline auto chat(const QString& username_from, const QString& message) -> void {
+            logMessage(LogMessage(LogMessage::Kind::kChatKind, message, username_from, ""));
+         }
+
+         inline auto global(const QString& message) -> void {
+            logMessage(LogMessage(LogMessage::Kind::kGlobalKind, message, "", ""));
+         }
+
+         inline auto info(const QString& message) -> void {
+            logMessage(LogMessage(LogMessage::Kind::kInfoKind, message, "", ""));
+         }
+
+         inline auto warning(const QString& message) -> void {
+            logMessage(LogMessage(LogMessage::Kind::kWarningKind, message, "", ""));
+         }
+
+         inline auto error(const QString& message) -> void {
+            messageLogged(LogMessage(LogMessage::Kind::kErrorKind, message, "", ""));
+         }
+
+         inline auto debug(const QString& message) -> void {
+            if (LoggerMode::kDebugMode == my_logger_mode_)
+               messageLogged(LogMessage(LogMessage::Kind::kDebugKind, message, "", ""));
+         }
 
       signals:
          // should be a generic messageLogged method with an enum type parameter instead? eh.
          void messageLogged(const LogMessage& log);
+
+      private:
+         LoggerMode my_logger_mode_;
+         std::unique_ptr<std::vector<LogMessage>> my_messages_unique_ptr_;
       };
    }
 }
 
-#endif // PALACE_LOGGER_H
+#endif  // SEVILLE_PALACE_LOGGER_H_

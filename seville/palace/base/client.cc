@@ -7,13 +7,14 @@
 #include <QtNetwork/QNetworkReply>
 
 #include "seville/base/log.h"
-#include "host.h"
-#include "client.h"
-#include "server.h"
-#include "room.h"
-#include "user.h"
+#include "seville/palace/base/host.h"
+#include "seville/palace/base/client.h"
+#include "seville/palace/base/server.h"
+#include "seville/palace/base/room.h"
+#include "seville/palace/base/user.h"
 
-#include "seville/palace/netmsg/generic.h"
+#include "seville/palace/base/genericnetmsg.h"
+
 #include "seville/palace/netmsg/logon.h"
 #include "seville/palace/netmsg/roomdescription.h"
 #include "seville/palace/netmsg/httpserverlocation.h"
@@ -29,8 +30,8 @@ namespace seville
          do_deinit();
       }
 
-      Client::Client(QObject* pParent)
-         : QObject(pParent)
+      Client::Client(QObject* parent_object_pointer) \
+         : QObject(parent_object_pointer)
       {
          do_init();
       }

@@ -18,114 +18,99 @@ namespace seville
       {
       Q_OBJECT
 
-      private:
-         Host::ByteOrder my_byteOrder;
-         std::unique_ptr<QList<Room>> my_puRoomList;
-         std::unique_ptr<QList<User>> my_puUserList;
-         QString my_host;
-         u16 my_port;
-         u32 my_version;
-         QString my_httpServerLocation;
+      signals:
+         auto roomListLoaded(void) -> void;
+         auto userListLoaded(void) -> void;
 
-         void do_reset(void)
-         {
-            my_puRoomList->clear();
-            my_puUserList->clear();
-         }
+      public:
+         Server(void);
+         virtual ~Server(void);
 
-         void do_deinit(void)
-         {
-         }
+         static const u16 kDefaultPort = 9998;
 
-         void do_init(void)
-         {
-            my_puRoomList = std::make_unique<QList<Room>>();
-            my_puUserList = std::make_unique<QList<User>>();
-
+         inline auto reset(void) -> void {
             do_reset();
          }
 
-      signals:
-         void roomListLoaded(void);
-         void userListLoaded(void);
-
-      public:
-         static const u16 kDefaultPort = 9998;
-
-         void reset(void) { do_reset(); }
-
-         void setByteOrder(const Host::ByteOrder& byteOrder)
-         {
-            my_byteOrder = byteOrder;
+         inline auto set_byte_order(const Host::ByteOrder& byteOrder) -> void {
+            my_byteorder_ = byteOrder;
          }
 
-         Host::ByteOrder byteOrder() const
-         {
-            return my_byteOrder;
+         inline auto byteOrder() const -> Host::ByteOrder {
+            return my_byteorder_;
          }
 
-         void setRoomList(std::unique_ptr<QList<Room>> puRoomList)
-         {
-            my_puRoomList = std::move(puRoomList);
+         inline auto setRoomList(std::unique_ptr<QList<Room>> puRoomList) -> void {
+            my_room_list_unique_pointer_ = std::move(puRoomList);
          }
 
-         QList<Room>* roomListP()
-         {
-            return my_puRoomList.get();
+         inline auto roomListPointer() -> QList<Room>* {
+            return my_room_list_unique_pointer_.get();
          }
 
-         void setUserList(std::unique_ptr<QList<User>> puUserList)
-         {
-            my_puUserList = std::move(puUserList);
+         inline auto setUserList(std::unique_ptr<QList<User>> puUserList) -> void {
+            my_user_list_unique_pointer_ = std::move(puUserList);
          }
 
-         QList<User>* userListP()
-         {
-            return my_puUserList.get();
+         auto userListPointer() -> QList<User>* {
+            return my_user_list_unique_pointer_.get();
          }
 
-         void setHost(const QString& host)
-         {
-            my_host = host;
+         inline auto setHost(const QString& host) -> void {
+            my_host_ = host;
          }
 
-         QString host() const
-         {
-            return my_host;
+         inline auto host() const -> QString {
+            return my_host_;
          }
 
-         void setPort(const u16 port)
-         {
-            my_port = port;
+         inline auto setPort(const u16 port) -> void {
+            my_port_ = port;
          }
 
-         u16 port() const
-         {
-            return my_port;
+         inline auto port() const -> u16 {
+            return my_port_;
          }
 
-         void setVersion(const u32 version)
-         {
-            my_version = version;
+         inline auto setVersion(const u32 version) -> void {
+            my_version_ = version;
          }
 
-         u32 version(void)
-         {
-            return my_version;
+         inline auto version(void) -> u32 {
+            return my_version_;
          }
 
-         void setHttpServerLocation(const QString& httpServerLocation)
-         {
-            my_httpServerLocation = httpServerLocation;
+         inline auto setHttpServerLocation(const QString& httpServerLocation) -> void {
+            my_http_server_location_string_ = httpServerLocation;
          }
 
-         QString httpServerLocation(void)
-         {
-            return my_httpServerLocation;
+         inline auto httpServerLocation(void) -> QString {
+            return my_http_server_location_string_;
          }
 
-         virtual ~Server();
-         Server();
+      private:
+         Host::ByteOrder my_byteorder_;
+         std::unique_ptr<QList<Room>> my_room_list_unique_pointer_;
+         std::unique_ptr<QList<User>> my_user_list_unique_pointer_;
+         QString my_host_;
+         u16 my_port_;
+         u32 my_version_;
+         QString my_http_server_location_string_;
+
+         inline auto do_reset(void) -> void {
+            my_room_list_unique_pointer_->clear();
+            my_user_list_unique_pointer_->clear();
+         }
+
+         inline auto do_deinit(void) -> void {
+         }
+
+         inline auto do_init(void) -> void {
+            my_room_list_unique_pointer_ = std::make_unique<QList<Room>>();
+            my_user_list_unique_pointer_ = std::make_unique<QList<User>>();
+
+            do_reset();
+         }
       };
    }
 }

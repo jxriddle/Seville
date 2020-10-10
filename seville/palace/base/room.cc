@@ -4,15 +4,17 @@ namespace seville
 {
    namespace palace
    {
-      Room::~Room(void)
-      {
-         do_deinit();
-      }
+//      Room::Room(QObject* parent_object_pointer)
+//         : QObject(parent_object_pointer) {}
 
-      Room::Room(QObject* pParent)
-         : QObject(pParent)
+      auto Room::newInstance(QObject* parent_object_pointer) -> std::optional<Room*>
       {
-         do_init();
+         auto instance =
+
+         my_parent_object_pointer_ = parent_object_pointer;
+         QObject::setParent(my_parent_object_pointer);
+
+         return instance;
       }
    }
 }

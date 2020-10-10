@@ -1,4 +1,4 @@
-#include "View_AboutDialog.h"
+#include "seville/view/dialog/aboutdialog.h"
 
 namespace seville
 {

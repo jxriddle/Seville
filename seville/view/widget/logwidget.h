@@ -1,30 +1,37 @@
-#ifndef UI_LOGWIDGET_H
-#define UI_LOGWIDGET_H
+#ifndef SEVILLE_LOGWIDGET_H_
+#define SEVILLE_LOGWIDGET_H_
 
 #include <QDockWidget>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QVBoxLayout>
 
-namespace Seville
+#include "seville/palace/base/client.h"
+
+namespace seville
 {
-   namespace View
+   namespace view
    {
       class LogWidget : public QWidget
       {
-         private:
-            QVBoxLayout* myBaseLayout;
-            QTextEdit* myTextEdit;
-            QLineEdit* myLineEdit;
+      public:
+         explicit LogWidget(QWidget* widget_parent_pointer = nullptr);
+         //virtual ~LogWidget();
 
-            void doSetupView();
-            void doSetupEvents();
+         auto palaceClientPointer(void) -> palace::Client*;
+         auto setPalaceClientPointer(palace::Client* palace_client_pointer) \
+               -> void;
 
-         public:
-            virtual ~LogWidget();
-            explicit LogWidget(QWidget *parent = nullptr);
+      private:
+         palace::Client* my_client_palace_pointer_;
+         QVBoxLayout* my_layout_base_;
+         QTextEdit* my_textedit_;
+         QLineEdit* my_lineedit_;
+
+         void do_setup_view_(void);
+         void do_setup_events_(void);
       };
    }
 }
 
-#endif // UI_LOGWIDGET_H
+#endif // SEVILLE_LOGWIDGET_H_

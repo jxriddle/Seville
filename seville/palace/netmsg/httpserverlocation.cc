@@ -9,8 +9,8 @@ namespace seville
    {
       namespace netmsg
       {
-         HttpServerLocation::HttpServerLocation(const netmsg::Generic& netMsg, bool shouldSwapEndianness)
-            : netmsg::Generic(netMsg, shouldSwapEndianness)
+         HttpServerLocation::HttpServerLocation(const netmsg::GenericNetMsg& netMsg, bool shouldSwapEndianness)
+            : netmsg::GenericNetMsg(netMsg, shouldSwapEndianness)
          {
             do_init();
          }

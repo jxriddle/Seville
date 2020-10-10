@@ -15,12 +15,12 @@ namespace seville
       {
       }
 
-      auto Host::do_swapWord(const quint16 unswapped) -> quint16
+      auto Host::do_SwapWord_(const quint16 unswapped) -> quint16
       {
           return (((unswapped >> 8) & 0xff) | ((unswapped << 8) & 0xff));
       }
 
-      auto Host::do_swapDword(const quint32 unswapped) -> quint32
+      auto Host::do_SwapDword_(const quint32 unswapped) -> quint32
       {
           return (((unswapped >> 24) & 0x000000ff) |  /* byte 3 to byte 0 */
                   ((unswapped <<  8) & 0x00ff0000) |  /* byte 1 to byte 2 */
@@ -28,24 +28,24 @@ namespace seville
                   ((unswapped << 24) & 0xff000000));  /* byte 0 to byte 3 */
       }
 
-      auto Host::swapI16(const qint16 unswapped) -> qint16
+      auto Host::SwapI16(const qint16 unswapped) -> qint16
       {
-          return static_cast<qint16>(do_swapWord(static_cast<quint16>(unswapped)));
+          return static_cast<qint16>(do_SwapWord_(static_cast<quint16>(unswapped)));
       }
 
-      auto Host::swapU16(const quint16 unswapped) -> quint16
+      auto Host::SwapU16(const quint16 unswapped) -> quint16
       {
-          return do_swapWord(unswapped);
+          return do_SwapWord_(unswapped);
       }
 
-      auto Host::swapI32(const qint32 unswapped) -> qint32
+      auto Host::SwapI32(const qint32 unswapped) -> qint32
       {
-          return static_cast<qint32>(do_swapDword(static_cast<quint32>(unswapped)));
+          return static_cast<qint32>(do_SwapDword_(static_cast<quint32>(unswapped)));
       }
 
-      auto Host::swapU32(const quint32 unswapped) -> quint32
+      auto Host::SwapU32(const quint32 unswapped) -> quint32
       {
-          return do_swapDword(unswapped);
+          return do_SwapDword_(unswapped);
       }
    }
 }

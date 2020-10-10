@@ -20,21 +20,19 @@ namespace seville
          Q_OBJECT
 
          public:
-            explicit AppTabWidget(QWidget* parent = nullptr);
+            explicit AppTabWidget(QWidget* widget_parent_pointer = nullptr);
             virtual ~AppTabWidget();
             //AppTabBar myAppTabBar;
-            void addNewTab(QWidget* contents = nullptr);
+            void addNewTab(QWidget* widget_contents_pointer = nullptr);
 
          public slots:
+            void on_tabMovedTriggered();
+            void on_tabClosedTriggered(int index);
+            //void on_plusButton_clicked();
 
          private:
-            void doSetupView();
-            void doAddNewTab(QWidget* contents = nullptr);
-
-         private slots:
-            void doOnTabMovedTriggered();
-            void doOnTabClosedTriggered(int index);
-            //void on_plusButton_clicked();
+            void do_setupView();
+            void do_addNewTab(QWidget* widget_contents_pointer = nullptr);
       };
    }
 }

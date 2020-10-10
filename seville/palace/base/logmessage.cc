@@ -4,17 +4,23 @@ namespace seville
 {
    namespace palace
    {
-      LogMessage::LogMessage(LogMessageKind kind, const QString& message, const QString& usernameFrom, const QString& usernameTo)
+      auto LogMessage::newInstance(
+            LogMessageKind log_message_kind,
+            const QString& message,
+            const QString& username_from,
+            const QString& username_to)
+      -> std::optional<LogMessage*>
       {
-         do_init(kind, message, usernameFrom, usernameTo);
-      }
+         auto instance = std::make_optional<LogMessage*>();
 
-      void LogMessage::do_init(LogMessageKind kind, const QString& message, const QString& usernameFrom, const QString& usernameTo)
-      {
-         my_kind = kind;
-         my_message = message;
-         my_usernameFrom = usernameFrom;
-         my_usernameTo = usernameTo;
+         if (instance.has_value()) {
+            my_kind_log_message_ = log_message_kind;
+            my_message_ = message;
+            my_username_from_ = username_from;
+            my_username_to_ = username_to;
+         }
+
+         return instance;
       }
    }
 }

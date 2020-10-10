@@ -26,12 +26,11 @@ CONFIG += c++17
 
 
 SOURCES += \
-    seville/base/app.cc \
     seville/base/log.cc \
     seville/base/bytearray.cc \
+    seville/base/main.cc \
     seville/palace/base/cipher.cc \
     seville/palace/base/client.cc \
-    seville/palace/base/crypto.cc \
     seville/palace/base/host.cc \
     seville/palace/base/logger.cc \
     seville/palace/base/logmessage.cc \
@@ -39,7 +38,7 @@ SOURCES += \
     seville/palace/base/room.cc \
     seville/palace/base/server.cc \
     seville/palace/base/user.cc \
-    seville/palace/netmsg/generic.cc \
+    seville/palace/base/genericnetmsg.cc \
     seville/palace/netmsg/httpserverlocation.cc \
     seville/palace/netmsg/logon.cc \
     seville/palace/netmsg/roomdescription.cc \
@@ -57,7 +56,6 @@ HEADERS += \
     seville/base/bytearray.h \
     seville/palace/base/cipher.h \
     seville/palace/base/client.h \
-    seville/palace/base/crypto.h \
     seville/palace/base/host.h \
     seville/palace/base/logger.h \
     seville/palace/base/logmessage.h \
@@ -65,7 +63,7 @@ HEADERS += \
     seville/palace/base/room.h \
     seville/palace/base/server.h \
     seville/palace/base/user.h \
-    seville/palace/netmsg/generic.h \
+    seville/palace/base/genericnetmsg.h \
     seville/palace/netmsg/httpserverlocation.h \
     seville/palace/netmsg/logon.h \
     seville/palace/netmsg/roomdescription.h \

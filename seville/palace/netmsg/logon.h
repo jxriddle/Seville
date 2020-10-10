@@ -1,7 +1,7 @@
 #ifndef SEVILLE_PALACE_NETMSG_LOGON_H_
 #define SEVILLE_PALACE_NETMSG_LOGON_H_
 
-#include "generic.h"
+#include "seville/palace/base/genericnetmsg.h"
 
 namespace seville
 {
@@ -9,123 +9,219 @@ namespace seville
    {
       namespace netmsg
       {
-         class Logon : public netmsg::Generic
+         class Logon : public GenericNetMsg
          {
-            public:
-               static const int kByteSizeOfIdent = 6;
-               static const int kByteSizeOfUsernameMax = 31;
-               static const int kByteSizeOfWizardPasswordMax = 31;
+         public:
+            static const int kSizeOfIdentInBytes = 6;
+            static const int kSizeOfUsernameMaxInBytes = 31;
+            static const int kSizeOfWizardPasswordMaxInBytes = 31;
 
-               static const int kByteOffsetOfRegCrc = kOffsetForPayloadInBytes;
-               static const int kByteOffsetOfRegCounter = kOffsetForPayloadInBytes+4;
-               static const int kByteOffsetOfUsernameLen = kOffsetForPayloadInBytes+8;
-               static const int kByteOffsetOfUsername = kOffsetForPayloadInBytes+9;
-               static const int kByteOffsetOfWizardPasswordLen = kOffsetForPayloadInBytes+40;
-               static const int kByteOffsetOfWizardPassword = kOffsetForPayloadInBytes+41;
-               static const int kByteOffsetOfFlags = kOffsetForPayloadInBytes+72;
-               static const int kByteOffsetOfPuidCounter = kOffsetForPayloadInBytes+76;
-               static const int kByteOffsetOfPuidCrc = kOffsetForPayloadInBytes+80;
-               static const int kByteOffsetOfDemoElapsed = kOffsetForPayloadInBytes+84;
-               static const int kByteOffsetOfTotalElapsed = kOffsetForPayloadInBytes+88;
-               static const int kByteOffsetOfDemoLimit = kOffsetForPayloadInBytes+92;
-               static const int kByteOffsetOfInitialRoomId = kOffsetForPayloadInBytes+96;
-               static const int kByteOffsetOfReserved = kOffsetForPayloadInBytes+98; // size: 6
-               static const int kByteOffsetOfUploadRequestedProtocolVersion = kOffsetForPayloadInBytes+104;
-               static const int kByteOffsetOfUploadCapabilities = kOffsetForPayloadInBytes+108;
-               static const int kByteOffsetOfDownloadCapabilities = kOffsetForPayloadInBytes+112;
-               static const int kByteOffsetOfEngineCapabilities2d = kOffsetForPayloadInBytes+116;
-               static const int kByteOffsetOfGraphicsCapabilities2d = kOffsetForPayloadInBytes+120;
-               static const int kByteOffsetOfGraphicsCapabilities3d = kOffsetForPayloadInBytes+124;
+            static const int kOffsetOfRegCrcInBytes = kOffsetForNetMsgPayloadInBytes;
+            static const int kOffsetOfRegCounterInBytes = kOffsetForNetMsgPayloadInBytes+4;
+            static const int kOffsetOfUsernameLenInBytes = kOffsetForNetMsgPayloadInBytes+8;
+            static const int kOffsetOfUsernameInBytes = kOffsetForNetMsgPayloadInBytes+9;
+            static const int kOffsetOfWizardPasswordLenInBytes = kOffsetForNetMsgPayloadInBytes+40;
+            static const int kOffsetOfWizardPasswordInBytes = kOffsetForNetMsgPayloadInBytes+41;
+            static const int kOffsetOfFlagsInBytes = kOffsetForNetMsgPayloadInBytes+72;
+            static const int kOffsetOfPuidCounterInBytes = kOffsetForNetMsgPayloadInBytes+76;
+            static const int kOffsetOfPuidCrcInBytes = kOffsetForNetMsgPayloadInBytes+80;
+            static const int kOffsetOfDemoElapsedInBytes = kOffsetForNetMsgPayloadInBytes+84;
+            static const int kOffsetOfTotalElapsedInBytes = kOffsetForNetMsgPayloadInBytes+88;
+            static const int kOffsetOfDemoLimitInBytes = kOffsetForNetMsgPayloadInBytes+92;
+            static const int kOffsetOfInitialRoomIdInBytes = kOffsetForNetMsgPayloadInBytes+96;
+            static const int kOffsetOfReservedInBytes = kOffsetForNetMsgPayloadInBytes+98; // size: 6
+            static const int kOffsetOfUploadRequestedProtocolVersionInBytes = kOffsetForNetMsgPayloadInBytes+104;
+            static const int kOffsetOfUploadCapabilitiesInBytes = kOffsetForNetMsgPayloadInBytes+108;
+            static const int kOffsetOfDownloadCapabilitiesInBytes = kOffsetForNetMsgPayloadInBytes+112;
+            static const int kOffsetOfEngineCapabilities2dInBytes = kOffsetForNetMsgPayloadInBytes+116;
+            static const int kOffsetOfGraphicsCapabilities2dInBytes = kOffsetForNetMsgPayloadInBytes+120;
+            static const int kOffsetOfGraphicsCapabilities3dInBytes = kOffsetForNetMsgPayloadInBytes+124;
 
-               Logon(netmsg::NetMsgOptions shouldSwapEndianness = netmsg::NetMsgOptions::kShouldNotSwapEndianness);
-               Logon(const netmsg::Generic& netMsg, netmsg::NetMsgOptions shouldSwapEndianness = netmsg::NetMsgOptions::kShouldNotSwapEndianness);
+            Logon(NetMsgOptions options = NetMsgOptions::kDoNotSwapEndianness);
 
-               virtual ~Logon(void);
+            Logon(const GenericNetMsg& netMsg, \
+                  NetMsgOptions options = NetMsgOptions::kDoNotSwapEndianness);
 
-            private:
-               void do_init(void)
-               {
-                  truncate(kOffsetForPayloadInBytes);
-                  reserve(kSizeOfLogonInBytes);
+            virtual ~Logon(void);
 
-                  setId(netmsg::Kind::kLogonKind);
-                  setLen(kSizeOfLogonInBytes);
-                  setRef(0);
+            auto regCrc(void) const -> u32 {
+               return u32At(kOffsetOfRegCrcInBytes);
+            }
 
-                  setFlags(0);
-                  setRegCrc(0);
-                  setPuidCrc(0);
-                  setUsername("Seville User");
-                  setDemoLimit(0x00011940);
-                  setRegCounter(0);
-                  setDemoElapsed(0x00011940);
-                  setPuidCounter(0);
-                  setTotalElapsed(0x00011940);
-                  setInitialRoomId(0);
-                  setUploadCapabilities(0);
-                  setDownloadCapabilities(0);
-                  setEngineCapabilities2d(0);
-                  setGraphicsCapabilities2d(0);
-                  setGraphicsCapabilities3d(0);
-               }
+            auto setRegCrc(u32 value) -> void {
+               set_u32_at(kOffsetOfRegCrcInBytes, value);
+            }
 
-            public:
-               u32 regCrc(void) const { return u32At(kByteOffsetOfRegCrc); }
-               void setRegCrc(u32 value) { setU32At(kByteOffsetOfRegCrc, value); }
+            auto regCounter(void) const -> u32 {
+               return u32At(kOffsetOfRegCounterInBytes);
+            }
 
-               u32 regCounter(void) const { return u32At(kByteOffsetOfRegCounter); }
-               void setRegCounter(u32 value) { setU32At(kByteOffsetOfRegCounter, value); }
+            auto setRegCounter(u32 value) -> void {
+               set_u32_at(kOffsetOfRegCounterInBytes, value);
+            }
 
-               QString username(void) const { return qStringU8At(kByteOffsetOfUsername, kByteSizeOfUsernameMax); }
-               void setUsername(const QString& value) { setQStringU8At(kByteOffsetOfUsername, value); }
+            auto username(void) const -> QString {
+               return pascal_qstring_at(kOffsetOfUsernameInBytes, kSizeOfUsernameMaxInBytes);
+            }
 
-               u8 usernameLen(void) const { return u8At(kByteOffsetOfUsernameLen); }
-               void setUsernameLen(u8 value) { setU8At(kByteOffsetOfUsernameLen, value); }
+            auto setUsername(const QString& value) -> void {
+               set_pascal_qstring_at_at(kOffsetOfUsernameInBytes, value);
+            }
 
-               QString wizardPassword(void) const { return qStringU8At(kByteOffsetOfWizardPassword, kByteSizeOfWizardPasswordMax); }
-               void setWizardPassword(const QString& value) { return setQStringU8At(kByteOffsetOfWizardPassword, value); }
+            auto usernameLen(void) const -> u8 {
+               return u8_at(kOffsetOfUsernameLenInBytes);
+            }
 
-               u32 flags(void) const { return u32At(kByteOffsetOfFlags); }
-               void setFlags(u32 value) { setU32At(kByteOffsetOfFlags, value); }
+            auto setUsernameLen(u8 value) -> void {
+               set_u8_at(kOffsetOfUsernameLenInBytes, value);
+            }
 
-               u32 puidCounter(void) const { return u32At(kByteOffsetOfPuidCounter); }
-               void setPuidCounter(u32 value) { setU32At(kByteOffsetOfPuidCounter, value); }
+            auto wizardPassword(void) const -> QString {
+               return pascal_qstring_at(kOffsetOfWizardPasswordInBytes, kSizeOfWizardPasswordMaxInBytes);
+            }
 
-               u32 puidCrc(void) const { return u32At(kByteOffsetOfPuidCrc); }
-               void setPuidCrc(u32 value) { setU32At(kByteOffsetOfPuidCrc, value); }
+            auto setWizardPassword(const QString& value) -> void {
+               return set_pascal_qstring_at_at(kOffsetOfWizardPasswordInBytes, value);
+            }
 
-               u32 demoElapsed(void) const { return u32At(kByteOffsetOfDemoElapsed); }
-               void setDemoElapsed(u32 value) { setU32At(kByteOffsetOfDemoElapsed, value); }
+            auto flags(void) const -> u32 {
+               return u32At(kOffsetOfFlagsInBytes);
+            }
 
-               u32 totalElapsed(void) const { return u32At(kByteOffsetOfTotalElapsed); }
-               void setTotalElapsed(u32 value) { setU32At(kByteOffsetOfTotalElapsed, value); }
+            auto setFlags(u32 value) -> void {
+               set_u32_at(kOffsetOfFlagsInBytes, value);
+            }
 
-               u32 demoLimit(void) const { return u32At(kByteOffsetOfDemoLimit); }
-               void setDemoLimit(u32 value) { setU32At(kByteOffsetOfDemoLimit, value); }
+            auto puidCounter(void) const -> u32 {
+               return u32At(kOffsetOfPuidCounterInBytes);
+            }
 
-               u16 initialRoomId(void) const { return u16At(kByteOffsetOfInitialRoomId); }
-               void setInitialRoomId(u16 value) { setU16At(kByteOffsetOfInitialRoomId, value); }
+            auto setPuidCounter(u32 value) -> void {
+               set_u32_at(kOffsetOfPuidCounterInBytes, value);
+            }
 
-               QString reserved(void) const { return qStringAt(kByteOffsetOfReserved, kByteSizeOfIdent); }
-               void setReserved(const QString& value) { setQStringAt(kByteOffsetOfReserved, value); }
+            auto puidCrc(void) const -> u32 {
+               return u32At(kOffsetOfPuidCrcInBytes);
+            }
 
-               u32 uploadRequestedProtocolVersion(void) const { return u32At(kByteOffsetOfUploadRequestedProtocolVersion); }
-               void setUploadRequestedProtocolVersion(u32 value) { setU32At(kByteOffsetOfUploadRequestedProtocolVersion, value); }
+            auto setPuidCrc(u32 value) -> void {
+               set_u32_at(kOffsetOfPuidCrcInBytes, value);
+            }
 
-               u32 uploadCapabilities(void) const { return u32At(kByteOffsetOfUploadCapabilities); }
-               void setUploadCapabilities(u32 value) { setU32At(kByteOffsetOfUploadCapabilities, value); }
+            auto demoElapsed(void) const -> u32 {
+               return u32At(kOffsetOfDemoElapsedInBytes);
+            }
 
-               u32 downloadCapabilities(void) const { return u32At(kByteOffsetOfDownloadCapabilities); }
-               void setDownloadCapabilities(u32 value) { setU32At(kByteOffsetOfDownloadCapabilities, value); }
+            auto setDemoElapsed(u32 value) -> void {
+               set_u32_at(kOffsetOfDemoElapsedInBytes, value);
+            }
 
-               u32 engineCapabilities2d(void) const { return u32At(kByteOffsetOfEngineCapabilities2d); }
-               void setEngineCapabilities2d(u32 value) { setU32At(kByteOffsetOfEngineCapabilities2d, value); }
+            auto totalElapsed(void) const -> u32 {
+               return u32At(kOffsetOfTotalElapsedInBytes);
+            }
 
-               u32 graphicsCapabilities2d(void) const { return u32At(kByteOffsetOfGraphicsCapabilities2d); }
-               void setGraphicsCapabilities2d(u32 value) { setU32At(kByteOffsetOfGraphicsCapabilities2d, value); }
+            auto setTotalElapsed(u32 value) -> void {
+               set_u32_at(kOffsetOfTotalElapsedInBytes, value);
+            }
 
-               u32 graphicsCapabilities3d(void) const { return u32At(kByteOffsetOfGraphicsCapabilities3d); }
-               void setGraphicsCapabilities3d(u32 value) { setU32At(kByteOffsetOfGraphicsCapabilities3d, value); }
+            auto demoLimit(void) const -> u32 {
+               return u32At(kOffsetOfDemoLimitInBytes);
+            }
+
+            auto setDemoLimit(u32 value) -> void {
+               set_u32_at(kOffsetOfDemoLimitInBytes, value);
+            }
+
+            auto initialRoomId(void) const -> u16 {
+               return u16At(kOffsetOfInitialRoomIdInBytes);
+            }
+
+            auto setInitialRoomId(u16 value) -> void {
+               set_u16_at(kOffsetOfInitialRoomIdInBytes, value);
+            }
+
+            auto reserved(void) const -> QString {
+               return qstring_at(kOffsetOfReservedInBytes, kSizeOfIdentInBytes);
+            }
+
+            auto setReserved(const QString& value) -> void {
+               set_qstring_at(kOffsetOfReservedInBytes, value);
+            }
+
+            auto uploadRequestedProtocolVersion(void) const -> u32 {
+               return u32At(kOffsetOfUploadRequestedProtocolVersionInBytes);
+            }
+
+            auto setUploadRequestedProtocolVersion(u32 value) -> void {
+               set_u32_at(kOffsetOfUploadRequestedProtocolVersionInBytes, value);
+            }
+
+            auto uploadCapabilities(void) const -> u32 {
+               return u32At(kOffsetOfUploadCapabilitiesInBytes);
+            }
+
+            auto setUploadCapabilities(u32 value) -> void {
+               set_u32_at(kOffsetOfUploadCapabilitiesInBytes, value);
+            }
+
+            auto downloadCapabilities(void) const -> u32 {
+               return u32At(kOffsetOfDownloadCapabilitiesInBytes);
+            }
+
+            auto setDownloadCapabilities(u32 value) -> void {
+               set_u32_at(kOffsetOfDownloadCapabilitiesInBytes, value);
+            }
+
+            auto engineCapabilities2d(void) const -> u32 {
+               return u32At(kOffsetOfEngineCapabilities2dInBytes);
+            }
+
+            auto setEngineCapabilities2d(u32 value) -> void {
+               set_u32_at(kOffsetOfEngineCapabilities2dInBytes, value);
+            }
+
+            auto graphicsCapabilities2d(void) const -> u32 {
+               return u32At(kOffsetOfGraphicsCapabilities2dInBytes);
+            }
+
+            auto setGraphicsCapabilities2d(u32 value) -> void {
+               set_u32_at(kOffsetOfGraphicsCapabilities2dInBytes, value);
+            }
+
+            auto graphicsCapabilities3d(void) const -> u32 {
+               return u32At(kOffsetOfGraphicsCapabilities3dInBytes);
+            }
+
+            auto setGraphicsCapabilities3d(u32 value) -> void {
+               set_u32_at(kOffsetOfGraphicsCapabilities3dInBytes, value);
+            }
+
+         private:
+            void do_init(void)
+            {
+               truncate(kOffsetForNetMsgPayloadInBytes);
+               reserve(kSizeOfLogonNetMsgInBytes);
+
+               setId(NetMsgKind::kLogonKind);
+               setLen(kSizeOfLogonNetMsgInBytes);
+               setRef(0);
+
+               setFlags(0);
+               setRegCrc(0);
+               setPuidCrc(0);
+               setUsername("Seville User");
+               setDemoLimit(0x00011940);
+               setRegCounter(0);
+               setDemoElapsed(0x00011940);
+               setPuidCounter(0);
+               setTotalElapsed(0x00011940);
+               setInitialRoomId(0);
+               setUploadCapabilities(0);
+               setDownloadCapabilities(0);
+               setEngineCapabilities2d(0);
+               setGraphicsCapabilities2d(0);
+               setGraphicsCapabilities3d(0);
+            }
          };
       }
    }

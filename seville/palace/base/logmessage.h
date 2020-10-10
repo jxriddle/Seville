@@ -21,31 +21,55 @@ namespace seville
       class LogMessage
       {
       public:
-         LogMessage(LogMessageKind kind = LogMessageKind::kChatKind, const QString& message = "", const QString& usernameFrom = "", const QString& usernameTo = "");
+         LogMessage(void) = delete;
 
-         inline LogMessageKind kind() const { return my_kind; }
-         inline void setKind(const LogMessageKind& value) { my_kind = value; }
+         auto newInstance(
+               LogMessageKind log_message_kind = LogMessageKind::kChatKind,
+               const QString& message = "",
+               const QString& username_from = "",
+               const QString& username_to = "") -> std::optional<LogMessage*>;
 
-         inline QString message() const { return my_message; }
-         inline void setMessage(const QString& value) { my_message = value; }
+         inline auto kind(void) const -> LogMessageKind {
+            return my_kind_log_message_;
+         }
 
-         inline QString fromUsername() const { return my_usernameFrom; }
-         inline void setFromUsername(const QString& value) { my_usernameFrom = value; }
+         inline auto setKind(const LogMessageKind& value) -> void {
+            my_kind_log_message_ = value;
+         }
 
-         inline QString toUsername() const { return my_usernameTo; }
-         inline void setToUsername(const QString& value) { my_usernameTo = value; }
+         inline auto message(void) const -> QString {
+            return my_message_;
+         }
+
+         inline auto setMessage(const QString& value) -> void {
+            my_message_ = value;
+         }
+
+         inline auto fromUsername(void) const -> QString {
+            return my_username_from_;
+         }
+
+         inline auto setFromUsername(const QString& value) -> void {
+            my_username_from_ = value;
+         }
+
+         inline auto toUsername(void) const -> QString {
+            return my_username_to_;
+         }
+
+         inline auto setToUsername(const QString& value) -> void {
+            my_username_to_ = value;
+         }
 
       private:
-         std::unique_ptr<std::vector<LogMessage>> my_puMessages;
-         bool my_isDebugModeFlag;
-
-         LogMessageKind my_kind;
-         QString my_message;
-         QString my_usernameFrom;
-         QString my_usernameTo;
+         std::unique_ptr<std::vector<LogMessage>> my_messages_unique_pointer_;
+         bool my_flag_is_debug_mode_;
+         LogMessageKind my_kind_log_message_;
+         QString my_message_;
+         QString my_username_from_;
+         QString my_username_to_;
 
          void do_init(LogMessageKind kind, const QString& message, const QString& usernameFrom, const QString& usernameTo);
-         void do_deinit(void);
       };
    }
 }

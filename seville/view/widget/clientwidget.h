@@ -1,5 +1,5 @@
-#ifndef UI_CLIENT_WIDGET_H
-#define UI_CLIENT_WIDGET_H
+#ifndef SEVILLE_PALACE_CLIENT_WIDGET_H_
+#define SEVILLE_PALACE_CLIENT_WIDGET_H_
 
 #include <QDir>
 #include <QImage>
@@ -9,9 +9,9 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "Log.h"
-#include "View_MainWindow.h"
-#include "Palace_Client.h"
+#include "seville/view/widget/logwidget.h"
+#include "seville/view/window/mainwindow.h"
+#include "seville/palace/base/client.h"
 
 namespace seville
 {
@@ -21,45 +21,47 @@ namespace seville
       {
          Q_OBJECT
 
-         private:
-            Palace::Client* myPalaceClient;
+      public:
+         palace::Client* palaceClient(void) {
+            return my_client_palace_pointer_;
+         }
 
-            QLabel* myBackgroundImageLabel;
-            QScrollArea* myScrollArea;
-            QVBoxLayout* myWidgetLayout;
+         auto promptNewConnection(void) -> void {
+            do_promptNewConnection(this);
+         }
 
-            QPixmap myBackgroundImage;
-            double myScaleFactor;
+         //virtual ~ClientWidget();
+         explicit ClientWidget(QWidget* widget_parent_pointer = nullptr);
 
-            void doSetupView();
-            void doSetupEvents();
 
-            void doSetBackgroundImage(QPixmap& pixmap);
-            void doSetBackgroundImageFromFile(QString imagePath);
-            //void doResizeBackgroundImage(QSize size);
-            void doPromptNewConnection(QWidget* parent);
-            void doFetchBackgroundImage(QString fileUrl);
+      protected:
+         auto mousePressEvent(QMouseEvent* event_mouse_pointer) -> void;
+         //void resizeEvent(QResizeEvent *event) override;
 
-         protected:
-            void mousePressEvent(QMouseEvent* event);
-            //void resizeEvent(QResizeEvent *event) override;
+      signals:
 
-         signals:
+      public slots:
+         //void updateGeometry();
+         //void onBackgroundImageLabelResized(QResizeEvent *event);
+         auto on_backgroundChanged(void) -> void;
 
-         public slots:
-            //void updateGeometry();
-            //void onBackgroundImageLabelResized(QResizeEvent *event);
-            void onBackgroundChanged();
+      private:
+         palace::Client* my_client_palace_pointer_;
+         QLabel* my_label_background_image_pointer_;
+         QScrollArea* my_scrollarea_pointer_;
+         QVBoxLayout* my_layout_widget_pointer_;
+         QPixmap my_pixmap_background_image_;
+         double my_scale_factor_;
 
-         public:
-            Palace::Client* palaceClient() { return myPalaceClient; }
+         auto do_setupView() -> void;
+         auto do_setupEvents() -> void;
 
-            void promptNewConnection()
-               { doPromptNewConnection(this); }
-
-            //virtual ~ClientWidget();
-            explicit ClientWidget(QWidget* parent = nullptr);
+         auto do_setBackgroundImage(QPixmap& pixmap) -> void;
+         auto do_setBackgroundImageFromFile(QString imagePath) -> void;
+         //void doResizeBackgroundImage(QSize size);
+         auto do_promptNewConnection(QWidget* parent) -> void;
+         auto do_fetchBackgroundImage(QString fileUrl) -> void;
       };
    }
 }
-#endif // UI_CLIENT_WIDGET_H
+#endif // SEVILLE_PALACE_CLIENT_WIDGET_H_

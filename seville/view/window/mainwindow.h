@@ -1,5 +1,5 @@
-#ifndef UI_MAINWINDOW_H
-#define UI_MAINWINDOW_H
+#ifndef UI_MAINWINDOW_H_
+#define UI_MAINWINDOW_H_
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -22,11 +22,12 @@
 #include <QTabBar>
 #include <QTabWidget>
 
-#include "connectdialog.h"
-#include "seville/view/base/clientwidget.h"
-#include "aboutdialog.h"
-#include "View_PalaceLogWidget.h"
-#include "seville/view/tabwidget.h"
+#include "seville/view/dialog/aboutdialog.h"
+#include "seville/view/dialog/connectdialog.h"
+
+#include "seville/view/widget/clientwidget.h"
+#include "seville/view/widget/logwidget.h"
+#include "seville/view/widget/tabwidget.h"
 
 namespace seville
 {
@@ -37,27 +38,27 @@ namespace seville
       Q_OBJECT
 
       private:
-         Zed::View::ZedTabWidget* my_pTabWidget;
-         QDockWidget* my_pDockWidgetForLog;
-         PalaceLogWidget* my_pLogWidget;
-         QVBoxLayout* my_pMainLayout;
-         QTabBar* my_pTabBar;
-         QMenuBar* my_pMenuBar;
-         QMenu* my_pFileMenu;
-         QMenu* my_pEditMenu;
-         QMenu* my_pWindowMenu;
-         QMenu* my_pHelpMenu;
-         QAction* my_pNewHostConnectionAction;
-         QAction* my_pCloseHostConnectionAction;
-         QAction* my_pUndoContentAction;
-         QAction* my_pRedoContentAction;
-         QAction* my_pCutContentAction;
-         QAction* my_pCopyContentAction;
-         QAction* my_pPasteContentAction;
-         QAction* my_pQuitAppAction;
-         QAction* my_pAboutAppAction;
-         QAction* my_pToggleLogAction;
-         QStatusBar* my_pStatusBar;
+         AppTabWidget* my_widget_tab_pointer_;
+         QDockWidget* my_widget_dock_log_pointer_;
+         LogWidget* my_widget_log_pointer_;
+         QVBoxLayout* my_layout_main_pointer_;
+         QTabBar* my_tabbar_pointer_;
+         QMenuBar* my_menubar_pointer_;
+         QMenu* my_menu_file_pointer_;
+         QMenu* my_menu_edit_pointer_;
+         QMenu* my_menu_window_pointer_;
+         QMenu* my_menu_help_pointer_;
+         QAction* my_action_new_host_connection_pointer_;
+         QAction* my_action_close_host_connection_pointer_;
+         QAction* my_action_undo_content_pointer_;
+         QAction* my_action_redo_content_pointer_;
+         QAction* my_action_cut_content_pointer_;
+         QAction* my_action_copy_content_pointer_;
+         QAction* my_action_paste_content_pointer_;
+         QAction* my_action_quit_app_pointer_;
+         QAction* my_action_about_app_pointer_;
+         QAction* my_action_toggle_log_pointer_;
+         QStatusBar* my_statusbar_pointer_;
 
          void do_setupView(void)
          {
@@ -68,13 +69,15 @@ namespace seville
             QScreen *primaryScreen = QGuiApplication::primaryScreen();
             auto screen = primaryScreen->geometry();
 
-            QSize defaultWindowSize = QSize(static_cast<int>(.67*screen.width()),
-                                            static_cast<int>(.67*screen.height()));
+            QSize defaultWindowSize = QSize( \
+                     static_cast<int>(.67*screen.width()), \
+                     static_cast<int>(.67*screen.height()));
 
-            setGeometry(QStyle::alignedRect(Qt::LeftToRight,
-                                            Qt::AlignCenter,
-                                            defaultWindowSize,
-                                            primaryScreen->geometry()));
+            setGeometry(QStyle::alignedRect( \
+                           Qt::LeftToRight, \
+                           Qt::AlignCenter, \
+                           defaultWindowSize, \
+                           primaryScreen->geometry()));
 
             setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
             adjustSize();
@@ -86,26 +89,26 @@ namespace seville
             //mainLayout_->addWidget(menuBar_, 0, 0);
 
             // Tab Widget
-            my_pTabWidget = new Zed::View::ZedTabWidget(this);
-            my_pTabWidget->setGeometry(0, 0, width(), height()); // x, y, w, h
+            my_widget_tab_pointer_ = new AppTabWidget(this);
+            my_widget_tab_pointer_->setGeometry(0, 0, width(), height()); // x, y, w, h
             layout()->setSpacing(0);
             //layout()->addWidget(tabWidget_);
-            auto pClientWidget = new PalaceClientWidget(this);
+            auto widget_client_pointer = new ClientWidget(this);
             //connect(palRoomWidget, )
-            my_pTabWidget->addNewTab(pClientWidget);
+            my_widget_tab_pointer_->addNewTab(widget_client_pointer);
             //mainLayout_->setSpacing(0);
             //mainLayout_->addWidget(tabWidget_, 1);
 
             //setLayout(mainLayout_);
             //mainLayout_->setSizeConstraint(QLayout::SetMinimumSize);
 
-            my_pStatusBar = new QStatusBar(this);
+            my_statusbar_pointer_ = new QStatusBar(this);
             //setStatusBar(my_pStatusBar);
             //my_pStatusBar->showMessage(tr("Ready"));
             //layout()->addWidget(my_pStatusBar);
 
             // Set Main Window to Tab Widget
-            setCentralWidget(my_pTabWidget);
+            setCentralWidget(my_widget_tab_pointer_);
 
             QSettings settings;
             restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
@@ -115,103 +118,108 @@ namespace seville
          void do_setupActions(void)
          {
             // Create Actions
-            my_pNewHostConnectionAction = new QAction(tr("&Connect"), this);
-            my_pCloseHostConnectionAction = new QAction(tr("&Disconnect"), this);
-            my_pQuitAppAction = new QAction(tr("E&xit"), this);
-            my_pUndoContentAction = new QAction(tr("&Undo"), this);
-            my_pRedoContentAction = new QAction(tr("&Redo"), this);
-            my_pCutContentAction = new QAction(tr("&Cut"), this);
-            my_pCopyContentAction = new QAction(tr("&Copy"), this);
-            my_pPasteContentAction = new QAction(tr("&Paste"), this);
-            my_pAboutAppAction = new QAction(tr("&About Seville"), this);
-            my_pToggleLogAction = new QAction(tr("&Log"), this);
+            my_action_new_host_connection_pointer_ = new QAction(tr("&Connect"), this);
+            my_action_close_host_connection_pointer_ = new QAction(tr("&Disconnect"), this);
+            my_action_quit_app_pointer_ = new QAction(tr("E&xit"), this);
+            my_action_undo_content_pointer_ = new QAction(tr("&Undo"), this);
+            my_action_redo_content_pointer_ = new QAction(tr("&Redo"), this);
+            my_action_cut_content_pointer_ = new QAction(tr("&Cut"), this);
+            my_action_copy_content_pointer_ = new QAction(tr("&Copy"), this);
+            my_action_paste_content_pointer_ = new QAction(tr("&Paste"), this);
+            my_action_about_app_pointer_ = new QAction(tr("&About Seville"), this);
+            my_action_toggle_log_pointer_ = new QAction(tr("&Log"), this);
 
             // Assign Action Shortcut Keys
-            my_pNewHostConnectionAction->setShortcut(QKeySequence::New);
-            my_pCloseHostConnectionAction->setShortcut(Qt::CTRL | Qt::Key_W);
-            my_pCloseHostConnectionAction->setEnabled(false);
-            my_pQuitAppAction->setShortcut(QKeySequence::Quit);
-            my_pUndoContentAction->setShortcut(QKeySequence::Undo);
-            my_pRedoContentAction->setShortcut(QKeySequence::Redo);
-            my_pCutContentAction->setShortcut(QKeySequence::Cut);
-            my_pCopyContentAction->setShortcut(QKeySequence::Copy);
-            my_pPasteContentAction->setShortcut(QKeySequence::Paste);
-            my_pToggleLogAction->setShortcut(Qt::CTRL | Qt::Key_L);
+            my_action_new_host_connection_pointer_->setShortcut(QKeySequence::New);
+            my_action_close_host_connection_pointer_->setShortcut(Qt::CTRL | Qt::Key_W);
+            my_action_close_host_connection_pointer_->setEnabled(false);
+            my_action_quit_app_pointer_->setShortcut(QKeySequence::Quit);
+            my_action_undo_content_pointer_->setShortcut(QKeySequence::Undo);
+            my_action_redo_content_pointer_->setShortcut(QKeySequence::Redo);
+            my_action_cut_content_pointer_->setShortcut(QKeySequence::Cut);
+            my_action_copy_content_pointer_->setShortcut(QKeySequence::Copy);
+            my_action_paste_content_pointer_->setShortcut(QKeySequence::Paste);
+            my_action_toggle_log_pointer_->setShortcut(Qt::CTRL | Qt::Key_L);
          }
 
          void do_setupMenus(void)
          {
             // Create Menu Bar
-            my_pMenuBar = new QMenuBar(this);
-            my_pFileMenu = my_pMenuBar->addMenu(tr("&File"));
-            my_pEditMenu = my_pMenuBar->addMenu(tr("&Edit"));
-            my_pWindowMenu = my_pMenuBar->addMenu(tr("&Window"));
-            my_pHelpMenu = my_pMenuBar->addMenu(tr("&Help"));
+            my_menubar_pointer_ = new QMenuBar(this);
+            my_menu_file_pointer_ = my_menubar_pointer_->addMenu(tr("&File"));
+            my_menu_edit_pointer_ = my_menubar_pointer_->addMenu(tr("&Edit"));
+            my_menu_window_pointer_ = my_menubar_pointer_->addMenu(tr("&Window"));
+            my_menu_help_pointer_ = my_menubar_pointer_->addMenu(tr("&Help"));
 
             // File Menu
-            my_pFileMenu->addAction(my_pNewHostConnectionAction);
-            my_pFileMenu->addAction(my_pCloseHostConnectionAction);
-            my_pFileMenu->addSeparator();
-            my_pFileMenu->addAction(my_pQuitAppAction);
+            my_menu_file_pointer_->addAction(my_action_new_host_connection_pointer_);
+            my_menu_file_pointer_->addAction(my_action_close_host_connection_pointer_);
+            my_menu_file_pointer_->addSeparator();
+            my_menu_file_pointer_->addAction(my_action_quit_app_pointer_);
 
             // Edit Menu
-            my_pEditMenu->addAction(my_pUndoContentAction);
-            my_pEditMenu->addAction(my_pRedoContentAction);
-            my_pEditMenu->addSeparator();
-            my_pEditMenu->addAction(my_pCutContentAction);
-            my_pEditMenu->addAction(my_pCopyContentAction);
-            my_pEditMenu->addAction(my_pPasteContentAction);
-            my_pEditMenu->addSeparator();
+            my_menu_edit_pointer_->addAction(my_action_undo_content_pointer_);
+            my_menu_edit_pointer_->addAction(my_action_redo_content_pointer_);
+            my_menu_edit_pointer_->addSeparator();
+            my_menu_edit_pointer_->addAction(my_action_cut_content_pointer_);
+            my_menu_edit_pointer_->addAction(my_action_copy_content_pointer_);
+            my_menu_edit_pointer_->addAction(my_action_paste_content_pointer_);
+            my_menu_edit_pointer_->addSeparator();
 
             // Window Menu
             //myWindowMenu->addAction(myToggleLogAction);
-            my_pWindowMenu->addAction(my_pDockWidgetForLog->toggleViewAction());
+            my_menu_window_pointer_->addAction(my_widget_dock_log_pointer_->toggleViewAction());
 
             // About Menu
-            my_pHelpMenu->addSeparator();
-            my_pHelpMenu->addAction(my_pAboutAppAction);
+            my_menu_help_pointer_->addSeparator();
+            my_menu_help_pointer_->addAction(my_action_about_app_pointer_);
 
-            setMenuBar(my_pMenuBar);
+            setMenuBar(my_menubar_pointer_);
          }
 
          void do_setupDocks(void)
          {
-            auto my_pPalaceClientWidget = static_cast<PalaceClientWidget *>(my_pTabWidget->currentWidget());
-            auto pPalaceClient = my_pPalaceClientWidget->palaceClientP();
-            my_pLogWidget = new PalaceLogWidget(pPalaceClient, this);
-            my_pLogWidget->setLineEditChatVisible(my_pLogWidget->isWindow());
+            auto widget_palace_client_pointer = \
+                  static_cast<ClientWidget *>( \
+                     my_widget_tab_pointer_->currentWidget());
+            auto palace_client_pointer = \
+                  widget_palace_client_pointer->palaceClientPointer();
 
-            my_pDockWidgetForLog = new QDockWidget(tr("Log"), this);
-            my_pDockWidgetForLog->setAllowedAreas(
-                     Qt::LeftDockWidgetArea |
-                     Qt::BottomDockWidgetArea |
-                     Qt::RightDockWidgetArea |
-                     Qt::TopDockWidgetArea
-            );
+            my_widget_log_pointer_ = new PalaceLogWidget(pPalaceClient, this);
+            my_widget_log_pointer_->setLineEditChatVisible( \
+                     my_widget_log_pointer_->isWindow());
 
-            my_pDockWidgetForLog->setWidget(my_pLogWidget);
-            addDockWidget(Qt::RightDockWidgetArea, my_pDockWidgetForLog);
+            my_widget_dock_log_pointer_ = new QDockWidget(tr("Log"), this);
+            my_widget_dock_log_pointer_->setAllowedAreas( \
+                     Qt::LeftDockWidgetArea | \
+                     Qt::BottomDockWidgetArea | \
+                     Qt::RightDockWidgetArea | \
+                     Qt::TopDockWidgetArea \
+                  );
+
+            my_widget_dock_log_pointer_->setWidget(my_widget_log_pointer_);
+            addDockWidget(Qt::RightDockWidgetArea, my_widget_dock_log_pointer_);
          }
 
          void do_setupEvents(void)
          {
             // Connect Action Signals to Slots
-            connect(my_pDockWidgetForLog, &QDockWidget::topLevelChanged,
+            connect(my_widget_dock_log_pointer_, &QDockWidget::topLevelChanged,
                     this, &seville::view::MainWindow::on_topLevelChanged);
 
-            connect(my_pNewHostConnectionAction, &QAction::triggered,
+            connect(my_action_new_host_connection_pointer_, &QAction::triggered,
                     this, &seville::view::MainWindow::on_newHostConnectionActionTriggered);
 
-            connect(my_pCloseHostConnectionAction, &QAction::triggered,
+            connect(my_action_close_host_connection_pointer_, &QAction::triggered,
                     this, &seville::view::MainWindow::on_closeHostConnectionActionTriggered);
 
-            connect(my_pQuitAppAction, &QAction::triggered,
+            connect(my_action_quit_app_pointer_, &QAction::triggered,
                     this, &seville::view::MainWindow::on_quitAppActionTriggered);
 
-            connect(my_pAboutAppAction, &QAction::triggered,
+            connect(my_action_about_app_pointer_, &QAction::triggered,
                     this, &seville::view::MainWindow::on_aboutAppActionTriggered);
 
-            connect(my_pToggleLogAction, &QAction::triggered,
+            connect(my_action_toggle_log_pointer_, &QAction::triggered,
                     this, &seville::view::MainWindow::on_toggleLogWindowActionTriggered);
          }
 
@@ -239,12 +247,15 @@ namespace seville
       public slots:
          void on_topLevelChanged(bool shouldBeVisible)
          {
-            my_pLogWidget->setLineEditChatVisible(shouldBeVisible);
+            my_widget_log_pointer_->setLineEditChatVisible(shouldBeVisible);
          }
 
          void on_newHostConnectionActionTriggered(void)
          {
-            PalaceClientWidget* pActiveClientWidget = static_cast<PalaceClientWidget *>(my_pTabWidget->currentWidget());
+            auto widget_client_active_pointer = \
+                  static_cast<PalaceClientWidget *>( \
+                     my_widget_tab_pointer_->currentWidget());
+
             //connect(palTabWidget, resize);
             pActiveClientWidget->promptNewConnection();
          }
@@ -252,11 +263,11 @@ namespace seville
          void on_closeHostConnectionActionTriggered(void)
          {
             // if last tab is closed, quit application
-            if (my_pTabWidget->count() <= 2) {
+            if (my_widget_tab_pointer_->count() <= 2) {
                QApplication::quit();
             }
 
-            my_pTabWidget->removeTab(my_pTabWidget->currentIndex());
+            my_widget_tab_pointer_->removeTab(my_widget_tab_pointer_->currentIndex());
          }
 
          void on_quitAppActionTriggered(void)
@@ -301,16 +312,16 @@ namespace seville
 
          void on_toggleLogWindowActionTriggered(void)
          {
-            if (!my_pLogWidget->isVisible())
-               my_pLogWidget->show();
+            if (!my_widget_log_pointer_->isVisible())
+               my_widget_log_pointer_->show();
             else
-               my_pLogWidget->hide();
+               my_widget_log_pointer_->hide();
          }
 
          void do_deinit(void)
          {
-            if (my_pLogWidget != nullptr)
-               delete(my_pLogWidget);
+            if (my_widget_log_pointer_ != nullptr)
+               delete(my_widget_log_pointer_);
             /*
             if (this->menuBar != nullptr)
             {
@@ -339,4 +350,4 @@ namespace seville
    }
 }
 
-#endif // UI_MAINWINDOW_H
+#endif // UI_MAINWINDOW_H_

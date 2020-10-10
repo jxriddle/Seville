@@ -6,32 +6,32 @@ namespace seville
    {
       void User::do_reset(void)
       {
-         my_color = 1;
-         my_face = 1;
-         my_x = 0;
-         my_y = 0;
-         my_idChanged = false;
-         my_idCounter = 0xf5dc385e;
-         my_idCrc = 0xc144c580;
-         my_regCounter = 0xcf07309c;
-         my_regCrc = 0x5905f923;
-         my_username = "Seville User";
-         my_wizpass = "";
+         my_color_ = 1;
+         my_face_ = 1;
+         my_x_ = 0;
+         my_y_ = 0;
+         my_id_changed_ = false;
+         my_id_counter_ = 0xf5dc385e;
+         my_id_crc_ = 0xc144c580;
+         my_reg_counter_ = 0xcf07309c;
+         my_reg_crc_ = 0x5905f923;
+         my_username_ = "Seville User";
+         my_wizpass_ = "";
       }
 
       void User::do_assign(const User& user)
       {
-         my_color = user.my_color;
-         my_face = user.my_face;
-         my_x = user.my_x;
-         my_y = user.my_y;
-         my_idChanged = user.my_idChanged;
-         my_idCounter = user.my_idCounter;
-         my_idCrc = user.my_idCrc;
-         my_regCounter = user.my_regCounter;
-         my_regCrc = user.my_regCrc;
-         my_username = user.my_username;
-         my_wizpass = user.my_wizpass;
+         my_color_ = user.my_color_;
+         my_face_ = user.my_face_;
+         my_x_ = user.my_x_;
+         my_y_ = user.my_y_;
+         my_id_changed_ = user.my_id_changed_;
+         my_id_counter_ = user.my_id_counter_;
+         my_id_crc_ = user.my_id_crc_;
+         my_reg_counter_ = user.my_reg_counter_;
+         my_reg_crc_ = user.my_reg_crc_;
+         my_username_ = user.my_username_;
+         my_wizpass_ = user.my_wizpass_;
       }
 
       void User::do_init(void)

@@ -1,5 +1,5 @@
-#ifndef PALACE_HOST_H
-#define PALACE_HOST_H
+#ifndef PALACE_HOST_H_
+#define PALACE_HOST_H_
 
 #include <QtCore>
 
@@ -10,29 +10,27 @@ namespace seville
       class Host
       {
       public:
-         enum ByteOrder
-         {
-            Unknown,
-            BigEndian,
-            LittleEndian
+         enum ByteOrder {
+            kUnknownEndian,
+            kBigEndian,
+            kLittleEndian
          };
 
-      private:
-         static quint16 do_swapWord(const quint16 unswapped);
-         static quint32 do_swapDword(const quint32 unswapped);
-
-      public:
          Host(void);
          virtual ~Host(void);
 
-         static bool isBigEndian(void);
+         static auto IsBigEndian(void) -> bool;
 
-         static qint16 swapI16(const qint16 unswapped);
-         static quint16 swapU16(const quint16 unswapped);
-         static qint32 swapI32(const qint32 unswapped);
-         static quint32 swapU32(const quint32 unswapped);
+         static auto SwapI16(const qint16 unswapped) -> qint16;
+         static auto SwapU16(const quint16 unswapped) -> quint16;
+         static auto SwapI32(const qint32 unswapped) -> qint32;
+         static auto SwapU32(const quint32 unswapped) -> quint32;
+
+      private:
+         static auto do_SwapWord_(const quint16 unswapped) -> quint16;
+         static auto do_SwapDword_(const quint32 unswapped) -> quint32;
       };
    }
 }
 
-#endif // PALACE_HOST_H
+#endif  // PALACE_HOST_H_

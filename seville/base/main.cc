@@ -6,7 +6,7 @@
 #include "app.h"
 #include "log.h"
 
-#include "seville/view/mainwindow.h"
+#include "seville/view/window/mainwindow.h"
 
 /*
 void msgHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
@@ -29,13 +29,13 @@ namespace seville
 
       QLoggingCategory::setFilterRules("*.debug=false\n"
                                            "seville.io.debug=true");
-      qCDebug(sevilleLog) << "Starting " << argv[0]; // << "...";
+      qCDebug(log_seville) << "Starting " << argv[0]; // << "...";
       QApplication app(argc, argv);
-      view::MainWindow mainWindow;
-      app_pMainWindow = &mainWindow;
-      mainWindow.show();
+      view::MainWindow window_main;
+      app_window_main_ptr = &window_main;
+      window_main.show();
 
-      qCDebug(sevilleLog) << argv[0] << " Started.";
+      qCDebug(log_seville) << argv[0] << " Started.";
 
       return app.exec();
    }

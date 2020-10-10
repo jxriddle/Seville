@@ -1,19 +1,24 @@
 #include <QVBoxLayout>
-#include "View_PalaceLogWidget.h"
+
+#include "seville/palace/base/client.h"
+#include "seville/view/widget/logwidget.h"
 
 namespace seville
 {
    namespace view
    {
-      PalaceLogWidget::~PalaceLogWidget()
+      LogWidget::LogWidget(QWidget* widget_parent_pointer) \
+         : QWidget(widget_parent_pointer) {}
+
+      auto LogWidget::palaceClientPointer(void) -> palace::Client*
       {
-         do_deinit();
+         return my_client_palace_pointer_;
       }
 
-      PalaceLogWidget::PalaceLogWidget(Palace::Client* pPalaceClient, QWidget* pParent)
-         : QWidget(pParent)
+      auto LogWidget::setPalaceClientPointer( \
+            palace::Client* palace_client_pointer) -> void
       {
-         do_init(pPalaceClient);
+         my_client_palace_pointer_ = palace_client_pointer;
       }
    }
 }
