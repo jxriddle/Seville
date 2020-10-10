@@ -12,37 +12,37 @@ namespace seville
 {
    namespace palace
    {
-      GenericNetMsg::GenericNetMsg(bool shouldSwapEndianness)
+      GenericNetMsg::GenericNetMsg(NetMsgOptions options)
          : ByteArray()
       {
-         do_init(shouldSwapEndianness);
+         do_init_(options);
       }
 
       GenericNetMsg::GenericNetMsg(
             Host::ByteOrder clientByteOrder,
             Host::ByteOrder serverByteOrder,
-            bool shouldSwapEndianness)
+            NetMsgOptions options)
          : ByteArray()
       {
-         do_init(clientByteOrder, serverByteOrder, shouldSwapEndianness);
+         do_init_(clientByteOrder, serverByteOrder, options);
       }
 
-      GenericNetMsg::GenericNetMsg(const char* data, int len, bool shouldSwapEndianness)
+      GenericNetMsg::GenericNetMsg(const char* data, int len, NetMsgOptions options)
          : ByteArray()
       {
-         do_init(data, len, shouldSwapEndianness);
+         do_init_(data, len, options);
       }
 
-      GenericNetMsg::GenericNetMsg(const QByteArray& bytesOfNetMsg, bool shouldSwapEndianness)
+      GenericNetMsg::GenericNetMsg(const QByteArray& bytesOfNetMsg, NetMsgOptions options)
          : ByteArray()
       {
-         do_init(bytesOfNetMsg, shouldSwapEndianness);
+         do_init_(bytesOfNetMsg, options);
       }
 
-      GenericNetMsg::GenericNetMsg(const GenericNetMsg& netMsg, bool shouldSwapEndianness)
+      GenericNetMsg::GenericNetMsg(const GenericNetMsg& netMsg, NetMsgOptions options)
          : ByteArray()
       {
-         do_init(netMsg, shouldSwapEndianness);
+         do_init_(netMsg, options);
       }
    }
 }

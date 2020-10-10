@@ -297,7 +297,7 @@ namespace seville
          }
 
       signals:
-         auto backgroundImageDidLoad(void) -> void;
+         auto background_image_did_load(void) -> void;
 
       private:
          Logger my_logger_;
@@ -307,7 +307,7 @@ namespace seville
          //QDataStream *myNetMsgRxDs;
          //NetMsg myNetMsgTx;
          //QDataStream *myNetMsgTxDs;
-         netmsg::GenericNetMsg my_netmsg_;
+         palace::GenericNetMsg my_netmsg_;
          int my_transfer_timer_id_;
          QTimer my_ping_timer_;
          QTimer my_receive_netmsg_timer_;
@@ -370,11 +370,11 @@ namespace seville
                   }
                   else {
                      auto qbytearray = pReply->readAll();
-                     auto const byteArray = \
+                     auto const bytearray_ptr = \
                            reinterpret_cast<ByteArray*>(&qbytearray);
-                     my_current_room_.setBackgroundImageBytes(*byteArray);
+                     my_current_room_.setBackgroundImageBytes(*bytearray_ptr);
 
-                     emit backgroundImageDidLoad();
+                     emit background_image_did_load();
                   }
 
                   pReply->deleteLater();
@@ -396,7 +396,7 @@ namespace seville
          }
 
          //, const QMap<QString, QString>& mapOfHeaders)
-         auto fetchBackgroundAsync(const QString& url) -> void
+         auto fetch_background_async(const QString& url) -> void
          {
             // create HTTP request and set hostname
             QNetworkRequest request;
@@ -422,7 +422,7 @@ namespace seville
          {
             my_transfer_timer_id_ = 0;
             my_socket_.disconnectFromHost();
-            do_determineClientByteOrder_();
+            do_determine_client_byteorder_();
             my_connection_state_ = ConnectionState::kDisconnected;
             //myLog.resetState();
             my_server_.reset();
@@ -450,9 +450,9 @@ namespace seville
                my_transfer_timer_id_ = 0;
             }
 
-            while (my_netmsg_.readInNetMsgFromSocketP(&my_socket_))
+            while (my_netmsg_.read_in_netmsg_from_socket_ptr(&my_socket_))
             {
-               if (my_netmsg_.size() < netmsg::kMinimumSizeInBytes ||
+               if (my_netmsg_.size() < netmsg::kMinimuNetMsgSizeInBytes ||
                    my_netmsg_.size() < my_netmsg_.len())
                {
                   my_transfer_timer_id_ = \
@@ -462,7 +462,7 @@ namespace seville
 
                if (my_connection_state_ == ConnectionState::kHandshaking)
                {
-                  if (do_determineServerByteOrder_() < 0) //myNetMsg) < 0)
+                  if (do_determine_server_byteorder_() < 0) //myNetMsg) < 0)
                   {
                      qCDebug(log_seville) <<
                            "ERROR: Could not determine server byte order!";
@@ -483,7 +483,7 @@ namespace seville
                }
                else if (my_connection_state_ == ConnectionState::kConnected)
                {
-                  do_routeReceivedNetMsg();
+                  do_route_received_netmsg_();
                }
 
                //qCDebug(log_seville) << "Resetting NetMsg";
@@ -494,9 +494,9 @@ namespace seville
             my_pong_time_.start();
          }
 
-         void do_setConnectionState(ConnectionState connectionState)
+         void do_set_connection_state_(ConnectionState connection_state)
          {
-            my_connection_state_ = connectionState;
+            my_connection_state_ = connection_state;
             // TODO signal?
             //do_updateMenus();
          }
@@ -539,7 +539,7 @@ namespace seville
             }
          }
 
-         void do_determineClientByteOrder_(void)
+         void do_determine_client_byteorder_(void)
          {
             // TODO
             auto is_little_endian = (Host::kLittleEndian * !Client::is_big_endian());
@@ -547,7 +547,7 @@ namespace seville
             my_byte_order_ = static_cast<Host::ByteOrder>(is_little_endian | is_big_endian);
          }
 
-         int do_determineServerByteOrder_(void)
+         int do_determine_server_byteorder_(void)
          {
             auto res = 0;
             // TODO more consideration here.
@@ -623,13 +623,13 @@ namespace seville
          }
          */
 
-         bool do_determineIsConnected(void) const
+         bool do_determine_is_connected_(void) const
          {
             return my_socket_.state() != QTcpSocket::ConnectedState ||
                   my_connection_state_ != ConnectionState::kConnected;
          }
 
-         bool do_determineIfShouldSwapEndianness(void) const
+         bool do_determine_if_should_swap_endianness_(void) const
          {
             int notUnknownClientByteOrder =
                   my_byte_order_ != Host::ByteOrder::kUnknownEndian;
@@ -646,7 +646,7 @@ namespace seville
           * @brief do_receiveAltLogon
           * @return number of network messages handled
           */
-         int do_receiveAltLogon(void)
+         int do_receive_altlogon_(void)
          {
             auto netMsgLogon = static_cast<netmsg::Logon>(my_netmsg_);
             if (my_user_.idCounter() != netMsgLogon.puidCounter() ||
@@ -807,7 +807,7 @@ namespace seville
             auto roomDescription = static_cast<netmsg::RoomDescription&>(my_netmsg_);
             my_current_room_.setFromRoomDescription(roomDescription);
 
-            fetchBackgroundAsync(my_server_.httpServerLocation() + "/" + my_current_room_.backgroundImageName());
+            fetch_background_async(my_server_.httpServerLocation() + "/" + my_current_room_.backgroundImageName());
 
             value = 1;
             return value;
@@ -966,7 +966,7 @@ namespace seville
          int do_send_logon(void)
          {
             auto res = 0;
-            netmsg::Logon msgLogon(do_determineIfShouldSwapEndianness());
+            netmsg::Logon msgLogon(do_determine_if_should_swap_endianness_());
 
             msgLogon.setRegCrc(my_user_.regCrc());
             msgLogon.setRegCounter(my_user_.regCounter());
@@ -1066,7 +1066,7 @@ namespace seville
             my_socket_.write(msgLogon);
             res = my_socket_.flush();
 
-            do_setConnectionState(ConnectionState::kConnected);
+            do_set_connection_state_(ConnectionState::kConnected);
 
             return res;
          }
@@ -1077,7 +1077,7 @@ namespace seville
             (void)username;
             (void)password;
 
-            int res = do_determineIsConnected();
+            int res = do_determine_is_connected_();
             if (!res)
                return res;
 
@@ -1092,7 +1092,7 @@ namespace seville
             return res;
          }
 
-         int do_routeReceivedNetMsg(void)
+         int do_route_received_netmsg_(void)
          {
             auto res = 0;
             auto kind = my_netmsg_.id();
@@ -1130,7 +1130,7 @@ namespace seville
                if (netmsg::kSizeOfLogonInBytes != size)
                   my_logger_.debug("(but size did not match!)");
 
-               res = do_receiveAltLogon();
+               res = do_receive_altlogon_();
             }
             else if (netmsg::NetMsgKind::ConnectionErrorKind == kind)
 
