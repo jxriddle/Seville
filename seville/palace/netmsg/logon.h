@@ -45,7 +45,7 @@ namespace seville
             virtual ~Logon(void);
 
             auto regCrc(void) const -> u32 {
-               return u32At(kOffsetOfRegCrcInBytes);
+               return u32_at(kOffsetOfRegCrcInBytes);
             }
 
             auto setRegCrc(u32 value) -> void {
@@ -53,7 +53,7 @@ namespace seville
             }
 
             auto regCounter(void) const -> u32 {
-               return u32At(kOffsetOfRegCounterInBytes);
+               return u32_at(kOffsetOfRegCounterInBytes);
             }
 
             auto setRegCounter(u32 value) -> void {
@@ -65,7 +65,7 @@ namespace seville
             }
 
             auto setUsername(const QString& value) -> void {
-               set_pascal_qstring_at_at(kOffsetOfUsernameInBytes, value);
+               set_pascal_qstring_at(kOffsetOfUsernameInBytes, value);
             }
 
             auto usernameLen(void) const -> u8 {
@@ -81,11 +81,11 @@ namespace seville
             }
 
             auto setWizardPassword(const QString& value) -> void {
-               return set_pascal_qstring_at_at(kOffsetOfWizardPasswordInBytes, value);
+               return set_pascal_qstring_at(kOffsetOfWizardPasswordInBytes, value);
             }
 
             auto flags(void) const -> u32 {
-               return u32At(kOffsetOfFlagsInBytes);
+               return u32_at(kOffsetOfFlagsInBytes);
             }
 
             auto setFlags(u32 value) -> void {
@@ -93,7 +93,7 @@ namespace seville
             }
 
             auto puidCounter(void) const -> u32 {
-               return u32At(kOffsetOfPuidCounterInBytes);
+               return u32_at(kOffsetOfPuidCounterInBytes);
             }
 
             auto setPuidCounter(u32 value) -> void {
@@ -101,7 +101,7 @@ namespace seville
             }
 
             auto puidCrc(void) const -> u32 {
-               return u32At(kOffsetOfPuidCrcInBytes);
+               return u32_at(kOffsetOfPuidCrcInBytes);
             }
 
             auto setPuidCrc(u32 value) -> void {
@@ -109,7 +109,7 @@ namespace seville
             }
 
             auto demoElapsed(void) const -> u32 {
-               return u32At(kOffsetOfDemoElapsedInBytes);
+               return u32_at(kOffsetOfDemoElapsedInBytes);
             }
 
             auto setDemoElapsed(u32 value) -> void {
@@ -117,7 +117,7 @@ namespace seville
             }
 
             auto totalElapsed(void) const -> u32 {
-               return u32At(kOffsetOfTotalElapsedInBytes);
+               return u32_at(kOffsetOfTotalElapsedInBytes);
             }
 
             auto setTotalElapsed(u32 value) -> void {
@@ -125,7 +125,7 @@ namespace seville
             }
 
             auto demoLimit(void) const -> u32 {
-               return u32At(kOffsetOfDemoLimitInBytes);
+               return u32_at(kOffsetOfDemoLimitInBytes);
             }
 
             auto setDemoLimit(u32 value) -> void {
@@ -133,7 +133,7 @@ namespace seville
             }
 
             auto initialRoomId(void) const -> u16 {
-               return u16At(kOffsetOfInitialRoomIdInBytes);
+               return u16_at(kOffsetOfInitialRoomIdInBytes);
             }
 
             auto setInitialRoomId(u16 value) -> void {
@@ -149,7 +149,7 @@ namespace seville
             }
 
             auto uploadRequestedProtocolVersion(void) const -> u32 {
-               return u32At(kOffsetOfUploadRequestedProtocolVersionInBytes);
+               return u32_at(kOffsetOfUploadRequestedProtocolVersionInBytes);
             }
 
             auto setUploadRequestedProtocolVersion(u32 value) -> void {
@@ -157,7 +157,7 @@ namespace seville
             }
 
             auto uploadCapabilities(void) const -> u32 {
-               return u32At(kOffsetOfUploadCapabilitiesInBytes);
+               return u32_at(kOffsetOfUploadCapabilitiesInBytes);
             }
 
             auto setUploadCapabilities(u32 value) -> void {
@@ -165,7 +165,7 @@ namespace seville
             }
 
             auto downloadCapabilities(void) const -> u32 {
-               return u32At(kOffsetOfDownloadCapabilitiesInBytes);
+               return u32_at(kOffsetOfDownloadCapabilitiesInBytes);
             }
 
             auto setDownloadCapabilities(u32 value) -> void {
@@ -173,7 +173,7 @@ namespace seville
             }
 
             auto engineCapabilities2d(void) const -> u32 {
-               return u32At(kOffsetOfEngineCapabilities2dInBytes);
+               return u32_at(kOffsetOfEngineCapabilities2dInBytes);
             }
 
             auto setEngineCapabilities2d(u32 value) -> void {
@@ -181,7 +181,7 @@ namespace seville
             }
 
             auto graphicsCapabilities2d(void) const -> u32 {
-               return u32At(kOffsetOfGraphicsCapabilities2dInBytes);
+               return u32_at(kOffsetOfGraphicsCapabilities2dInBytes);
             }
 
             auto setGraphicsCapabilities2d(u32 value) -> void {
@@ -189,7 +189,7 @@ namespace seville
             }
 
             auto graphicsCapabilities3d(void) const -> u32 {
-               return u32At(kOffsetOfGraphicsCapabilities3dInBytes);
+               return u32_at(kOffsetOfGraphicsCapabilities3dInBytes);
             }
 
             auto setGraphicsCapabilities3d(u32 value) -> void {
@@ -197,14 +197,14 @@ namespace seville
             }
 
          private:
-            void do_init(void)
+            void do_init_(void)
             {
                truncate(kOffsetForNetMsgPayloadInBytes);
                reserve(kSizeOfLogonNetMsgInBytes);
 
-               setId(NetMsgKind::kLogonKind);
-               setLen(kSizeOfLogonNetMsgInBytes);
-               setRef(0);
+               set_id(NetMsgKind::kLogonKind);
+               set_len(kSizeOfLogonNetMsgInBytes);
+               set_ref(0);
 
                setFlags(0);
                setRegCrc(0);

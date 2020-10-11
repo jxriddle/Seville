@@ -42,10 +42,10 @@ namespace seville
             return instance;
          }
 
-         auto RoomDescription::do_reset(void) -> void
+         auto RoomDescription::do_reset_(void) -> void
          {
             truncate(kOffsetForPayloadInBytes);
-            reserve(kSizeOfRoomDescriptionInBytes);
+            reserve(kSizeOfNetMsgRoomDescriptionInBytes);
             setId(netmsg::NetMsgKind::kRoomKind);
             setLen(netmsg::kSizeOfRoomDescriptionInBytes);
             setRef(0);

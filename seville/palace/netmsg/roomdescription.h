@@ -27,7 +27,7 @@ namespace seville
                   std::optional<RoomDescription*>;
 
          private:
-            auto do_reset(void) -> void;
+            auto do_reset_(void) -> void;
 //            {
 //               truncate(kOffsetForNetMsgPayloadInBytes);
 //               reserve(kSizeOfRoomDescriptionInBytes);
@@ -40,75 +40,75 @@ namespace seville
             RoomDescription(void) = delete;
 
             inline auto flags(void) const -> u32 {
-               return u32At(kOffsetForNetMsgPayloadInBytes);
+               return u32_at(kOffsetForNetMsgPayloadInBytes);
             }
 
             inline auto face(void) const -> u32 {
-               return u32At(kOffsetForNetMsgPayloadInBytes+4);
+               return u32_at(kOffsetForNetMsgPayloadInBytes+4);
             }
 
-            inline auto roomId(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+8);
+            inline auto room_id(void) const -> u16 {
+               return u16_at(kOffsetForNetMsgPayloadInBytes+8);
             }
 
             inline auto roomNameOffset(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+10);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+10);
             }
 
             inline auto backgroundImageNameOffset(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+12);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+12);
             }
 
             inline auto artistNameOffset(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+14);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+14);
             }
 
             inline auto passwordOffset(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+16);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+16);
             }
 
             inline auto hotspotCount(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+18);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+18);
             }
 
             inline auto hotspotOffset(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+20);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+20);
             }
 
-            inline auto roomImageCount(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+22);
+            inline auto room_image_count(void) const -> u16 {
+               return u16_at(kOffsetForNetMsgPayloadInBytes+22);
             }
 
             inline auto backgroundImageOffset(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+24);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+24);
             }
 
-            inline auto drawCommandsCount(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+26);
+            inline auto draw_commands_count(void) const -> u16 {
+               return u16_at(kOffsetForNetMsgPayloadInBytes+26);
             }
 
             inline auto firstDrawCommand(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+28);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+28);
             }
 
-            inline auto roomUserCount(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+30);
+            inline auto room_user_count(void) const -> u16 {
+               return u16_at(kOffsetForNetMsgPayloadInBytes+30);
             }
 
-            inline auto loosePropCount(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+32);
+            inline auto loose_prop_count(void) const -> u16 {
+               return u16_at(kOffsetForNetMsgPayloadInBytes+32);
             }
 
             inline auto firstLooseProp(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+34);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+34);
             }
 
             inline auto reserved(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+36);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+36);
             }
 
             inline auto roomDataLen(void) const -> u16 {
-               return u16At(kOffsetForNetMsgPayloadInBytes+38);
+               return u16_at(kOffsetForNetMsgPayloadInBytes+38);
             }
 
             //ByteArray roomData(void) {
@@ -119,7 +119,7 @@ namespace seville
 //            {
 //               auto value = std::vector<Palace::Prop>();
 
-//               auto loosePropCount =  u16At(kOffsetForNetMsgPayloadInBytes+32);
+//               auto loosePropCount =  u16_at(kOffsetForNetMsgPayloadInBytes+32);
 //               for (auto i = 0; i < loosePropCount; i++)
 //               {
 //                  Prop* p = ;
@@ -132,17 +132,17 @@ namespace seville
             auto artistName(void) const -> QString {
                return qstring_at(
                         kOffsetRoomPayload +
-                        u16At(kOffsetForNetMsgPayloadInBytes+14), 1024);
+                        u16_at(kOffsetForNetMsgPayloadInBytes+14), 1024);
             }
 
-            auto backgroundImageName(void) const -> QString {
+            auto background_image_name(void) const -> QString {
                return qstring_at(
-                        u16At(kOffsetRoomPayload +
-                              u16At(kOffsetForNetMsgPayloadInBytes+24)), 1024);
+                        u16_at(kOffsetRoomPayload +
+                              u16_at(kOffsetForNetMsgPayloadInBytes+24)), 1024);
             }
 
             //QByteArray backgroundImage(void) {
-            //   return byteArrayAt(u16At(kOffsetForNetMsgPayloadInBytes+24), 1024);
+            //   return byteArrayAt(u16_at(kOffsetForNetMsgPayloadInBytes+24), 1024);
             //}
          };
       }

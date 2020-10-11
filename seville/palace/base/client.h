@@ -292,7 +292,7 @@ namespace seville
             do_setup_events_();
             do_reset_();
 
-            my_logger_.setMode(Logger::kDebugMode);
+            my_logger_.set_mode(Logger::kDebugMode);
             //my_logger_.setIsDebugMode(true);
          }
 
@@ -372,7 +372,7 @@ namespace seville
                      auto qbytearray = pReply->readAll();
                      auto const bytearray_ptr = \
                            reinterpret_cast<ByteArray*>(&qbytearray);
-                     my_current_room_.setBackgroundImageBytes(*bytearray_ptr);
+                     my_current_room_.set_background_image_bytes(*bytearray_ptr);
 
                      emit background_image_did_load();
                   }
@@ -522,7 +522,7 @@ namespace seville
             my_user_.setUsername(username);
             my_server_.setHost(host);
             my_server_.setPort(actual_host_tcp_port);
-            my_current_room_.setId(actual_initial_room);
+            my_current_room_.set_id(actual_initial_room);
 
             qCDebug(log_seville) << "Client Connection is now in Handshaking State";
             my_connection_state_ = ConnectionState::kHandshaking;
@@ -805,9 +805,9 @@ namespace seville
             int value = 0;
 
             auto roomDescription = static_cast<netmsg::RoomDescription&>(my_netmsg_);
-            my_current_room_.setFromRoomDescription(roomDescription);
+            my_current_room_.set_from_room_description(roomDescription);
 
-            fetch_background_async(my_server_.httpServerLocation() + "/" + my_current_room_.backgroundImageName());
+            fetch_background_async(my_server_.httpServerLocation() + "/" + my_current_room_.background_image_name());
 
             value = 1;
             return value;

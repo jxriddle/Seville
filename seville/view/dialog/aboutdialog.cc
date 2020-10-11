@@ -4,12 +4,13 @@ namespace seville
 {
    namespace view
    {
-      AboutDialog::~AboutDialog()
+      AboutDialog::~AboutDialog(void)
       {
          do_deinit();
       }
 
-      AboutDialog::AboutDialog(QWidget* pParent) : QDialog(pParent)
+      AboutDialog::AboutDialog(QWidget* parent_widget_ptr) \
+         : QDialog(parent_widget_ptr)
       {
           do_init();
       }

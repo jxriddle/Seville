@@ -9,11 +9,13 @@
 namespace seville
 {
    struct app_struct {
+      const char app_kAppVersion[] = "1.0";
+      view::MainWindow* app_window_main_ptr;
+   } my_app_;
 
-   } app_;
-
-   const char app_kAppVersion[] = "1.0";
-   extern view::MainWindow* app_window_main_ptr;
+   auto app(void) -> app_struct {
+      return my_app_;
+   }
 }
 
 #endif   // SEVILLE_APP_H_

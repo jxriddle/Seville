@@ -27,22 +27,25 @@ namespace seville
          do_init_(clientByteOrder, serverByteOrder, options);
       }
 
-      GenericNetMsg::GenericNetMsg(const char* data, int len, NetMsgOptions options)
+      GenericNetMsg::GenericNetMsg( \
+            const char* data, int len, NetMsgOptions options)
          : ByteArray()
       {
          do_init_(data, len, options);
       }
 
-      GenericNetMsg::GenericNetMsg(const QByteArray& bytesOfNetMsg, NetMsgOptions options)
+      GenericNetMsg::GenericNetMsg( \
+            const QByteArray& bytesOfNetMsg, NetMsgOptions options)
          : ByteArray()
       {
          do_init_(bytesOfNetMsg, options);
       }
 
-      GenericNetMsg::GenericNetMsg(const GenericNetMsg& netMsg, NetMsgOptions options)
+      GenericNetMsg::GenericNetMsg( \
+            const GenericNetMsg& netmsg, NetMsgOptions options)
          : ByteArray()
       {
-         do_init_(netMsg, options);
+         do_init_(netmsg, options);
       }
    }
 }

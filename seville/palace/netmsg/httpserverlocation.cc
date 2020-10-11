@@ -1,6 +1,7 @@
-#include "zog/base/types.h"
+#include "seville/base/types.h"
 
-#include "seville/palace/netmsg/generic.h"
+#include "seville/palace/base/genericnetmsg.h"
+
 #include "seville/palace/netmsg/httpserverlocation.h"
 
 namespace seville
@@ -9,20 +10,21 @@ namespace seville
    {
       namespace netmsg
       {
-         HttpServerLocation::HttpServerLocation(const netmsg::GenericNetMsg& netMsg, bool shouldSwapEndianness)
-            : netmsg::GenericNetMsg(netMsg, shouldSwapEndianness)
+         HttpServerLocation::HttpServerLocation( \
+               const GenericNetMsg& netmsg, NetMsgOptions options) \
+            : GenericNetMsg(netmsg, options)
          {
-            do_init();
+            do_init_();
          }
 
-         void HttpServerLocation::do_init(void)
+         void HttpServerLocation::do_init_(void)
          {
-            truncate(kOffsetForPayloadInBytes);
-            reserve(kSizeOfRoomDescriptionInBytes);
+            truncate(kOffsetForNetMsgPayloadInBytes);
+            reserve(kSizeOfNetMsgHttpServerLocationInBytes);
 
-            setId(netmsg::Kind::kHttpServerLocationKind);
-            setLen(netmsg::kSizeOfHttpServerLocationInBytes);
-            setRef(0);
+            set_id(NetMsgKind::kHttpServerLocationKind);
+            set_len(kSizeOfNetMsgHttpServerLocationPayloadInBytes);
+            set_ref(0);
          }
       }
    }

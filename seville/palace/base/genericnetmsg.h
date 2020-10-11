@@ -118,7 +118,7 @@ namespace seville
       static const i32 kSizeOfUserStatusInBytes = kSizeOfGenericNetMsgInBytes;
       static const i32 kSizeOfUserLoggedOnAndMaxInBytes = \
             kSizeOfGenericNetMsgInBytes;
-      static const i32 kSizeOfHttpServerLocationInBytes = \
+      static const i32 kSizeOfNetMsgHttpServerLocationInBytes = \
             kSizeOfGenericNetMsgInBytes;
       static const i32 kSizeOfRoomUserListInBytes = \
             kSizeOfGenericNetMsgInBytes;
@@ -162,8 +162,10 @@ namespace seville
       static const i32 kSizeOfAltRoomDescriptionInBytes = \
             kSizeOfGenericNetMsgInBytes;
       static const i32 kSizeOfRoomDescriptionBodyInBytes = 40;
-      static const i32 kSizeOfRoomDescriptionInBytes = \
+      static const i32 kSizeOfNetMsgRoomDescriptionInBytes = \
             kOffsetForNetMsgPayloadInBytes + kSizeOfRoomDescriptionBodyInBytes;
+
+      static const i32 kSizeOfNetMsgHttpServerLocationPayloadInBytes = 0;
 
       // : public QObject, public QByteArray {};
       class GenericNetMsg : public ByteArray
@@ -223,17 +225,25 @@ namespace seville
          }
 
       public:
-         GenericNetMsg(bool shouldSwapEndianness = false);
+         GenericNetMsg( \
+               NetMsgOptions options = NetMsgOptions::kDoNotSwapEndianness);
 
          GenericNetMsg(const Host::ByteOrder client_byteorder, \
                  const Host::ByteOrder server_byteorder, \
-                 bool shouldSwapEndianness = false);
+                 NetMsgOptions options = NetMsgOptions::kDoNotSwapEndianness);
 
          GenericNetMsg( \
-               const char* data, int len, bool shouldSwapEndianness = false);
-         GenericNetMsg(const QByteArray& ba, bool shouldSwapEndianness = false);
+               const char* data, \
+               int len, \
+               NetMsgOptions options = NetMsgOptions::kDoNotSwapEndianness);
+
          GenericNetMsg( \
-               GenericNetMsg& netMsg, bool shouldSwapEndianness = false);
+               const QByteArray& ba, \
+               NetMsgOptions options = NetMsgOptions::kDoNotSwapEndianness);
+
+         GenericNetMsg( \
+               const GenericNetMsg& netmsg, \
+               NetMsgOptions options = NetMsgOptions::kDoNotSwapEndianness);
 
          inline auto should_swap_endianness_flag(void) const -> bool {
             return my_flag_swap_endian_;
@@ -284,7 +294,7 @@ namespace seville
          }
 
          inline auto reset(void) -> void {
-            do_reset();
+            do_reset_();
          }
 
          inline auto read_in_netmsg_from_socket_ptr( \
@@ -554,7 +564,7 @@ namespace seville
          }
 
          inline auto do_u64_at_(int offset) const -> u64 {
-            return do_maybe_swap_u64_(ByteArray::u64At(offset));
+            return do_maybe_swap_u64_(ByteArray::u64_at(offset));
          }
 
          inline auto do_set_u64_at_(int offset, u64 value) -> void {
@@ -562,7 +572,7 @@ namespace seville
          }
 
          inline auto do_i32_at_(int offset) const -> i32 {
-            return do_maybe_swap_i32_(ByteArray::i32At(offset));
+            return do_maybe_swap_i32_(ByteArray::i32_at(offset));
          }
 
          inline auto do_set_i32_at_(int offset, i32 value) -> void {
@@ -570,7 +580,7 @@ namespace seville
          }
 
          inline auto do_u32_at(int offset) const -> u32 {
-            return do_maybe_swap_u32_(ByteArray::u32At(offset));
+            return do_maybe_swap_u32_(ByteArray::u32_at(offset));
          }
 
          inline auto do_set_u32_at_(int offset, u32 value) -> void {
@@ -578,7 +588,7 @@ namespace seville
          }
 
          inline auto do_i16_at_(int offset) const -> i16 {
-            return do_maybe_swap_i16_(ByteArray::i16At(offset));
+            return do_maybe_swap_i16_(ByteArray::i16_at(offset));
          }
 
          inline auto do_set_i16_at_(int offset, i16 value) -> void {
@@ -586,7 +596,7 @@ namespace seville
          }
 
          inline auto do_u16_at_(int offset) const -> u16 {
-            return do_maybe_swap_u16_(ByteArray::u16At(offset));
+            return do_maybe_swap_u16_(ByteArray::u16_at(offset));
          }
 
          inline auto do_set_u16_at_(int offset, u16 value) -> void {
@@ -665,7 +675,7 @@ namespace seville
             //auto nBytesRead = finalNetMsgSize - initialNetMsgSize;
             if (kOffsetForNetMsgPayloadInBytes == this->size())
                this->reserve(kOffsetForNetMsgPayloadInBytes +
-                             ByteArray::i32At(kOffsetForNetMsgLenInBytes));
+                             ByteArray::i32_at(kOffsetForNetMsgLenInBytes));
 
             return kOffsetForNetMsgPayloadInBytes == this->size();
          }
@@ -714,9 +724,9 @@ namespace seville
             */
          }
 
-         inline auto do_init( \
+         inline auto do_init_( \
                const char* data, int len, NetMsgOptions options) -> void {
-            do_reset();
+            do_reset_();
 
             //int *p = static_cast<int *>(data);
             ////id_ = static_cast<int *>(p)[kPalMsgIdOffset];
@@ -728,21 +738,21 @@ namespace seville
             append(data, len);
          }
 
-         inline auto do_init( \
+         inline auto do_init_( \
                const QByteArray& bytes_of_netmsg, \
                NetMsgOptions options) -> void {
-            do_reset();
+            do_reset_();
 
             my_flag_swap_endian_ = \
                   options & NetMsgOptions::kSwapEndianness;
             append(bytes_of_netmsg);
          }
 
-         inline auto do_init( \
+         inline auto do_init_( \
                const Host::ByteOrder& client_byte_order, \
                const Host::ByteOrder& server_byte_order, \
                NetMsgOptions options) -> void {
-            do_reset();
+            do_reset_();
 
             my_byteorder_client_ = client_byte_order;
             my_byteorder_server_ = server_byte_order;
@@ -750,16 +760,16 @@ namespace seville
                   options & NetMsgOptions::kSwapEndianness;
          }
 
-         inline auto do_init(bool shouldSwapEndianness) -> void {
-            do_reset();
+         inline auto do_init_(NetMsgOptions options) -> void {
+            do_reset_();
 
-            my_flag_swap_endian_ = shouldSwapEndianness;
+            my_flag_swap_endian_ = options;
          }
 
-         inline auto do_init( \
+         inline auto do_init_( \
                const GenericNetMsg& netmsg, \
                NetMsgOptions options) -> void {
-            do_reset();
+            do_reset_();
             //id_ = palMsg.id_;
             //len_ = palMsg.len_;
             //ref_ = palMsg.ref_;
@@ -767,7 +777,7 @@ namespace seville
             append(netmsg);
          }
 
-         inline auto do_reset(void) -> void {
+         inline auto do_reset_(void) -> void {
             truncate(0);
             reserve(kSizeOfNetMsgHeaderInBytes);
          }

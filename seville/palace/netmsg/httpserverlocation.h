@@ -13,24 +13,24 @@ namespace seville
       {
          class HttpServerLocation : public GenericNetMsg
          {
+         public:
+            HttpServerLocation( \
+                  const GenericNetMsg& netmsg, \
+                  NetMsgOptions options = \
+                     NetMsgOptions::kDoNotSwapEndianness);
+
+            inline auto url(void) -> QString {
+               return qstring_at( \
+                        palace::kOffsetForNetMsgPayloadInBytes, 4096);
+            }
+
+            inline auto set_url(const QString& value) -> void {
+               set_pascal_qstring_at( \
+                        palace::kOffsetForNetMsgPayloadInBytes, value);
+            }
+
             private:
-               auto do_init(void) -> void;
-
-            public:
-               auto url(void) -> QString {
-                  return qstring_at( \
-                           palace::kOffsetForNetMsgPayloadInBytes, 4096);
-               }
-
-               auto setUrl(const QString& value) -> void {
-                  set_pascal_qstring_at( \
-                           palace::kOffsetForNetMsgPayloadInBytes, value);
-               }
-
-               HttpServerLocation( \
-                     const GenericNetMsg& netmsg, \
-                     NetMsgOptions options = \
-                        NetMsgOptions::kDoNotSwapEndianness);
+               auto do_init_(void) -> void;
          };
       }
    }

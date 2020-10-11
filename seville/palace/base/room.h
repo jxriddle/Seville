@@ -18,7 +18,7 @@ namespace seville
       Q_OBJECT
 
       signals:
-         void backgroundChanged(void);
+         void background_changed(void);
 
       public:
          static auto New(QObject* object_parent_ptr = nullptr) -> \
@@ -26,13 +26,12 @@ namespace seville
          {
             auto instance_ptr = std::make_unique<Room>(object_parent_ptr);
 
-            instance_ptr->do_reset();
-            instance_ptr->do_setupEvents();
+            instance_ptr->do_reset_();
+            instance_ptr->do_setup_events_();
 
             return instance_ptr;
          }
 
-      public:
          explicit Room(QObject* object_parent_ptr = nullptr);
          Room(const Room& room, QObject* object_parent_ptr = nullptr);
 
@@ -42,7 +41,7 @@ namespace seville
             return my_id_;
          }
 
-         inline auto setId(const u16& value) -> void {
+         inline auto set_id(const u16& value) -> void {
             my_id_ = value;
          }
 
@@ -50,35 +49,36 @@ namespace seville
             return my_flags_;
          }
 
-         inline auto setFlags(const u32& value) -> void {
+         inline auto set_flags(const u32& value) -> void {
             my_flags_ = value;
          }
 
-         inline auto setBackgroundImageName( \
+         inline auto set_background_image_name( \
                const QString& background_image_name) -> void {
             my_name_image_background_ = background_image_name;
          }
 
-         inline auto backgroundImageName(void) -> QString {
+         inline auto background_image_name(void) -> QString {
             return my_name_image_background_;
          }
 
-         inline auto setFromRoomDescription( \
+         inline auto set_from_room_description( \
                const netmsg::RoomDescription& room_description) -> void {
-            my_id_ = room_description.roomId();
+            my_id_ = room_description.room_id();
             my_flags_ = room_description.flags();
             my_face_ = room_description.face();
             my_reserved_ = room_description.reserved();
-            my_count_users_ = room_description.roomUserCount();
-            my_count_images_ = room_description.roomImageCount();
-            my_count_props_loose_ = room_description.loosePropCount();
-            my_count_commands_draw_ = room_description.drawCommandsCount();
-            my_name_image_background_ = room_description.backgroundImageName();
+            my_count_users_ = room_description.room_user_count();
+            my_count_images_ = room_description.room_image_count();
+            my_count_props_loose_ = room_description.loose_prop_count();
+            my_count_commands_draw_ = room_description.draw_commands_count();
+            my_name_image_background_ = \
+                  room_description.background_image_name();
 
             //do_setBackgroundImageBytes();
          }
 
-         inline auto setBackgroundImage( \
+         inline auto set_background_image( \
                const QImage& background_image) -> void {
             auto bits = background_image.bits();
             my_bytearray_image_background_.clear();
@@ -86,28 +86,28 @@ namespace seville
             my_bytearray_image_background_.append( \
                      reinterpret_cast<const char*>(bits));
 
-            emit backgroundChanged();
+            emit background_changed();
          }
 
-         inline auto backgroundImage(void) const -> QImage {
+         inline auto background_image(void) const -> QImage {
             return QImage::fromData(my_bytearray_image_background_);
          }
 
-         inline auto setBackgroundImageBytes( \
-               const ByteArray& backgroundImageBytes) -> void {
-            do_setBackgroundImageBytes(backgroundImageBytes);
+         inline auto set_background_image_bytes( \
+               const ByteArray& background_image_bytes) -> void {
+            do_set_background_image_bytes_(background_image_bytes);
          }
 
-         inline auto backgroundImageBytes(void) const -> QByteArray {
+         inline auto background_image_bytes(void) const -> QByteArray {
             return my_bytearray_image_background_;
          }
 
-         inline auto backgroundImageBytesP(void) -> QByteArray* {
+         inline auto background_image_bytes_ptr(void) -> QByteArray* {
             return &my_bytearray_image_background_;
          }
 
          inline auto reset(void) -> void {
-            do_reset();
+            do_reset_();
          }
 
       private:
@@ -122,11 +122,11 @@ namespace seville
          u16 my_reserved_;
          QString my_name_image_background_;
 
-         auto do_setupEvents(void) -> void
+         auto do_setup_events_(void) -> void
          {
          }
 
-         void do_reset(void)
+         void do_reset_(void)
          {
             my_id_ = 0;
             my_flags_ = 0;
@@ -141,16 +141,17 @@ namespace seville
             my_bytearray_image_background_.truncate(0);
          }
 
-         void do_setBackgroundImageBytes(const ByteArray& backgroundImageBytes)
+         void do_set_background_image_bytes_( \
+               const ByteArray& backgroundImageBytes)
          {
             my_bytearray_image_background_.clear();
             my_bytearray_image_background_.resize(0);
             my_bytearray_image_background_.append(backgroundImageBytes);
 
-            emit backgroundChanged();
+            emit background_changed();
          }
 
-         void do_assign(const Room& room)
+         void do_assign_(const Room& room)
          {
             my_id_ = room.my_id_;
             my_bytearray_image_background_ = \
@@ -158,10 +159,10 @@ namespace seville
             //my_backgroundImage = room.my_backgroundImage;
          }
 
-         void do_init(const Room& room)
+         void do_init_(const Room& room)
          {
-            do_assign(room);
-            do_setupEvents();
+            do_assign_(room);
+            do_setup_events_();
          }
       };
    }
