@@ -14,56 +14,59 @@ namespace seville
 {
    namespace view
    {
-      class ConnectDialog : public QDialog
+      namespace dialog
       {
-      Q_OBJECT
+         class ConnectDialog : public QDialog
+         {
+         Q_OBJECT
 
-      private:
-         QGridLayout* my_layout_main_pointer_;
-         QLabel* my_label_username_pointer_;
-         QLineEdit* my_lineedit_username_pointer_;
-         QLabel* my_label_url_pointer_;
-         QLineEdit* my_lineedit_url_pointer_;
-         QPushButton* my_pushbutton_connect_pointer_;
-         QPushButton* my_pushbutton_cancel_pointer_;
-         QDialogButtonBox* my_buttonbox_pointer_;
+         private:
+            QGridLayout* my_layout_main_ptr_;
+            QLabel* my_label_username_ptr_;
+            QLineEdit* my_lineedit_username_ptr_;
+            QLabel* my_label_url_ptr_;
+            QLineEdit* my_lineedit_url_ptr_;
+            QPushButton* my_pushbutton_connect_ptr_;
+            QPushButton* my_pushbutton_cancel_ptr_;
+            QDialogButtonBox* my_buttonbox_ptr_;
 
-      protected:
-         auto ok_setupView(void) -> void;
-         auto ok_setupEvents(void) -> void;
+            auto do_setup_view_(void) -> void;
+            auto do_setup_events_(void) -> void;
 
-      public:
-         static auto init(void) -> std::optional<ConnectDialog*>;
+         public:
+            static auto New(QWidget* widget_parent_ptr = nullptr)
+               -> std::unique_ptr<ConnectDialog>;
 
-         explicit ConnectDialog(QWidget* parent_widget_pointer = nullptr);
+            explicit ConnectDialog(QWidget* widget_parent_ptr = nullptr);
 
-         virtual ~ConnectDialog(void);
+            virtual ~ConnectDialog(void);
 
-         inline auto address(void) -> QString {
-            return my_lineedit_url_pointer_->text();
-         }
+            inline auto address(void) -> QString {
+               return my_lineedit_url_ptr_->text();
+            }
 
-         inline auto host(void) -> QString {
-            QStringList sl = my_lineedit_url_pointer_->text().split(':');
-            return sl.first();
-         }
+            inline auto host(void) -> QString {
+               QStringList sl = my_lineedit_url_ptr_->text().split(':');
+               return sl.first();
+            }
 
-         inline auto port(void) -> quint16 {
-            QStringList sl = my_lineedit_url_pointer_->text().split(':');
-            return sl.last().toUShort();
-         }
+            inline auto port(void) -> quint16 {
+               QStringList sl = my_lineedit_url_ptr_->text().split(':');
+               return sl.last().toUShort();
+            }
 
-         inline auto username(void) -> QString {
-            return my_lineedit_username_pointer_->text();
-         }
+            inline auto username(void) -> QString {
+               return my_lineedit_username_ptr_->text();
+            }
 
-      signals:
+         signals:
 
-      public slots:
-//       void on_pushButtonConnectClicked();
-//       void on_pushButtonCancelClicked();
+         public slots:
+   //       void on_pushButtonConnectClicked();
+   //       void on_pushButtonCancelClicked();
 
-      };
+         };
+      }
    }
 }
 

@@ -24,10 +24,9 @@ namespace seville
 
       public:
          enum LoggerMode: i32 {
-            kNoMode = 0,
-            kDebugMode = 1,
-            kDefaultMode = 2,
-            kProductionMode = 3,
+            kDebugMode = 0,
+            kDefaultMode = 1,
+            kProductionMode = 2,
          };
 
          //Logger(bool isDebugMode = false);

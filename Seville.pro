@@ -26,7 +26,7 @@ CONFIG += c++17
 
 
 SOURCES += \
-    seville/base/log.cc \
+    seville/base/app.cc \
     seville/base/bytearray.cc \
     seville/base/main.cc \
     seville/palace/base/cipher.cc \
@@ -51,7 +51,6 @@ SOURCES += \
 
 HEADERS += \
     seville/base/app.h \
-    seville/base/log.h \
     seville/base/types.h \
     seville/base/bytearray.h \
     seville/palace/base/cipher.h \

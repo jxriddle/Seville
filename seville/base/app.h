@@ -1,21 +1,41 @@
 #ifndef SEVILLE_APP_H_
 #define SEVILLE_APP_H_
 
-#include <QString>
+#include <memory>
 
-#include "seville/palace/base/logger.h"
-#include "seville/view/window/mainwindow.h"
+#include <QLoggingCategory>
 
 namespace seville
 {
-   struct app_struct {
-      const char app_kAppVersion[] = "1.0";
-      view::MainWindow* app_window_main_ptr;
-   } my_app_;
+   Q_DECLARE_LOGGING_CATEGORY(log_seville)
 
-   auto app(void) -> app_struct {
-      return my_app_;
-   }
+   class SevilleApp
+   {
+   public:
+      //extern const QLoggingCategory &name();
+      const char kAppVersion[4] = "1.0";
+      //const char kLogCategoryName[12] = "log_seville";
+
+      SevilleApp(void) noexcept;
+
+//      inline auto main_window_ptr(void) -> view::window::MainWindow* {
+//         return my_window_main_unique_ptr_.get();
+//      }
+
+//      inline auto app_version(void) -> char {
+//      }
+
+      auto main(int argc, char* argv[]) -> int;
+
+//   private:
+//      std::unique_ptr<view::window::MainWindow> my_window_main_unique_ptr_;
+   };
+}
+
+extern seville::SevilleApp app_seville;
+
+auto Seville(void) -> seville::SevilleApp* {
+   return &app_seville;
 }
 
 #endif   // SEVILLE_APP_H_

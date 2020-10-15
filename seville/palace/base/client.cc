@@ -6,7 +6,7 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
-#include "seville/base/log.h"
+//#include "seville/base/log.h"
 #include "seville/palace/base/host.h"
 #include "seville/palace/base/client.h"
 #include "seville/palace/base/server.h"
@@ -25,15 +25,15 @@ namespace seville
    {
       const char* Client::kIdent = "PC4237";
 
-      Client::~Client(void)
-      {
-         do_deinit();
-      }
-
       Client::Client(QObject* parent_object_pointer) \
          : QObject(parent_object_pointer)
       {
-         do_init();
+         do_init_();
+      }
+
+      Client::~Client(void)
+      {
+         do_deinit_();
       }
    }
 }

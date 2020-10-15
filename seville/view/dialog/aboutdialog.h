@@ -14,48 +14,25 @@ namespace seville
 {
    namespace view
    {
-      class AboutDialog : public QDialog
+      namespace dialog
       {
-      Q_OBJECT
-
-      public:
-         explicit AboutDialog(QWidget* parent_widget_ptr = nullptr);
-
-         virtual ~AboutDialog(void);
-
-      public slots:
-         void on_button_ok_clicked(void)
+         class AboutDialog : public QDialog
          {
-            close();
-         }
+         Q_OBJECT
 
-      private:
-         void do_setup_view_(void)
-         {
-            setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-            QVBoxLayout* pLayout = new QVBoxLayout(this);
-            QLabel* pLabelAbout =
-                  new QLabel(QString("Seville v%1")
-                             .arg(app()->kAppVersion), this);
+         public:
+            explicit AboutDialog(QWidget* parent_widget_ptr = nullptr);
 
-            pLayout->addWidget(pLabelAbout);
+            virtual ~AboutDialog(void);
 
-            QPushButton *pButtonOk = new QPushButton(tr("&OK"), this);
-            pLayout->addWidget(pButtonOk);
-            setLayout(pLayout);
+         public slots:
+            auto on_button_ok_clicked(void) -> void;
 
-            connect(pButtonOk, &QPushButton::clicked, this, &view::AboutDialog::on_button_ok_clicked);
-         }
-
-         void do_deinit(void)
-         {
-         }
-
-         void do_init(void)
-         {
-            do_setup_view_();
-         }
-      };
+         private:
+            auto do_setup_view_(void) -> void;
+            auto do_init_(void) -> void;
+         };
+      }
    }
 }
 

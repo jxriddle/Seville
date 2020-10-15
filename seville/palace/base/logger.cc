@@ -4,7 +4,7 @@ namespace seville
 {
    namespace palace
    {
-      Logger::Logger() {}
+      Logger::Logger(void) {}
 
       // Logger::~Logger(void) {}
 
@@ -14,7 +14,7 @@ namespace seville
          return instance;
       }
 
-      auto Logger::do_init_(LoggerMode mode = LoggerMode::kDefaultMode) -> void
+      auto Logger::do_init_(LoggerMode mode) -> void
       {
          my_messages_unique_ptr_ = std::make_unique<std::vector<LogMessage>>();
          my_mode_ = mode;

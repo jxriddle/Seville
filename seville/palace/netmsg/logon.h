@@ -12,52 +12,55 @@ namespace seville
          class Logon : public GenericNetMsg
          {
          public:
-            static const int kSizeOfIdentInBytes = 6;
-            static const int kSizeOfUsernameMaxInBytes = 31;
-            static const int kSizeOfWizardPasswordMaxInBytes = 31;
+            enum NetMsgLogonSize {
+               kIdent = 6,
+               kMaximumUsernameLength = 31,
+               kMaximumWizardPasswordLength = 31,
+            };
 
-            static const int kOffsetOfRegCrcInBytes = kOffsetForNetMsgPayloadInBytes;
-            static const int kOffsetOfRegCounterInBytes = kOffsetForNetMsgPayloadInBytes+4;
-            static const int kOffsetOfUsernameLenInBytes = kOffsetForNetMsgPayloadInBytes+8;
-            static const int kOffsetOfUsernameInBytes = kOffsetForNetMsgPayloadInBytes+9;
-            static const int kOffsetOfWizardPasswordLenInBytes = kOffsetForNetMsgPayloadInBytes+40;
-            static const int kOffsetOfWizardPasswordInBytes = kOffsetForNetMsgPayloadInBytes+41;
-            static const int kOffsetOfFlagsInBytes = kOffsetForNetMsgPayloadInBytes+72;
-            static const int kOffsetOfPuidCounterInBytes = kOffsetForNetMsgPayloadInBytes+76;
-            static const int kOffsetOfPuidCrcInBytes = kOffsetForNetMsgPayloadInBytes+80;
-            static const int kOffsetOfDemoElapsedInBytes = kOffsetForNetMsgPayloadInBytes+84;
-            static const int kOffsetOfTotalElapsedInBytes = kOffsetForNetMsgPayloadInBytes+88;
-            static const int kOffsetOfDemoLimitInBytes = kOffsetForNetMsgPayloadInBytes+92;
-            static const int kOffsetOfInitialRoomIdInBytes = kOffsetForNetMsgPayloadInBytes+96;
-            static const int kOffsetOfReservedInBytes = kOffsetForNetMsgPayloadInBytes+98; // size: 6
-            static const int kOffsetOfUploadRequestedProtocolVersionInBytes = kOffsetForNetMsgPayloadInBytes+104;
-            static const int kOffsetOfUploadCapabilitiesInBytes = kOffsetForNetMsgPayloadInBytes+108;
-            static const int kOffsetOfDownloadCapabilitiesInBytes = kOffsetForNetMsgPayloadInBytes+112;
-            static const int kOffsetOfEngineCapabilities2dInBytes = kOffsetForNetMsgPayloadInBytes+116;
-            static const int kOffsetOfGraphicsCapabilities2dInBytes = kOffsetForNetMsgPayloadInBytes+120;
-            static const int kOffsetOfGraphicsCapabilities3dInBytes = kOffsetForNetMsgPayloadInBytes+124;
+            enum NetMsgLogonOffset {
+               kRegCrc = NetMsgOffset::kPayload,
+               kRegCounter = NetMsgOffset::kPayload+4,
+               kUsernameLen = NetMsgOffset::kPayload+8,
+               kUsername = NetMsgOffset::kPayload+9,
+               kWizardPasswordLen = NetMsgOffset::kPayload+40,
+               kWizardPassword = NetMsgOffset::kPayload+41,
+               kFlags = NetMsgOffset::kPayload+72,
+               kPuidCounter = NetMsgOffset::kPayload+76,
+               kPuidCrc = NetMsgOffset::kPayload+80,
+               kDemoElapsed = NetMsgOffset::kPayload+84,
+               kTotalElapsed = NetMsgOffset::kPayload+88,
+               kDemoLimit = NetMsgOffset::kPayload+92,
+               kInitialRoomId = NetMsgOffset::kPayload+96,
+               kReserved = NetMsgOffset::kPayload+98, // size: 6
+               kUploadRequestedProtocolVersion = NetMsgOffset::kPayload+104,
+               kUploadCapabilities = NetMsgOffset::kPayload+108,
+               kDownloadCapabilities = NetMsgOffset::kPayload+112,
+               kEngineCapabilities2d = NetMsgOffset::kPayload+116,
+               kGraphicsCapabilities2d = NetMsgOffset::kPayload+120,
+               kGraphicsCapabilities3d = NetMsgOffset::kPayload+124,
+            };
 
-            Logon(NetMsgOptions options = NetMsgOptions::kDoNotSwapEndianness);
+            Logon(NetMsgOptions options = NetMsgOptions::kDoNotSwapEndian);
 
-            Logon(const GenericNetMsg& netMsg, \
-                  NetMsgOptions options = NetMsgOptions::kDoNotSwapEndianness);
+            Logon(const GenericNetMsg& netMsg, NetMsgOptions options = NetMsgOptions::kDoNotSwapEndian);
 
             virtual ~Logon(void);
 
-            auto regCrc(void) const -> u32 {
-               return u32_at(kOffsetOfRegCrcInBytes);
+            auto reg_crc(void) const -> u32 {
+               return u32_at(NetMsgLogonOffset::kRegCrc);
             }
 
-            auto setRegCrc(u32 value) -> void {
-               set_u32_at(kOffsetOfRegCrcInBytes, value);
+            auto set_reg_crc(u32 value) -> void {
+               set_u32_at(NetMsgLogonOffset::kRegCrc, value);
             }
 
-            auto regCounter(void) const -> u32 {
-               return u32_at(kOffsetOfRegCounterInBytes);
+            auto reg_counter(void) const -> u32 {
+               return u32_at(NetMsgLogonOffset::kRegCounter);
             }
 
-            auto setRegCounter(u32 value) -> void {
-               set_u32_at(kOffsetOfRegCounterInBytes, value);
+            auto set_reg_counter(u32 value) -> void {
+               set_u32_at(NetMsgLogonOffset::kRegCounter, value);
             }
 
             auto username(void) const -> QString {
@@ -88,7 +91,7 @@ namespace seville
                return u32_at(kOffsetOfFlagsInBytes);
             }
 
-            auto setFlags(u32 value) -> void {
+            auto set_flags(u32 value) -> void {
                set_u32_at(kOffsetOfFlagsInBytes, value);
             }
 
@@ -199,19 +202,19 @@ namespace seville
          private:
             void do_init_(void)
             {
-               truncate(kOffsetForNetMsgPayloadInBytes);
-               reserve(kSizeOfLogonNetMsgInBytes);
+               truncate(NetMsgSize::kMinimum);
+               reserve(NetMsgSize::kLogon);
 
                set_id(NetMsgKind::kLogonKind);
-               set_len(kSizeOfLogonNetMsgInBytes);
+               set_len(NetMsgSize::kLogon);
                set_ref(0);
 
-               setFlags(0);
-               setRegCrc(0);
+               set_flags(0);
+               set_reg_crc(0);
                setPuidCrc(0);
                setUsername("Seville User");
                setDemoLimit(0x00011940);
-               setRegCounter(0);
+               set_reg_counter(0);
                setDemoElapsed(0x00011940);
                setPuidCounter(0);
                setTotalElapsed(0x00011940);

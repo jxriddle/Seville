@@ -15,7 +15,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include "seville/base/types.h"
-#include "seville/base/log.h"
+//#include "seville/base/log.h"
 
 #include "seville/palace/base/server.h"
 #include "seville/palace/base/user.h"
@@ -284,11 +284,11 @@ namespace seville
             do_disconnect_from_host_();
          }
 
-         inline auto do_deinit(void) -> void {
+         inline auto do_deinit_(void) -> void {
             do_disconnect_from_host_();
          }
 
-         inline auto do_init(void) -> void {
+         inline auto do_init_(void) -> void {
             do_setup_events_();
             do_reset_();
 
@@ -559,19 +559,19 @@ namespace seville
             auto kind = (flag_little_endian * Host::SwapU32(my_netmsg_.id())) |
                         (!flag_little_endian * my_netmsg_.id());
 
-            if (netmsg::NetMsgKind::kUnknownServerKind == kind)
+            if (netmsg::NetMsgKind::kkUnknownServerKind == kind)
             {
                qCDebug(log_seville) << "Server has Unknown Byte Order";
                my_server_.set_byte_order(Host::ByteOrder::kUnknownEndian);
                res = 0;
             }
-            else if (netmsg::NetMsgKind::kBigEndianServerKind == kind)
+            else if (netmsg::NetMsgKind::kkBigEndianServerKind == kind)
             {
                qCDebug(log_seville) << "Server has Big Endian Byte Order";
                my_server_.set_byte_order(Host::ByteOrder::kBigEndian);
                res = 1;
             }
-            else if (netmsg::NetMsgKind::kLittleEndianServerKind == kind)
+            else if (netmsg::NetMsgKind::kkLittleEndianServerKind == kind)
             {
                qCDebug(log_seville) << "Server has Little Endian Byte Order";
                my_server_.set_byte_order(Host::ByteOrder::kLittleEndian);
@@ -1086,7 +1086,7 @@ namespace seville
             // TODO stub
             //netMsg.appendU32(netmsg::Kind::AuthResponseKind);
             //netMsg.appendDw();
-            msgAuthenticate.setId(netmsg::NetMsgKind::AuthResponseKind);
+            msgAuthenticate.setId(netmsg::NetMsgKind::kAuthResponseKind);
             my_socket_.write(msgAuthenticate);
 
             return res;
@@ -1122,7 +1122,7 @@ namespace seville
                //case Net::Msg::LogonKind:
                //    res = sendLogon_();
                //    break;
-            if (netmsg::NetMsgKind::AltLogonKind == kind)
+            if (netmsg::NetMsgKind::kAltLogonKind == kind)
                 //netmsg::sizes[netmsg::AltLogonKind] == size) {
             {
                qCDebug(log_seville) << "Received AltLogon";
@@ -1132,7 +1132,7 @@ namespace seville
 
                res = do_receive_altlogon_();
             }
-            else if (netmsg::NetMsgKind::ConnectionErrorKind == kind)
+            else if (netmsg::NetMsgKind::kConnectionErrorKind == kind)
 
             {
                qCDebug(log_seville) << "Received ConnectionError";
@@ -1144,7 +1144,7 @@ namespace seville
 
                res = do_receiveConnectionError();
             }
-            else if (netmsg::NetMsgKind::ServerVersionKind == kind)
+            else if (netmsg::NetMsgKind::kServerVersionKind == kind)
             {
                qCDebug(log_seville) << "Received ServerVersion";
                my_logger_.debug("Received ServerVersion");
@@ -1153,7 +1153,7 @@ namespace seville
 
                res = do_receiveServerVersion();
             }
-            else if (netmsg::NetMsgKind::ServerInfoKind == kind)
+            else if (netmsg::NetMsgKind::kServerInfoKind == kind)
             {
                qCDebug(log_seville) << "Received ServerInfo";
                my_logger_.debug("Received ServerInfo");
@@ -1162,7 +1162,7 @@ namespace seville
 
                res = do_receiveServerInfo();
             }
-            else if (netmsg::NetMsgKind::UserStatusKind == kind)
+            else if (netmsg::NetMsgKind::kUserStatusKind == kind)
             {
                qCDebug(log_seville) << "Received UserStatus";
                my_logger_.debug("Received UserStatus");
@@ -1171,7 +1171,7 @@ namespace seville
 
                res = do_receiveUserStatus();
             }
-            else if (netmsg::NetMsgKind::UserLoggedOnAndMaxKind == kind)
+            else if (netmsg::NetMsgKind::kUserLoggedOnAndMaxKind == kind)
             {
                qCDebug(log_seville) << "Received UserLoggedOnAndMax";
                my_logger_.debug("Received UserLoggedOnAndMax");
@@ -1180,7 +1180,7 @@ namespace seville
 
                res = do_receiveUserLoggedOnAndMax();
             }
-            else if (netmsg::NetMsgKind::HttpServerLocationKind == kind)
+            else if (netmsg::NetMsgKind::kHttpServerLocationKind == kind)
             {
                qCDebug(log_seville) << "Received HttpServerLocation";
                my_logger_.debug("Received HttpServerLocation");
@@ -1189,7 +1189,7 @@ namespace seville
 
                res = do_receiveHttpServerLocation();
             }
-            else if (netmsg::NetMsgKind::RoomUserListKind == kind)
+            else if (netmsg::NetMsgKind::kRoomUserListKind == kind)
             {
                qCDebug(log_seville) << "Received RoomUserList";
                my_logger_.debug("Received RoomUserList");
@@ -1198,7 +1198,7 @@ namespace seville
 
                res = do_receiveRoomUserList();
             }
-            else if (netmsg::NetMsgKind::ServerUserListKind == kind)
+            else if (netmsg::NetMsgKind::kServerUserListKind == kind)
             {
                qCDebug(log_seville) << "Received ServerUserList";
                my_logger_.debug("Received ServerUserList");
@@ -1207,7 +1207,7 @@ namespace seville
 
                res = do_receiveServerUserList();
             }
-            else if (netmsg::NetMsgKind::ServerRoomListKind == kind)
+            else if (netmsg::NetMsgKind::kServerRoomListKind == kind)
             {
                qCDebug(log_seville) << "Received ServerRoomList";
                my_logger_.debug("Received ServerRoomList");
@@ -1216,7 +1216,7 @@ namespace seville
 
                res = do_receiveServerRoomList();
             }
-            else if (netmsg::NetMsgKind::RoomDescendKind == kind)
+            else if (netmsg::NetMsgKind::kRoomDescendKind == kind)
             {
                qCDebug(log_seville) << "Received RoomDescend";
                my_logger_.debug("Received RoomDescend");
@@ -1227,7 +1227,7 @@ namespace seville
 
                res = do_receiveRoomDescend();
             }
-            else if (netmsg::NetMsgKind::UserNewKind == kind)
+            else if (netmsg::NetMsgKind::kUserNewKind == kind)
             {
                qCDebug(log_seville) << "Received UserNew";
                my_logger_.debug("Received UserNew");
@@ -1238,7 +1238,7 @@ namespace seville
 
                res = do_receiveUserNew();
             }
-            else if (netmsg::NetMsgKind::PingKind == kind)
+            else if (netmsg::NetMsgKind::kPingKind == kind)
             {
                qCDebug(log_seville) << "Received Ping";
                my_logger_.debug("Received Ping");
@@ -1249,7 +1249,7 @@ namespace seville
 
                res = do_receivePing();
             }
-            else if (netmsg::NetMsgKind::PongKind == kind)
+            else if (netmsg::NetMsgKind::kPongKind == kind)
             {
                qCDebug(log_seville) << "Received Pong";
                my_logger_.debug("Received Pong");
@@ -1260,7 +1260,7 @@ namespace seville
 
                res = do_receivePong();
             }
-            else if (netmsg::NetMsgKind::XTalkKind == kind)
+            else if (netmsg::NetMsgKind::kXTalkKind == kind)
             {
                qCDebug(log_seville) << "Received XTalk";
                my_logger_.debug("Received XTalk");
@@ -1271,7 +1271,7 @@ namespace seville
 
                res = do_receiveXTalk();
             }
-            else if (netmsg::NetMsgKind::XWhisperKind == kind)
+            else if (netmsg::NetMsgKind::kXWhisperKind == kind)
             {
                qCDebug(log_seville) << "Received XWhisper";
                my_logger_.debug("Received XWhisper");
@@ -1282,7 +1282,7 @@ namespace seville
 
                res = do_receiveXWhisper();
             }
-            else if (netmsg::NetMsgKind::TalkKind == kind)
+            else if (netmsg::NetMsgKind::kTalkKind == kind)
             {
                qCDebug(log_seville) << "Received Talk";
                my_logger_.debug("Received Talk");
@@ -1293,7 +1293,7 @@ namespace seville
 
                res = do_receiveTalk();
             }
-            else if (netmsg::NetMsgKind::WhisperKind == kind)
+            else if (netmsg::NetMsgKind::kWhisperKind == kind)
 
             {
                qCDebug(log_seville) << "Recieved Whisper";
@@ -1305,7 +1305,7 @@ namespace seville
 
                res = do_receiveWhisper();
             }
-            else if (netmsg::NetMsgKind::AssetIncomingKind == kind)
+            else if (netmsg::NetMsgKind::kAssetIncomingKind == kind)
             {
                qCDebug(log_seville) << "Received AssetIncoming";
                my_logger_.debug("Received AssetIncoming");
@@ -1316,7 +1316,7 @@ namespace seville
 
                res = do_receiveAssetIncoming();
             }
-            else if (netmsg::NetMsgKind::AssetQueryKind == kind)
+            else if (netmsg::NetMsgKind::kAssetQueryKind == kind)
             {
                qCDebug(log_seville) << "Received AssetQuery";
                my_logger_.debug("Received AssetQuery");
@@ -1327,7 +1327,7 @@ namespace seville
 
                res = do_receiveAssetQuery();
             }
-            else if (netmsg::NetMsgKind::MovementKind == kind)
+            else if (netmsg::NetMsgKind::kMovementKind == kind)
             {
                qCDebug(log_seville) << "Received Movement";
                my_logger_.debug("Received Movement");
@@ -1338,7 +1338,7 @@ namespace seville
 
                res = do_receiveMovement();
             }
-            else if (netmsg::NetMsgKind::UserColorKind == kind)
+            else if (netmsg::NetMsgKind::kUserColorKind == kind)
             {
                qCDebug(log_seville) << "Received UserColor";
                my_logger_.debug("Received UserColor");
@@ -1349,7 +1349,7 @@ namespace seville
 
                res = do_receiveUserColor();
             }
-            else if (netmsg::NetMsgKind::UserFaceKind == kind)
+            else if (netmsg::NetMsgKind::kUserFaceKind == kind)
             {
                qCDebug(log_seville) << "Received UserFace";
                my_logger_.debug("Received UserFace");
@@ -1360,7 +1360,7 @@ namespace seville
 
                res = do_receiveUserFace();
             }
-            else if (netmsg::NetMsgKind::UserPropKind == kind)
+            else if (netmsg::NetMsgKind::kUserPropKind == kind)
             {
                qCDebug(log_seville) << "Received UserProp";
                my_logger_.debug("Received UserProp");
@@ -1371,7 +1371,7 @@ namespace seville
 
                res = do_receiveUserProp();
             }
-            else if (netmsg::NetMsgKind::UserDescriptionKind == kind)
+            else if (netmsg::NetMsgKind::kUserDescriptionKind == kind)
             {
                qCDebug(log_seville) << "Received UserDescription";
                my_logger_.debug("Received UserDescription");
@@ -1382,7 +1382,7 @@ namespace seville
 
                res = do_receiveUserDescription();
             }
-            else if (netmsg::NetMsgKind::UserRenameKind == kind)
+            else if (netmsg::NetMsgKind::kUserRenameKind == kind)
             {
                qCDebug(log_seville) << "Received UserRename";
                my_logger_.debug("Received UserRename");
@@ -1393,7 +1393,7 @@ namespace seville
 
                res = do_receiveUserRename();
             }
-            else if (netmsg::NetMsgKind::UserLeavingKind == kind)
+            else if (netmsg::NetMsgKind::kUserLeavingKind == kind)
             {
                qCDebug(log_seville) << "Received UserLeaving";
                my_logger_.debug("Received UserLeaving");
@@ -1404,7 +1404,7 @@ namespace seville
 
                res = do_receiveUserLeaving();
             }
-            else if (netmsg::NetMsgKind::UserExitRoomKind == kind)
+            else if (netmsg::NetMsgKind::kUserExitRoomKind == kind)
             {
                qCDebug(log_seville) << "Received UserExitRoom";
                my_logger_.debug("Received UserExitRoom");
@@ -1415,7 +1415,7 @@ namespace seville
 
                res = do_receiveUserExitRoom();
             }
-            else if (netmsg::NetMsgKind::PropMoveKind == kind)
+            else if (netmsg::NetMsgKind::kPropMoveKind == kind)
             {
                qCDebug(log_seville) << "Received PropMove";
                my_logger_.debug("Received PropMove");
@@ -1426,7 +1426,7 @@ namespace seville
 
                res = do_receivePropMove();
             }
-            else if (netmsg::NetMsgKind::PropDeleteKind == kind)
+            else if (netmsg::NetMsgKind::kPropDeleteKind == kind)
             {
                qCDebug(log_seville) << "Received PropDelete";
                my_logger_.debug("Received PropDelete");
@@ -1437,7 +1437,7 @@ namespace seville
 
                res = do_receivePropDelete();
             }
-            else if (netmsg::NetMsgKind::PropNewKind == kind)
+            else if (netmsg::NetMsgKind::kPropNewKind == kind)
             {
                qCDebug(log_seville) << "Received PropNew";
                my_logger_.debug("Received PropNew");
@@ -1446,7 +1446,7 @@ namespace seville
 
                res = do_receivePropNew();
             }
-            else if (netmsg::NetMsgKind::DoorLockKind == kind)
+            else if (netmsg::NetMsgKind::kDoorLockKind == kind)
             {
                qCDebug(log_seville) << "Received DoorLock";
                my_logger_.debug("Received DoorLock");
@@ -1455,7 +1455,7 @@ namespace seville
 
                res = do_receiveDoorLock();
             }
-            else if (netmsg::NetMsgKind::DoorUnlockKind == kind)
+            else if (netmsg::NetMsgKind::kDoorUnlockKind == kind)
             {
                my_logger_.debug("Received DoorUnlock");
                qCDebug(log_seville) << "Received DoorUnlock";
@@ -1464,7 +1464,7 @@ namespace seville
 
                res = do_receiveDoorUnlock();
             }
-            else if (netmsg::NetMsgKind::PictMoveKind == kind)
+            else if (netmsg::NetMsgKind::kPictMoveKind == kind)
             {
                my_logger_.debug("Received PictMove");
                qCDebug(log_seville) << "Received PictMove";
@@ -1473,7 +1473,7 @@ namespace seville
 
                res = do_receivePictMove();
             }
-            else if (netmsg::NetMsgKind::SpotStateKind == kind)
+            else if (netmsg::NetMsgKind::kSpotStateKind == kind)
             {
                my_logger_.debug("Received SpotState");
                qCDebug(log_seville) << "Received SpotState";
@@ -1482,7 +1482,7 @@ namespace seville
 
                res = do_receiveSpotState();
             }
-            else if (netmsg::NetMsgKind::SpotMoveKind == kind)
+            else if (netmsg::NetMsgKind::kSpotMoveKind == kind)
             {
                my_logger_.debug("Received SpotMove");
                qCDebug(log_seville) << "Received SpotMove";
@@ -1491,7 +1491,7 @@ namespace seville
 
                res = do_receiveSpotMove();
             }
-            else if (netmsg::NetMsgKind::DrawKind == kind)
+            else if (netmsg::NetMsgKind::kDrawKind == kind)
             {
                my_logger_.debug("Received Draw");
                qCDebug(log_seville) << "Received Draw";
@@ -1500,7 +1500,7 @@ namespace seville
 
                res = do_receiveDraw();
             }
-            else if (netmsg::NetMsgKind::NavErrorKind == kind)
+            else if (netmsg::NetMsgKind::kNavErrorKind == kind)
             {
                my_logger_.debug("Received NavError");
                qCDebug(log_seville) << "Received NavError";
@@ -1509,7 +1509,7 @@ namespace seville
 
                res = do_receiveNavigationError();
             }
-            else if (netmsg::NetMsgKind::BlowThruKind == kind)
+            else if (netmsg::NetMsgKind::kBlowThruKind == kind)
             {
                my_logger_.debug("Received BlowThru");
                qCDebug(log_seville) << "Received BlowThru";
@@ -1518,7 +1518,7 @@ namespace seville
 
                res = do_receiveBlowThru();
             }
-            else if (netmsg::NetMsgKind::AuthenticateKind == kind)
+            else if (netmsg::NetMsgKind::kAuthenticateKind == kind)
             {
                my_logger_.debug("Received Authenticate");
                qCDebug(log_seville) << "Received Authenticate";
@@ -1527,7 +1527,7 @@ namespace seville
 
                res = do_receiveAuthenticate();
             }
-            else if (netmsg::NetMsgKind::AltRoomDescriptionKind == kind)
+            else if (netmsg::NetMsgKind::kAltRoomDescriptionKind == kind)
             {
                my_logger_.debug("Received AltRoomDescription");
                qCDebug(log_seville) << "Received AltRoomDescription";
@@ -1536,7 +1536,7 @@ namespace seville
 
                res = do_receiveRoomDescription();
             }
-            else if (netmsg::NetMsgKind::RoomDescriptionKind == kind)
+            else if (netmsg::NetMsgKind::kRoomDescriptionKind == kind)
             {
                my_logger_.debug("Received RoomDescription");
                qCDebug(log_seville) << "Received RoomDescription";

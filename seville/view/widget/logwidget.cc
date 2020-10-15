@@ -7,18 +7,21 @@ namespace seville
 {
    namespace view
    {
-      LogWidget::LogWidget(QWidget* widget_parent_pointer) \
-         : QWidget(widget_parent_pointer) {}
-
-      auto LogWidget::palaceClientPointer(void) -> palace::Client*
+      namespace widget
       {
-         return my_client_palace_pointer_;
-      }
+         LogWidget::LogWidget(QWidget* widget_parent_pointer) \
+            : QWidget(widget_parent_pointer) {}
 
-      auto LogWidget::setPalaceClientPointer( \
-            palace::Client* palace_client_pointer) -> void
-      {
-         my_client_palace_pointer_ = palace_client_pointer;
+         auto LogWidget::palaceClientPointer(void) -> palace::Client*
+         {
+            return my_client_palace_pointer_;
+         }
+
+         auto LogWidget::setPalaceClientPointer( \
+               palace::Client* palace_client_pointer) -> void
+         {
+            my_client_palace_pointer_ = palace_client_pointer;
+         }
       }
    }
 }
