@@ -17,9 +17,7 @@ namespace seville
             HttpServerLocation( \
                   const GenericNetMsg& netmsg, \
                   NetMsgOptions options = \
-                     NetMsgOptions::kDoNotSwapEndianness);
-
-            inline auto url(void) -> QString {
+                     NetMsgOptions::kDoNotSwapEndian            inline auto url(void) -> QString {
                return qstring_at( \
                         palace::kOffsetForNetMsgPayloadInBytes, 4096);
             }
