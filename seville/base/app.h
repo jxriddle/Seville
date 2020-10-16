@@ -5,6 +5,9 @@
 
 #include <QLoggingCategory>
 
+#include "seville/base/types.h"
+#include "seville/base/bytearray.h"
+
 namespace seville
 {
    Q_DECLARE_LOGGING_CATEGORY(log_seville)
@@ -34,7 +37,7 @@ namespace seville
 
 extern seville::SevilleApp app_seville;
 
-auto Seville(void) -> seville::SevilleApp* {
+auto SevilleApp(void) -> seville::SevilleApp* {
    return &app_seville;
 }
 

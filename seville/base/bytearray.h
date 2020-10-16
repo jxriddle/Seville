@@ -301,8 +301,7 @@ namespace seville
          bi.qword = static_cast<i64>(value);
          auto z = static_cast<int>(sizeof(u64));
          for (auto i = 0; i < z; i++) {
-            insert(static_cast<int>(offset+i),
-                   static_cast<char>(bi.ch[i]));
+            insert(static_cast<int>(offset+i), static_cast<char>(bi.ch[i]));
          }
       }
 
@@ -334,8 +333,7 @@ namespace seville
          bi.dword = static_cast<i32>(value);
          auto z = static_cast<int>(sizeof(i32));
          for (auto i = 0; i < z; i++) {
-            insert(static_cast<int>(offset+i),
-                   static_cast<char>(bi.ch[i]));
+            insert(static_cast<int>(offset+i), static_cast<char>(bi.ch[i]));
          }
       }
 
@@ -367,8 +365,7 @@ namespace seville
          bi.dword = static_cast<i32>(value);
          auto z = static_cast<int>(sizeof(u32));
          for (auto i = 0; i < z; i++) {
-            insert(static_cast<int>(offset+i),
-                   static_cast<char>(bi.ch[i]));
+            insert(static_cast<int>(offset+i), static_cast<char>(bi.ch[i]));
          }
       }
 
@@ -399,8 +396,7 @@ namespace seville
          bi.word = static_cast<i16>(value);
          auto z = static_cast<int>(sizeof(i16));
          for (auto i = 0; i < z; i++) {
-            insert(static_cast<int>(offset+i),
-                   static_cast<char>(bi.ch[i]));
+            insert(static_cast<int>(offset+i), static_cast<char>(bi.ch[i]));
          }
       }
 
@@ -430,8 +426,7 @@ namespace seville
          bi.word = static_cast<i16>(value);
          auto z = static_cast<int>(sizeof(u16));
          for (auto i = 0; i < z; i++) {
-            insert(static_cast<int>(offset+i),
-                   static_cast<char>(bi.ch[i]));
+            insert(static_cast<int>(offset+i), static_cast<char>(bi.ch[i]));
          }
       }
 

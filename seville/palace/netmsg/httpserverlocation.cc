@@ -1,6 +1,6 @@
 #include "seville/base/types.h"
 
-#include "seville/palace/base/genericnetmsg.h"
+#include "seville/palace/base/netmsg.h"
 
 #include "seville/palace/netmsg/httpserverlocation.h"
 
@@ -11,18 +11,18 @@ namespace seville
       namespace netmsg
       {
          HttpServerLocation::HttpServerLocation( \
-               const GenericNetMsg& netmsg, NetMsgOptions options) \
-            : GenericNetMsg(netmsg, options)
+               const NetMsg& netmsg, NetMsgOptions options) \
+            : NetMsg(netmsg, options)
          {
             do_init_();
          }
 
          void HttpServerLocation::do_init_(void)
          {
-            truncate(kOffsetForNetMsgPayloadInBytes);
-            reserve(kSizeOfNetMsgHttpServerLocationInBytes);
+            truncate(NetMsgSize::kMinimumSize);
+            reserve(NetMsgSize::kHttpServerLocationSize);
 
-            set_id(NetMsgKind::kHttpServerLocationKind);
+            set_id(NetMsgKind::kHttpServerLocationSize);
             set_len(kSizeOfNetMsgHttpServerLocationPayloadInBytes);
             set_ref(0);
          }

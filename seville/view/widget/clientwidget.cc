@@ -1,13 +1,21 @@
 #include <memory>
 
+#include <QDir>
+#include <QImage>
+#include <QNetworkAccessManager>
+#include <QWidget>
+
 #include <QBitmap>
 #include <QDebug>
 #include <QLoggingCategory>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
+#include "seville/base/app.h"
+
 #include "seville/palace/base/logger.h"
 #include "seville/palace/base/client.h"
+
 #include "seville/view/dialog/connectdialog.h"
 #include "seville/view/widget/clientwidget.h"
 
@@ -42,7 +50,7 @@ namespace seville
          {
             my_layout_widget_ptr_ = new QVBoxLayout(this);
             my_scrollarea_ptr_ = new QScrollArea(this);
-            my_label_background_image_ptr_ = new QLabel(my_scrollarea_ptr_);
+            my_label_image_background_ptr_ = new QLabel(my_scrollarea_ptr_);
             my_layout_widget_ptr_->setMargin(0);
             my_scrollarea_ptr_->setHorizontalScrollBarPolicy(
                      Qt::ScrollBarPolicy::ScrollBarAsNeeded);
@@ -55,7 +63,7 @@ namespace seville
             my_layout_widget_ptr_->setSpacing(0);
 
             auto layout_scroll_area_ptr = new QHBoxLayout(my_scrollarea_ptr_);
-            layout_scroll_area_ptr->addWidget(my_label_background_image_ptr_);
+            layout_scroll_area_ptr->addWidget(my_label_image_background_ptr_);
 
             layout_scroll_area_ptr->setMargin(0);
             layout_scroll_area_ptr->setContentsMargins(0, 0, 0, 0);
@@ -65,7 +73,7 @@ namespace seville
 
             //PalRoom& room = myPalClient->currentRoom();
             auto filename_image = QString(":/assets/images/test-pattern.png"); //.arg("test-pattern.png");
-            qCDebug(Seville()->log_category()) << filename_image;
+            qCDebug(SevilleApp()->log_category()) << filename_image;
             do_set_backgroundimage_from_file_(filename_image);
 
             setLayout(my_layout_widget_ptr_);
@@ -76,41 +84,47 @@ namespace seville
             //connect(
                //this, &Seville::View::ClientWidget::mousePressEvent,
                //this, &Seville::View::ClientWidget::onMousePressEvent);
-            connect(
-                  myPalaceClient, &seville::Palace::Client::backgroundChanged,
-                  this, &seville::view::ClientWidget::onBackgroundChanged
-               );
+
+            connect( \
+                  my_client_palace_ptr_, \
+                  &seville::palace::Client::background_image_did_load, \
+                  this, \
+                  &seville::view::widget::ClientWidget::on_background_changed);
          }
 
-         void ClientWidget::doSetBackgroundImage(QPixmap& pixmap)
+         void ClientWidget::do_set_background_image_(QPixmap& pixmap)
          {
-            myBackgroundImageLabel->setBackgroundRole(QPalette::Base);
-            myBackgroundImageLabel->setSizePolicy(
-                     QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-            myBackgroundImageLabel->setScaledContents(true);
-            //myBackgroundImageLabel->resize(backgroundImage_.size());
-            myBackgroundImageLabel->setPixmap(pixmap);
-            myBackgroundImageLabel->setMask(pixmap.mask());
+            my_label_image_background_ptr_->setBackgroundRole(QPalette::Base);
+            my_label_image_background_ptr_->setSizePolicy( \
+                     QSizePolicy::MinimumExpanding, \
+                     QSizePolicy::MinimumExpanding);
+            my_label_image_background_ptr_->setScaledContents(true);
+            //my_label_background_image_ptr->resize(backgroundImage_.size());
+            my_label_image_background_ptr_->setPixmap(pixmap);
+            my_label_image_background_ptr_->setMask(pixmap.mask());
             //myBackgroundImageLabel->setGeometry(0, 0, 500, 500);
 
-            myScrollArea->setBackgroundRole(QPalette::Dark);
-            myScrollArea->setWidget(myBackgroundImageLabel);
-            //myScrollArea->setGeometry(pixmap.rect());
-            //myScrollArea->setGeometry(myBackgroundImageLabel->geometry());
-            myScrollArea->setVisible(true);
+            my_scrollarea_ptr_->setBackgroundRole(QPalette::Dark);
+            my_scrollarea_ptr_->setWidget(my_label_image_background_ptr_);
+            //my_scrollarea_ptr_->setGeometry(pixmap.rect());
+            //my_scrollarea_ptr_->setGeometry( \
+            // my_label_background_image_ptr_->geometry());
+            my_scrollarea_ptr_->setVisible(true);
          }
 
-         void ClientWidget::doSetBackgroundImageFromFile(QString imagePath)
+         void ClientWidget::do_set_background_image_from_file_( \
+               QString imagePath)
          {
             QPixmap pixmap = QPixmap(imagePath);
-            doSetBackgroundImage(pixmap);
+            do_set_background_image_(pixmap);
          }
 
-         void ClientWidget::doPromptNewConnection(QWidget* parent)
+         void ClientWidget::do_prompt_new_connection_( \
+               QWidget* widget_parent_ptr)
          {
-            ConnectDialog dialog(parent);
+            seville::view::dialog::ConnectDialog dialog(parent);
             if (dialog.exec() == QDialog::Accepted) {
-               myPalaceClient->connectToHost(
+               my_client_palace_ptr_->connectToHost(
                         dialog.host(), dialog.port(), dialog.username());
             }
          }
@@ -137,8 +151,8 @@ namespace seville
          void ClientWidget::mousePressEvent(QMouseEvent* event)
          {
             (void)event;
-            if (myPalaceClient->connectionState() ==
-                Palace::Client::ConnectionState::Disconnected) {
+            if (my_client_palace_ptr_->connection_state() ==
+                palace::Client::ConnectionState::kDisconnected) {
                doPromptNewConnection(this);
             }
          }

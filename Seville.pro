@@ -34,11 +34,11 @@ SOURCES += \
     seville/palace/base/host.cc \
     seville/palace/base/logger.cc \
     seville/palace/base/logmessage.cc \
+    seville/palace/base/netmsg.cc \
     seville/palace/base/prop.cc \
     seville/palace/base/room.cc \
     seville/palace/base/server.cc \
     seville/palace/base/user.cc \
-    seville/palace/base/genericnetmsg.cc \
     seville/palace/netmsg/httpserverlocation.cc \
     seville/palace/netmsg/logon.cc \
     seville/palace/netmsg/roomdescription.cc \
@@ -58,11 +58,11 @@ HEADERS += \
     seville/palace/base/host.h \
     seville/palace/base/logger.h \
     seville/palace/base/logmessage.h \
+    seville/palace/base/netmsg.h \
     seville/palace/base/prop.h \
     seville/palace/base/room.h \
     seville/palace/base/server.h \
     seville/palace/base/user.h \
-    seville/palace/base/genericnetmsg.h \
     seville/palace/netmsg/httpserverlocation.h \
     seville/palace/netmsg/logon.h \
     seville/palace/netmsg/roomdescription.h \

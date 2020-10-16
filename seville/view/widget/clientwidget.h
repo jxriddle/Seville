@@ -1,16 +1,10 @@
 #ifndef SEVILLE_PALACE_CLIENT_WIDGET_H_
 #define SEVILLE_PALACE_CLIENT_WIDGET_H_
 
-#include <QDir>
-#include <QImage>
 #include <QLabel>
-#include <QNetworkAccessManager>
 #include <QScrollArea>
 #include <QVBoxLayout>
-#include <QWidget>
 
-#include "seville/view/widget/logwidget.h"
-#include "seville/view/window/mainwindow.h"
 #include "seville/palace/base/client.h"
 
 namespace seville
@@ -45,11 +39,11 @@ namespace seville
          public slots:
             //void updateGeometry();
             //void onBackgroundImageLabelResized(QResizeEvent *event);
-            auto on_backgroundChanged(void) -> void;
+            auto on_background_changed(void) -> void;
 
          private:
             palace::Client* my_client_palace_ptr_;
-            QLabel* my_label_background_image_ptr_;
+            QLabel* my_label_image_background_ptr_;
             QScrollArea* my_scrollarea_ptr_;
             QVBoxLayout* my_layout_widget_ptr_;
             QPixmap my_pixmap_background_image_;

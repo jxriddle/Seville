@@ -14,15 +14,14 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
-#include "seville/base/types.h"
-//#include "seville/base/log.h"
+#include "seville/base/app.h"
 
 #include "seville/palace/base/server.h"
 #include "seville/palace/base/user.h"
 #include "seville/palace/base/room.h"
 #include "seville/palace/base/cipher.h"
 #include "seville/palace/base/logger.h"
-#include "seville/palace/base/genericnetmsg.h"
+#include "seville/palace/base/netmsg.h"
 
 #include "seville/palace/netmsg/httpserverlocation.h"
 #include "seville/palace/netmsg/logon.h"
@@ -32,39 +31,39 @@ namespace seville
 {
    namespace palace
    {
-      enum class ConnectionState: u32 {
-         kDisconnected = 0x00000000,
-         kHandshaking = 0x00000001,
-         kConnected = 0x00000002,
+      enum class ClientState: u32 {
+         kDisconnectedClientState = 0x00000000,
+         kHandshakingClientState = 0x00000001,
+         kConnectedClientState = 0x00000002,
       };
 
-      enum class ReasonForTerminate: u32 {
-         kNil = 0x00000000,
-         kError = 0x00000001,
-         kCommError = 0x00000002,
-         kFlood = 0x00000003,
-         kKilledByPlayer = 0x00000004,
-         kServerDown = 0x00000005,
-         kUnresponsive = 0x00000006,
-         kKilledBySysop = 0x0000007,
-         kServerFull = 0x00000008,
-         kInvalidSerialNumber = 0x0000009,
-         kDuplicateUser = 0x0000000a,
-         kDeathPenaltyActive = 0x0000000b,
-         kBanished = 0x0000000c,
-         kBanishKill = 0x0000000d,
-         kNoGuests = 0x0000000e,
-         kDemoExpired = 0x0000000f,
-         kUnknown = 0x00000010,
+      enum class TerminateReason: u32 {
+         kNoTerminateReason = 0x00000000,
+         kErrorTerminateReason = 0x00000001,
+         kCommErrorTerminateReason = 0x00000002,
+         kFloodTerminateReason = 0x00000003,
+         kKilledByPlayerTerminateReason = 0x00000004,
+         kServerDownTerminateReason = 0x00000005,
+         kUnresponsiveTerminateReason = 0x00000006,
+         kKilledBySysopTerminateReason = 0x0000007,
+         kServerFullTerminateReason = 0x00000008,
+         kInvalidSerialNumberTerminateReason = 0x0000009,
+         kDuplicateUserTerminateReason = 0x0000000a,
+         kDeathPenaltyActiveTerminateReason = 0x0000000b,
+         kBanishedTerminateReason = 0x0000000c,
+         kBanishKillTerminateReason = 0x0000000d,
+         kNoGuestsTerminateReason = 0x0000000e,
+         kDemoExpiredTerminateReason = 0x0000000f,
+         kUnknownTerminateReason = 0x00000010,
       };
 
-      enum class ErrorForNavigation: u32 {
-         kInternalError = 0x00000000,
-         kUnknownRoom = 0x00000001,
-         kRoomFull = 0x00000002,
-         kRoomClosed = 0x00000003,
-         kCantAuthor = 0x00000004,
-         kPalaceFull = 0x00000005,
+      enum class NavigationError: u32 {
+         kInternalNavigationError = 0x00000000,
+         kUnknownRoomNavigationError = 0x00000001,
+         kRoomFullNavigationError = 0x00000002,
+         kRoomClosedNavigationError = 0x00000003,
+         kCantAuthorNavigationError = 0x00000004,
+         kPalaceFullNavigationError = 0x00000005,
       };
 
       enum class FlagAuxOptions: u32 {
@@ -203,7 +202,7 @@ namespace seville
             my_byte_order_ = value;
          }
 
-         inline auto connection_state(void) -> ConnectionState {
+         inline auto connection_state(void) -> ClientState {
             return my_connection_state_;
          }
 
@@ -307,14 +306,14 @@ namespace seville
          //QDataStream *myNetMsgRxDs;
          //NetMsg myNetMsgTx;
          //QDataStream *myNetMsgTxDs;
-         palace::GenericNetMsg my_netmsg_;
+         palace::NetMsg my_netmsg_;
          int my_transfer_timer_id_;
          QTimer my_ping_timer_;
          QTimer my_receive_netmsg_timer_;
          QTime my_pong_time_;
          //QByteArray myBuffer;
          Host::ByteOrder my_byte_order_;
-         ConnectionState my_connection_state_;
+         ClientState my_connection_state_;
          QTcpSocket my_socket_;
          QString my_username_;
          QString my_host_;
@@ -353,31 +352,42 @@ namespace seville
                }
             );
 
+//            connect(
+//               &my_socket_, QOverload<QAbstractSocket::SocketError>::of( \
+//                        &QAbstractSocket::error),
+//                     this, [this](void) {  //&Client::on_socketError
+//                  my_logger_.error("Socket Error");
+//                  qCDebug(log_seville) << "ERROR: Socket Error";
+//               }
+//            );
+
             connect(
-               &my_socket_, QOverload<QAbstractSocket::SocketError>::of( \
-                        &QAbstractSocket::error),
-                     this, [this](void) {  //&Client::on_socketError
-                  my_logger_.error("Socket Error");
-                  qCDebug(log_seville) << "ERROR: Socket Error";
-               }
-            );
+                  &my_socket_,
+                  &QTcpSocket::errorOccurred,
+                  this,
+                     [this](QAbstractSocket::SocketError socket_error) {
+               my_logger_.error("Socket error");
+               qCDebug(log_seville) << "ERROR: Socket Error";
+
+            });
 
             connect(
                &my_network_access_manager_, &QNetworkAccessManager::finished,
-               this, [this](QNetworkReply* pReply) {
-                  if (pReply->error()) {
-                     my_logger_.error(pReply->errorString());
+               this, [this](QNetworkReply* reply_ptr) {
+                  if (reply_ptr->error()) {
+                     my_logger_.error(reply_ptr->errorString());
                   }
                   else {
-                     auto qbytearray = pReply->readAll();
+                     auto qbytearray = reply_ptr->readAll();
                      auto const bytearray_ptr = \
                            reinterpret_cast<ByteArray*>(&qbytearray);
-                     my_current_room_.set_background_image_bytes(*bytearray_ptr);
+                     my_current_room_.set_background_image_bytes(
+                              *bytearray_ptr);
 
                      emit background_image_did_load();
                   }
 
-                  pReply->deleteLater();
+                  reply_ptr->deleteLater();
                }
             );
 
@@ -423,7 +433,7 @@ namespace seville
             my_transfer_timer_id_ = 0;
             my_socket_.disconnectFromHost();
             do_determine_client_byteorder_();
-            my_connection_state_ = ConnectionState::kDisconnected;
+            my_connection_state_ = ClientState::kDisconnectedClientState;
             //myLog.resetState();
             my_server_.reset();
             my_user_.reset();
@@ -648,7 +658,7 @@ namespace seville
           */
          int do_receive_altlogon_(void)
          {
-            auto netMsgLogon = static_cast<netmsg::Logon>(my_netmsg_);
+            auto netMsgLogon = static_cast<netmsg::LogonNetMsg>(my_netmsg_);
             if (my_user_.idCounter() != netMsgLogon.puidCounter() ||
                 my_user_.idCrc() != netMsgLogon.puidCrc())
             {
@@ -966,7 +976,7 @@ namespace seville
          int do_send_logon(void)
          {
             auto res = 0;
-            netmsg::Logon msgLogon(do_determine_if_should_swap_endianness_());
+            netmsg::LogonNetMsg msgLogon(do_determine_if_should_swap_endianness_());
 
             msgLogon.setRegCrc(my_user_.regCrc());
             msgLogon.setRegCounter(my_user_.regCounter());
