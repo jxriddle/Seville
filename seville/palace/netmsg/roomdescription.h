@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <QByteArray>
+#include <QImage>
 
 //#include "seville/base/app.h"
 
@@ -47,86 +48,89 @@ namespace seville
                kRoomDataLenOffset = NetMsgOffset::kPayloadOffset+38,
             };
 
-            static auto New( \
-                  NetMsgOptions options = NetMsgOptions::kNoEndianSwap) \
+            static auto New(
+                  NetMsgOptions options = NetMsgOptions::kNoEndianSwap)
                   -> std::unique_ptr<RoomDescription>;
 
-            static auto Copy( \
-                  const NetMsg& netmsg) \
+            static auto Copy(
+                  const NetMsg& netmsg)
                   -> std::unique_ptr<RoomDescription>;
 
             RoomDescription(void);
 
+            RoomDescription(
+                  NetMsgOptions options = NetMsgOptions::kNoEndianSwap);
+
             inline auto flags(void) const -> u32 {
-               return rep_ref_().u32_at(kFlagsOffset);
+               return do_flags_();
             }
 
             inline auto face(void) const -> u32 {
-               return rep_ref_().u32_at(kFaceOffset);
+               return do_face_();
             }
 
             inline auto room_id(void) const -> u16 {
-               return rep_ref_().u16_at(kRoomIdOffset);
+               return do_room_id_();
             }
 
             inline auto room_name_offset(void) const -> u16 {
-               return rep_ref_().u16_at(kRoomNameOffset);
+               return do_room_name_offset_();
             }
 
             inline auto background_image_name_offset(void) const -> u16 {
-               return rep_ref_().u16_at(kBackgroundImageNameOffsetOffset);
+               return do_background_image_name_offset_();
             }
 
             inline auto artist_name_offset(void) const -> u16 {
-               return rep_ref_().u16_at(kArtistNameOffsetOffset);
+               return do_artist_name_offset_();
             }
 
             inline auto password_offset(void) const -> u16 {
-               return rep_ref_().u16_at(kPasswordOffsetOffset);
+               return do_password_offset_();
             }
 
             inline auto hotspot_count(void) const -> u16 {
-               return rep_ref_().u16_at(kHotspotCountOffset);
+               return do_hotspot_count_();
             }
 
             inline auto hotspot_offset(void) const -> u16 {
-               return rep_ref_().u16_at(kHotspotOffsetOffset);
+               return do_hotspot_offset_();
             }
 
             inline auto room_image_count(void) const -> u16 {
-               return rep_ref_().u16_at(kRoomImageCountOffset);
+               return do_room_image_count_();
             }
 
             inline auto background_image_offset(void) const -> u16 {
-               return rep_ref_().u16_at(kBackgroundImageOffsetOffset);
+               return do_background_image_offset_();
             }
 
             inline auto draw_commands_count(void) const -> u16 {
-               return rep_ref_().u16_at(kDrawCommandsCountOffset);
+               return do_draw_commands_count_();
             }
 
             inline auto first_draw_command(void) const -> u16 {
-               return rep_ref_().u16_at(kFirstDrawCommandOffset);
+               return do_first_draw_command_();
             }
 
             inline auto room_user_count(void) const -> u16 {
-               return rep_ref_().u16_at(kRoomUserCountOffset);
+               return do_room_user_count_();
             }
 
             inline auto loose_prop_count(void) const -> u16 {
-               return rep_ref_().u16_at(kLoosePropCountOffset);
+               return do_loose_prop_count_();
             }
 
             inline auto first_loose_prop(void) const -> u16 {
-               return rep_ref_().u16_at(kFirstLoosePropOffset);
+               return do_first_loose_prop_();
             }
 
             inline auto reserved(void) const -> u16 {
-               return rep_ref_().u16_at(kReservedOffset);
+               return do_reserved_();
             }
 
             inline auto room_data_len(void) const -> u16 {
-               return rep_ref_().u16_at(kRoomDataLenOffset);
+               return do_room_data_len_();
             }
 
             //ByteArray roomData(void) {
@@ -148,22 +152,26 @@ namespace seville
 //            }
 
             auto artist_name(void) const -> QString {
-               auto result = \
-                     rep_ref_().qstring_at( \
-                        kPayloadOffset + do_artist_name_offset_(), \
+               return rep_ref_().qstring_at(
+                        kPayloadOffset + do_artist_name_offset_(),
                         kMaximumArtistNameSize);
-
-               return result;
             }
 
             auto background_image_name(void) const -> QString {
-                auto result = \
-                      rep_ref_().qstring_at( \
-                         kPayloadOffset + do_background_image_name_offset_(), \
-                         kMaximumBackgroundImageNameSize);
-
-                return result;
+               return rep_ref_().qstring_at(
+                        kPayloadOffset + do_background_image_name_offset_(),
+                        kMaximumBackgroundImageNameSize);
             }
+
+//            auto background_image(void) const -> QImage {
+//               auto image_byte_array = rep_ref_().mid(
+//                        kPayloadOffset + do_background_image_offset_(),
+//                        );
+
+//               QImage background_q_image(image_byte_array);
+
+//               return background_q_image;
+//            }
 
             //QByteArray backgroundImage(void) {
             //   return byteArrayAt(u16_at(NetMsgOffset::kPayload+24), 1024);

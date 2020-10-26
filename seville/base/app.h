@@ -37,8 +37,6 @@ namespace seville
 
 extern seville::SevilleApp app_seville;
 
-auto SevilleApp(void) -> seville::SevilleApp* {
-   return &app_seville;
-}
+auto SevilleApp(void) -> seville::SevilleApp*;
 
 #endif   // SEVILLE_APP_H_

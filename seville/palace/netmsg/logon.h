@@ -33,7 +33,7 @@ namespace seville
                kDemoLimitOffset = NetMsgOffset::kPayloadOffset+92,
                kInitialRoomIdOffset = NetMsgOffset::kPayloadOffset+96,
                kReservedOffset = NetMsgOffset::kPayloadOffset+98, // size: 6
-               kUploadRequestedProtocolVersionOffset = \
+               kUploadRequestedProtocolVersionOffset =
                      NetMsgOffset::kPayloadOffset+104,
                kUploadCapabilitiesOffset = NetMsgOffset::kPayloadOffset+108,
                kDownloadCapabilitiesOffset = NetMsgOffset::kPayloadOffset+112,
@@ -44,10 +44,10 @@ namespace seville
 
             NetMsgLogon(NetMsgOptions options = kNoEndianSwap);
 
-            NetMsgLogon( \
+            NetMsgLogon(
                   const NetMsg& netMsg, NetMsgOptions options = kNoEndianSwap);
 
-            virtual ~NetMsgLogon(void);
+            //virtual ~NetMsgLogon(void);
 
             auto reg_crc(void) const -> u32 {
                return rep_ref_().u32_at(kRegCrcOffset);
@@ -74,20 +74,20 @@ namespace seville
                rep_ref_mut_().set_pascal_qstring_at(kUsernameOffset, value);
             }
 
-            auto usernameLen(void) const -> u8 {
+            auto username_len(void) const -> u8 {
                return rep_ref_().u8_at(kUsernameLenOffset);
             }
 
-            auto setUsernameLen(u8 value) -> void {
+            auto set_username_len(u8 value) -> void {
                rep_ref_mut_().set_u8_at(kUsernameLenOffset, value);
             }
 
-            auto wizardPassword(void) const -> QString {
-               return rep_ref_().pascal_qstring_at( \
+            auto wizard_password(void) const -> QString {
+               return rep_ref_().pascal_qstring_at(
                         kWizardPasswordOffset, kMaximumWizardPasswordSize);
             }
 
-            auto setWizardPassword(const QString& value) -> void {
+            auto set_wizard_password(const QString& value) -> void {
                return rep_ref_mut_().set_pascal_qstring_at(
                         kWizardPasswordOffset, value);
             }
@@ -100,7 +100,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kFlagsOffset, value);
             }
 
-            auto puidCounter(void) const -> u32 {
+            auto puid_counter(void) const -> u32 {
                return rep_ref_().u32_at(kPuidCounterOffset);
             }
 
@@ -108,7 +108,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kPuidCounterOffset, value);
             }
 
-            auto puidCrc(void) const -> u32 {
+            auto puid_crc(void) const -> u32 {
                return rep_ref_().u32_at(kPuidCrcOffset);
             }
 
@@ -116,7 +116,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kPuidCrcOffset, value);
             }
 
-            auto demoElapsed(void) const -> u32 {
+            auto demo_elapsed(void) const -> u32 {
                return rep_ref_().u32_at(kDemoElapsedOffset);
             }
 
@@ -124,7 +124,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kDemoElapsedOffset, value);
             }
 
-            auto totalElapsed(void) const -> u32 {
+            auto total_elapsed(void) const -> u32 {
                return rep_ref_().u32_at(kTotalElapsedOffset);
             }
 
@@ -132,7 +132,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kTotalElapsedOffset, value);
             }
 
-            auto demoLimit(void) const -> u32 {
+            auto demo_limit(void) const -> u32 {
                return rep_ref_().u32_at(kDemoLimitOffset);
             }
 
@@ -140,7 +140,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kDemoLimitOffset, value);
             }
 
-            auto initialRoomId(void) const -> u16 {
+            auto initial_room_id(void) const -> u16 {
                return rep_ref_().u16_at(kInitialRoomIdOffset);
             }
 
@@ -152,20 +152,20 @@ namespace seville
                return rep_ref_().qstring_at(kReservedOffset, kIdentSize);
             }
 
-            auto setReserved(const QString& value) -> void {
+            auto set_reserved(const QString& value) -> void {
                rep_ref_mut_().set_qstring_at(kReservedOffset, value);
             }
 
-            auto uploadRequestedProtocolVersion(void) const -> u32 {
+            auto upload_requested_protocol_version(void) const -> u32 {
                return rep_ref_().u32_at(kUploadRequestedProtocolVersionOffset);
             }
 
-            auto setUploadRequestedProtocolVersion(u32 value) -> void {
+            auto set_upload_requested_protocol_version(u32 value) -> void {
                rep_ref_mut_().set_u32_at(
                         kUploadRequestedProtocolVersionOffset, value);
             }
 
-            auto uploadCapabilities(void) const -> u32 {
+            auto upload_capabilities(void) const -> u32 {
                return rep_ref_().u32_at(kUploadCapabilitiesOffset);
             }
 
@@ -173,7 +173,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kUploadCapabilitiesOffset, value);
             }
 
-            auto downloadCapabilities(void) const -> u32 {
+            auto download_capabilities(void) const -> u32 {
                return rep_ref_().u32_at(kDownloadCapabilitiesOffset);
             }
 
@@ -181,7 +181,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kDownloadCapabilitiesOffset, value);
             }
 
-            auto engineCapabilities2d(void) const -> u32 {
+            auto engine_capabilities_2d(void) const -> u32 {
                return rep_ref_().u32_at(kEngineCapabilities2dOffset);
             }
 
@@ -189,7 +189,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kEngineCapabilities2dOffset, value);
             }
 
-            auto graphicsCapabilities2d(void) const -> u32 {
+            auto graphics_capabilities_2d(void) const -> u32 {
                return rep_ref_().u32_at(kGraphicsCapabilities2dOffset);
             }
 
@@ -197,7 +197,7 @@ namespace seville
                rep_ref_mut_().set_u32_at(kGraphicsCapabilities2dOffset, value);
             }
 
-            auto graphicsCapabilities3d(void) const -> u32 {
+            auto graphics_capabilities_3d(void) const -> u32 {
                return rep_ref_().u32_at(kGraphicsCapabilities3dOffset);
             }
 

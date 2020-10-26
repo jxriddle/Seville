@@ -1,5 +1,5 @@
-#ifndef PALACE_HOST_H_
-#define PALACE_HOST_H_
+#ifndef SEVILLE_PALACE_HOST_H_
+#define SEVILLE_PALACE_HOST_H_
 
 #include <QtCore>
 
@@ -33,4 +33,4 @@ namespace seville
    }
 }
 
-#endif  // PALACE_HOST_H_
+#endif  // SEVILLE_PALACE_HOST_H_

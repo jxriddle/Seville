@@ -5,7 +5,10 @@ namespace seville
 {
    namespace palace
    {
-      // Cipher::Cipher(void) {}
+      Cipher::Cipher(void)
+      {
+         do_init_();
+      }
 
       Cipher::~Cipher(void) {}
 
@@ -13,6 +16,7 @@ namespace seville
       {
          //auto instance = std::make_optional<Cipher*>();
          auto instance_ptr = std::make_unique<Cipher>();
+         instance_ptr->do_init_();
 
 //         if (nullptr != instance_ptr) {
 //            instance_ptr
@@ -34,8 +38,8 @@ namespace seville
          my_seed_ = 1;
       }
 
-      auto Cipher::encipher( \
-            const QByteArray& input, \
+      auto Cipher::encipher(
+            const QByteArray& input,
             i32 bytelimit_input) -> QByteArray
       {
          auto output = QByteArray();

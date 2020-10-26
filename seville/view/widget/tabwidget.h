@@ -1,7 +1,5 @@
-#ifndef UI_APPTABWIDGET_H
-#define UI_APPTABWIDGET_H
-
-#include <QTabWidget>
+#ifndef SEVILLE_VIEW_WIDGET_TABWIDGET_H_
+#define SEVILLE_VIEW_WIDGET_TABWIDGET_H_
 
 #include <QObject>
 #include <QWidget>
@@ -11,33 +9,39 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
+#include <QTabWidget>
+
 namespace seville
 {
    namespace view
    {
       namespace widget
       {
-         class AppTabWidget : public QTabWidget
+         class TabWidget : public QTabWidget
          {
             Q_OBJECT
 
             public:
-               explicit AppTabWidget(QWidget* widget_parent_pointer = nullptr);
-               virtual ~AppTabWidget();
-               //AppTabBar myAppTabBar;
-               void addNewTab(QWidget* widget_contents_pointer = nullptr);
+               explicit TabWidget(QWidget* widget_parent_ptr = nullptr);
+               virtual ~TabWidget(void);
+
+               auto add_new_tab(QWidget* widget_contents_ptr = nullptr)
+                     -> void;
 
             public slots:
-               void on_tabMovedTriggered();
-               void on_tabClosedTriggered(int index);
-               //void on_plusButton_clicked();
+               void on_tab_moved_triggered(void);
+               void on_tab_closed_triggered(int index);
+               //auto on_plus_button_clicked(void) -> void;
 
             private:
-               void do_setupView();
-               void do_addNewTab(QWidget* widget_contents_pointer = nullptr);
+               //AppTabBar myAppTabBar;
+
+               auto do_setup_view_(void) -> void;
+               auto do_add_new_tab_(QWidget* widget_contents_ptr = nullptr)
+                     -> void;
          };
       }
    }
 }
 
-#endif // UI_APPTABWIDGET_H
+#endif // SEVILLE_VIEW_WIDGET_TABWIDGET_H_

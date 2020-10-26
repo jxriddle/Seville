@@ -20,7 +20,7 @@ namespace seville
    {
       class Logger : public QObject
       {
-         Q_OBJECT
+      Q_OBJECT
 
       public:
          enum LoggerMode: i32 {
@@ -32,7 +32,7 @@ namespace seville
          //Logger(bool isDebugMode = false);
          Logger(void);
 
-         virtual ~Logger(void);
+         //virtual ~Logger(void);
 
          static auto New(void) -> std::unique_ptr<Logger>;
 
@@ -48,7 +48,7 @@ namespace seville
             return my_messages_unique_ptr_.get();
          }
 
-         inline auto take_messages_ptr(void) -> \
+         inline auto take_messages_ptr(void) ->
                std::unique_ptr<std::vector<LogMessage>> {
             return std::move(my_messages_unique_ptr_);
          }
@@ -57,77 +57,77 @@ namespace seville
             do_log_message_(message);
          }
 
-         inline auto log( \
-               LogMessageKind kind, \
-               const QString& message, \
-               const QString& username_from, \
-               const QString& username_to \
+         inline auto log(
+               LogMessageKind kind,
+               const QString& message,
+               const QString& username_from,
+               const QString& username_to
                ) -> void {
             do_log_message_(
                      LogMessage(kind, message, username_from, username_to));
          }
 
          inline auto whisper(const QString& username_from, const QString& username_to, const QString& message) -> void {
-            do_log_message_( \
-                     LogMessage( \
-                        LogMessageKind::kWhisperKind, \
-                        message, \
-                        username_from, \
+            do_log_message_(
+                     LogMessage(
+                        LogMessageKind::kWhisperKind,
+                        message,
+                        username_from,
                         username_to));
          }
 
          inline auto chat(const QString& username_from, const QString& message) -> void {
-            do_log_message_( \
-                     LogMessage( \
-                        LogMessageKind::kChatKind, \
-                        message, \
-                        username_from, \
+            do_log_message_(
+                     LogMessage(
+                        LogMessageKind::kChatKind,
+                        message,
+                        username_from,
                         ""));
          }
 
          inline auto global(const QString& message) -> void {
-            do_log_message_( \
-                     LogMessage( \
-                        LogMessageKind::kGlobalKind, \
-                        message, \
-                        "", \
+            do_log_message_(
+                     LogMessage(
+                        LogMessageKind::kGlobalKind,
+                        message,
+                        "",
                         ""));
          }
 
          inline auto info(const QString& message) -> void {
-            do_log_message_( \
-                     LogMessage( \
-                        LogMessageKind::kInfoKind, \
-                        message, \
-                        "", \
+            do_log_message_(
+                     LogMessage(
+                        LogMessageKind::kInfoKind,
+                        message,
+                        "",
                         ""));
          }
 
          inline auto warning(const QString& message) -> void {
-            do_log_message_( \
-                     LogMessage( \
-                        LogMessageKind::kWarningKind, \
-                        message, \
-                        "", \
+            do_log_message_(
+                     LogMessage(
+                        LogMessageKind::kWarningKind,
+                        message,
+                        "",
                         ""));
          }
 
          inline auto error(const QString& message) -> void {
-            do_log_message_( \
-                     LogMessage( \
-                        LogMessageKind::kErrorKind, \
-                        message, \
-                        "", \
+            do_log_message_(
+                     LogMessage(
+                        LogMessageKind::kErrorKind,
+                        message,
+                        "",
                         ""));
          }
 
          inline auto debug(const QString& message) -> void {
             if (LoggerMode::kDebugMode == my_mode_)
-               do_log_message_( \
-                        LogMessage( \
-                           LogMessageKind::kDebugKind, \
-                           message, \
-                           "", \
+               do_log_message_(
+                        LogMessage(
+                           LogMessageKind::kDebugKind,
+                           message,
+                           "",
                            ""));
          }
 

@@ -24,8 +24,8 @@ namespace seville
          static auto New(void) -> std::unique_ptr<Cipher>;
          //std::optional<Cipher*>;
 
-         auto encipher( \
-               const QByteArray& input, \
+         auto encipher(
+               const QByteArray& input,
                i32 byteLimit = kPlaintextLimit) -> QByteArray;
 
          auto decipher(const QByteArray& input) -> QByteArray;
@@ -48,9 +48,9 @@ namespace seville
             do_reset_();
          }
 
-         inline auto init(void) -> void {
-            do_init_();
-         }
+//         inline auto init(void) -> void {
+//            do_init_();
+//         }
 
       private:
          short my_lookuptable_[kLookupTableElementCount];

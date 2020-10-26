@@ -26,7 +26,7 @@ namespace seville
             virtual ~AboutDialog(void);
 
          public slots:
-            auto on_button_ok_clicked(void) -> void;
+            void on_button_ok_clicked(void);
 
          private:
             auto do_setup_view_(void) -> void;

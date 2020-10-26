@@ -39,3 +39,7 @@ namespace seville
       return qapp.exec();
    }
 }
+
+auto SevilleApp(void) -> seville::SevilleApp* {
+   return &app_seville;
+}

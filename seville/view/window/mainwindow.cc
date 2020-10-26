@@ -4,15 +4,13 @@ namespace seville
 {
    namespace view
    {
-      MainWindow::~MainWindow(void)
+      namespace window
       {
-         do_deinit();
-      }
-
-      MainWindow::MainWindow(QWidget* pParentWidget)
-         : QMainWindow(pParentWidget)
-      {
-         do_init();
+         MainWindow::MainWindow(QWidget* widget_parent_ptr)
+            : QMainWindow(widget_parent_ptr)
+         {
+            do_init_();
+         }
       }
    }
 }

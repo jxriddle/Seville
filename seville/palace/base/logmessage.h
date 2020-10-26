@@ -21,21 +21,22 @@ namespace seville
       class LogMessage
       {
       public:
-         static auto New( \
-               LogMessageKind log_message_kind = LogMessageKind::kChatKind, \
-               const QString& message = "", \
-               const QString& username_from = "", \
-               const QString& username_to = "" \
+         static auto New(
+               LogMessageKind log_message_kind = LogMessageKind::kChatKind,
+               const QString& message = "",
+               const QString& username_from = "",
+               const QString& username_to = ""
             ) -> std::unique_ptr<LogMessage>;
 
-         LogMessage(void);
+         //LogMessage(void);
 
-         LogMessage( \
-               LogMessageKind log_message_kind = LogMessageKind::kChatKind, \
-               const QString& message = "", \
-               const QString& username_from = "", \
-               const QString& username_to = "" \
-            );
+         LogMessage(const LogMessage& other);
+
+         LogMessage(
+               LogMessageKind log_message_kind = LogMessageKind::kChatKind,
+               const QString& message = "",
+               const QString& username_from = "",
+               const QString& username_to = "");
 
          inline auto kind(void) const -> LogMessageKind {
             return my_kind_log_message_;
@@ -77,11 +78,15 @@ namespace seville
          QString my_username_from_;
          QString my_username_to_;
 
-         void do_init_( \
-               LogMessageKind kind, \
-               const QString& message, \
-               const QString& username_from, \
-               const QString& username_to);
+         auto do_init_(
+               LogMessageKind kind,
+               const QString& message,
+               const QString& username_from,
+               const QString& username_to) -> void;
+
+         auto do_reset_(void) -> void;
+
+         auto do_assign_(const LogMessage& other) -> void;
       };
    }
 }

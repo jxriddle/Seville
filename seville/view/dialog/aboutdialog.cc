@@ -7,7 +7,7 @@ namespace seville
       namespace dialog
       {
 
-         AboutDialog::AboutDialog(QWidget* parent_widget_ptr) \
+         AboutDialog::AboutDialog(QWidget* parent_widget_ptr)
             : QDialog(parent_widget_ptr)
          {
              do_init_();
@@ -26,7 +26,7 @@ namespace seville
             QVBoxLayout* layout_ptr = new QVBoxLayout(this);
             QLabel* label_about_ptr =
                   new QLabel(QString("Seville v%1")
-                             .arg(Seville()->kAppVersion), this);
+                             .arg(SevilleApp().kAppVersion), this);
 
             layout_ptr->addWidget(label_about_ptr);
 
@@ -34,8 +34,8 @@ namespace seville
             layout_ptr->addWidget(button_ok_ptr);
             setLayout(layout_ptr);
 
-            connect(button_ok_ptr, &QPushButton::clicked, \
-                    this, &seville::view::dialog::AboutDialog::\
+            connect(button_ok_ptr, &QPushButton::clicked,
+                    this, &seville::view::dialog::AboutDialog::
                     on_button_ok_clicked);
          }
 

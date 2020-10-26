@@ -15,23 +15,23 @@ namespace seville
    {
       namespace widget
       {
-         AppTabWidget::AppTabWidget(QWidget* widget_parent_pointer) \
+         TabWidget::TabWidget(QWidget* widget_parent_pointer) \
             : QTabWidget(widget_parent_pointer)
          {
-             do_setupView();
+             do_setup_view_();
          }
 
-         AppTabWidget::~AppTabWidget()
+         TabWidget::~TabWidget()
          {
             // close all tabs?
          }
 
-         void AppTabWidget::addNewTab(QWidget* widget_contents_pointer)
+         void TabWidget::add_new_tab(QWidget* widget_contents_pointer)
          {
-            do_addNewTab(widget_contents_pointer);
+            do_add_new_tab_(widget_contents_pointer);
          }
 
-         void AppTabWidget::do_setupView()
+         void TabWidget::do_setup_view_()
          {
             setTabShape(QTabWidget::TabShape::Triangular);
             ////setTabBar(&this->appTabBar);
@@ -47,13 +47,13 @@ namespace seville
             //tabWidget_->setSizePolicy();
 
             //connect(tb, SIGNAL(clicked()), this, SLOT(on_addTab_triggered()));
-            connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tabClosedTriggered(int)));
+            connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tab_closed_triggered(int)));
             ////connect(appTabBar.PlusButton(), SIGNAL(clicked()), this, SLOT(on_plusButton_clicked()));
             ////connect(&appTabBar, SIGNAL(tabMoved(int, int)), this, SLOT(on_tabMoved_triggered()));
             //connect(this, SIGNAL(removeTab(int)), this, SLOT(on_tabClosed_triggered(int)));
          }
 
-         void AppTabWidget::do_addNewTab(QWidget* widget_contents_pointer)
+         void TabWidget::do_add_new_tab_(QWidget* widget_contents_pointer)
          {
             // new tab
             QWidget *newTab = widget_contents_pointer;
@@ -65,11 +65,11 @@ namespace seville
             setCurrentWidget(newTab);
          }
 
-         void AppTabWidget::on_tabMovedTriggered()
+         void TabWidget::on_tab_moved_triggered()
          {
          }
 
-         void AppTabWidget::on_tabClosedTriggered(int index)
+         void TabWidget::on_tab_closed_triggered(int index)
          {
             delete widget(index);
             if (count() <= 0) {

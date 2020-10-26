@@ -19,11 +19,11 @@ namespace seville
 
          void HttpServerLocation::do_init_(void)
          {
-            truncate(NetMsgSize::kMinimumSize);
-            reserve(NetMsgSize::kHttpServerLocationSize);
+            rep_ref_mut_().truncate(NetMsgSize::kMinimumSize);
+            rep_ref_mut_().reserve(NetMsgSize::kHttpServerLocationSize);
 
-            set_id(NetMsgKind::kHttpServerLocationSize);
-            set_len(kSizeOfNetMsgHttpServerLocationPayloadInBytes);
+            set_id(NetMsgSize::kHttpServerLocationSize);
+            set_len(NetMsgSize::kHttpServerLocationPayloadSize);
             set_ref(0);
          }
       }

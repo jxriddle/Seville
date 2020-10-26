@@ -18,28 +18,31 @@ namespace seville
             Q_OBJECT
 
          public:
-            palace::Client* palaceClient(void) {
+            explicit ClientWidget(QWidget* widget_parent_ptr = nullptr);
+            //virtual ~ClientWidget(void);
+
+            inline palace::Client* palace_client_ptr(void) {
                return my_client_palace_ptr_;
             }
 
-            auto promptNewConnection(void) -> void {
-               do_promptNewConnection(this);
+            inline auto prompt_new_connection(void) -> void {
+               do_prompt_new_connection_(this);
             }
 
-            //virtual ~ClientWidget();
-            explicit ClientWidget(QWidget* widget_parent_pointer = nullptr);
-
-
          protected:
-            auto mousePressEvent(QMouseEvent* event_mouse_pointer) -> void;
-            //void resizeEvent(QResizeEvent *event) override;
+            auto mousePressEvent(QMouseEvent* event_ptr) -> void;
+
+            //void resizeEvent(QResizeEvent *event_ptr) override;
 
          signals:
 
          public slots:
-            //void updateGeometry();
-            //void onBackgroundImageLabelResized(QResizeEvent *event);
-            auto on_background_changed(void) -> void;
+            //void updateGeometry(void);
+
+            //auto on_background_image_label_resized(QResizeEvent* event_ptr)
+            //    -> void;
+
+            void on_background_changed(void);
 
          private:
             palace::Client* my_client_palace_ptr_;
@@ -49,14 +52,14 @@ namespace seville
             QPixmap my_pixmap_background_image_;
             double my_scale_factor_;
 
-            auto do_setup_view_() -> void;
-            auto do_setup_events_() -> void;
+            auto do_setup_view_(void) -> void;
+            auto do_setup_events_(void) -> void;
 
-            auto do_setBackgroundImage(QPixmap& pixmap) -> void;
-            auto do_set_backgroundimage_from_file_(QString imagePath) -> void;
-            //void doResizeBackgroundImage(QSize size);
-            auto do_promptNewConnection(QWidget* parent) -> void;
-            auto do_fetchBackgroundImage(QString fileUrl) -> void;
+            auto do_set_background_image_(QPixmap& pixmap) -> void;
+            auto do_set_background_image_from_file_(QString image_path) -> void;
+            //auto do_resize_background_image(QSize size) -> void;
+            auto do_prompt_new_connection_(QWidget* widget_parent_ptr) -> void;
+            auto do_fetch_background_image_(QString file_url) -> void;
          };
       }
    }

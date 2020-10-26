@@ -17,13 +17,9 @@ namespace seville
 {
    namespace palace
    {
-      // : public QObject, public QByteArray {};
-      class NetMsg // : public ByteArray
-      {
-      public:   // static
          enum NetMsgOptions {
-            kEndianSwap = true,
-            kNoEndianSwap = false,
+            kNoEndianSwap = 0,
+            kEndianSwap = 1,
          };
 
          enum NetMsgKind {
@@ -129,7 +125,7 @@ namespace seville
             kXTalkSize = kGenericSize,
             kXWhisperSize = kGenericSize,
             kTalkSize = kGenericSize,
-            kWhisperInSize = kGenericSize,
+            kWhisperSize = kGenericSize,
             kAssetIncomingSize = kGenericSize,
             kAssetQuerySize = kGenericSize,
             kMovementSize = kGenericSize,
@@ -158,48 +154,52 @@ namespace seville
             kHttpServerLocationPayloadSize = 0,
          };
 
+      // : public QObject, public QByteArray {};
+      class NetMsg // : public ByteArray
+      {
+      public:
          static inline auto SwapI64(i64 value) -> i64 {
-            auto result = \
-                  (((value >> 56) & 0x00000000000000ff) | \
-                   ((value << 40) & 0x00ff000000000000) | \
-                   ((value >> 24) & 0x0000000000ff0000) | \
-                   ((value <<  8) & 0x000000ff00000000) | \
-                   ((value >>  8) & 0x00000000ff000000) | \
-                   ((value << 24) & 0x0000ff0000000000) | \
-                   ((value >> 40) & 0x000000000000ff00) | \
+            auto result =
+                  (((value >> 56) & 0x00000000000000ff) |
+                   ((value << 40) & 0x00ff000000000000) |
+                   ((value >> 24) & 0x0000000000ff0000) |
+                   ((value <<  8) & 0x000000ff00000000) |
+                   ((value >>  8) & 0x00000000ff000000) |
+                   ((value << 24) & 0x0000ff0000000000) |
+                   ((value >> 40) & 0x000000000000ff00) |
                    (static_cast<u64>(value << 56) & 0xff00000000000000));
 
             return static_cast<i64>(result);
          }
 
          static inline auto SwapU64(u64 value) -> u64 {
-            auto result = \
-                  (((value >> 56) & 0x00000000000000ff) | \
-                   ((value << 40) & 0x00ff000000000000) | \
-                   ((value >> 24) & 0x0000000000ff0000) | \
-                   ((value <<  8) & 0x000000ff00000000) | \
-                   ((value >>  8) & 0x00000000ff000000) | \
-                   ((value << 24) & 0x0000ff0000000000) | \
-                   ((value >> 40) & 0x000000000000ff00) | \
+            auto result =
+                  (((value >> 56) & 0x00000000000000ff) |
+                   ((value << 40) & 0x00ff000000000000) |
+                   ((value >> 24) & 0x0000000000ff0000) |
+                   ((value <<  8) & 0x000000ff00000000) |
+                   ((value >>  8) & 0x00000000ff000000) |
+                   ((value << 24) & 0x0000ff0000000000) |
+                   ((value >> 40) & 0x000000000000ff00) |
                    (static_cast<u64>(value << 56) & 0xff00000000000000));
 
             return result;
          }
 
          static inline auto SwapI32(i32 value) -> i32 {
-            auto result = \
-                  (((value >> 24) & 0x000000ff) | \
-                   ((value <<  8) & 0x00ff0000) | \
-                   ((value >>  8) & 0x0000ff00) | \
+            auto result =
+                  (((value >> 24) & 0x000000ff) |
+                   ((value <<  8) & 0x00ff0000) |
+                   ((value >>  8) & 0x0000ff00) |
                    (static_cast<u32>(value << 24) & 0xff000000));
 
             return static_cast<i32>(result);
          }
 
          static inline auto SwapU32(u32 unswapped) -> u32 {
-            return (((unswapped >> 24) & 0x000000ff) | \
-                    ((unswapped <<  8) & 0x00ff0000) | \
-                    ((unswapped >>  8) & 0x0000ff00) | \
+            return (((unswapped >> 24) & 0x000000ff) |
+                    ((unswapped <<  8) & 0x00ff0000) |
+                    ((unswapped >>  8) & 0x0000ff00) |
                     ((unswapped << 24) & 0xff000000));
          }
 
@@ -211,32 +211,35 @@ namespace seville
             return (((value >> 8) & 0xff) | ((value << 8) & 0xff));
          }
 
-      public:
-         NetMsg(NetMsgOptions options = kNoEndianSwap);
+         NetMsg(NetMsgOptions options = NetMsgOptions::kNoEndianSwap);
 
-         NetMsg( \
-               const Host::ByteOrder client_byteorder, \
-               const Host::ByteOrder server_byteorder, \
-               NetMsgOptions options = kNoEndianSwap);
+         NetMsg(
+               const Host::ByteOrder client_byteorder,
+               const Host::ByteOrder server_byteorder,
+               NetMsgOptions options = NetMsgOptions::kNoEndianSwap);
 
-         NetMsg( \
-               const char* data, \
-               int len, \
-               NetMsgOptions options = kNoEndianSwap);
+         NetMsg(
+               const char* data,
+               int len,
+               NetMsgOptions options = NetMsgOptions::kNoEndianSwap);
 
-         NetMsg( \
-               const QByteArray& ba, \
-               NetMsgOptions options = kNoEndianSwap);
+         NetMsg(
+               const QByteArray& ba,
+               NetMsgOptions options = NetMsgOptions::kNoEndianSwap);
 
-         NetMsg( \
-               const NetMsg& netmsg, \
-               NetMsgOptions options = kNoEndianSwap);
+         NetMsg(
+               const NetMsg& netmsg,
+               NetMsgOptions options = NetMsgOptions::kNoEndianSwap);
 
-         inline auto rep(void) const -> const ByteArray& {
+         inline auto to_byte_array(void) const -> const ByteArray& {
             return my_rep_;
          }
 
-         inline auto set_rep(ByteArray& value) -> void {
+         inline auto to_bytearray_mut(void) -> ByteArray& {
+            return my_rep_;
+         }
+
+         inline auto from_bytearray(ByteArray& value) -> void {
             my_rep_ = value;
          }
 
@@ -292,29 +295,29 @@ namespace seville
             do_reset_();
          }
 
-         inline auto read_in_netmsg_from_socket_ptr( \
+         inline auto read_in_netmsg_from_socket_ptr(
                QTcpSocket* socket_ptr) -> int {
             // read in header
             auto flag_read_header_ok = 0;
             auto size = my_rep_.size();
             if (size < NetMsgOffset::kPayloadOffset) {
-               flag_read_header_ok = \
+               flag_read_header_ok =
                      do_read_in_netmsg_header_from_socket_ptr_(socket_ptr);
             }
 
-            auto flag_read_body_ok = \
+            auto flag_read_body_ok =
                   do_read_in_netmsg_body_from_socket_ptr_(socket_ptr);
             //int minNetMsgOk = NetMsg::kByteSizeOfHeader <= this->size();
 
             return flag_read_header_ok && flag_read_body_ok; //&& minNetMsgOk;
          }
 
-//         inline auto pascal_string_at( \
+//         inline auto pascal_string_at(
 //               int offset, u8 maxlen) const -> std::string {
 //            return do_pascal_string_at_(offset, maxlen);
 //         }
 
-//         inline auto set_pascal_string_at( \
+//         inline auto set_pascal_string_at(
 //               int offset, const std::string& value) -> void {
 //            do_set_pascal_string_at_(offset, value);
 //         }
@@ -323,7 +326,7 @@ namespace seville
 //            return do_string_at_(offset, len);
 //         }
 
-//         inline auto set_string_at( \
+//         inline auto set_string_at(
 //               int offset, const std::string& value) -> void {
 //            do_set_string_at_(offset, value);
 //         }
@@ -332,7 +335,7 @@ namespace seville
 //            return do_pascal_qstring_at_(offset, len);
 //         }
 
-//         inline auto set_pascal_qstring_at( \
+//         inline auto set_pascal_qstring_at(
 //               int offset, const QString& value) -> void {
 //            do_set_pascal_qstring_at_(offset, value);
 //         }
@@ -463,8 +466,8 @@ namespace seville
             //auto cond = doDetermineShouldSwapEndianness();
             auto cond = my_flag_swap_endian_;
             i64 swapped_value = SwapI64(value);
-            auto result = \
-                  static_cast<i64>(cond) * swapped_value | \
+            auto result =
+                  static_cast<i64>(cond) * swapped_value |
                   static_cast<i64>(!cond) * value;
 
             return result;
@@ -474,8 +477,8 @@ namespace seville
             //auto cond = doDetermineShouldSwapEndianness();
             auto cond = my_flag_swap_endian_;
             u64 swapped_value = SwapU64(value);
-            auto result = \
-                  static_cast<u64>(cond) * swapped_value | \
+            auto result =
+                  static_cast<u64>(cond) * swapped_value |
                   static_cast<u64>(!cond) * value;
 
             return result;
@@ -485,8 +488,8 @@ namespace seville
             //auto cond = doDetermineShouldSwapEndianness();
             auto cond = my_flag_swap_endian_;
             auto swapped_value = SwapI32(value);
-            auto result = \
-                  static_cast<i32>(cond) * swapped_value | \
+            auto result =
+                  static_cast<i32>(cond) * swapped_value |
                   static_cast<i32>(!cond) * value;
 
             return result;
@@ -496,8 +499,8 @@ namespace seville
             //auto cond = doDetermineShouldSwapEndianness();
             auto cond = my_flag_swap_endian_;
             auto swapped_value = SwapU32(value);
-            auto result = \
-                  static_cast<u32>(cond) * swapped_value | \
+            auto result =
+                  static_cast<u32>(cond) * swapped_value |
                   static_cast<u32>(!cond) * value;
 
             return result;
@@ -507,8 +510,8 @@ namespace seville
             //auto cond = doDetermineShouldSwapEndianness();
             auto cond = my_flag_swap_endian_;
             auto swapped_value = SwapU16(value);
-            auto result = static_cast<u16>( \
-                     static_cast<u16>(cond) * swapped_value | \
+            auto result = static_cast<u16>(
+                     static_cast<u16>(cond) * swapped_value |
                      static_cast<u16>(!cond) * value);
 
             return result;
@@ -518,24 +521,24 @@ namespace seville
             //auto cond = doDetermineShouldSwapEndianness();
             auto cond = my_flag_swap_endian_;
             auto swapped_value = SwapI16(value);
-            auto result = static_cast<i16>( \
-                     static_cast<i16>(cond) * swapped_value | \
+            auto result = static_cast<i16>(
+                     static_cast<i16>(cond) * swapped_value |
                      static_cast<i16>(!cond) * value);
 
             return result;
          }
 
-//         inline auto do_pascal_string_at_( \
+//         inline auto do_pascal_string_at_(
 //               int offset, u8 maxlen) const -> std::string {
 //            return ByteArray::pascal_string_at(offset, maxlen);
 //         }
 
-//         inline auto do_set_pascal_string_at_( \
+//         inline auto do_set_pascal_string_at_(
 //               int offset, const std::string& value) -> void {
 //            ByteArray::set_pascal_string_at(offset, value);
 //         }
 
-//         inline auto do_set_string_at_( \
+//         inline auto do_set_string_at_(
 //               int offset, const std::string& value) -> void {
 //            ByteArray::set_string_at(offset, value);
 //         }
@@ -544,17 +547,17 @@ namespace seville
 //            return ByteArray::string_at(offset, len);
 //         }
 
-//         inline auto do_set_pascal_qstring_at_( \
+//         inline auto do_set_pascal_qstring_at_(
 //               int offset, const QString& value) -> void {
 //            ByteArray::set_pascal_qstring_at(offset, value);
 //         }
 
-//         inline auto do_pascal_qstring_at_( \
+//         inline auto do_pascal_qstring_at_(
 //               int offset, u32 len) const -> QString {
 //            return ByteArray::pascal_qstring_at(offset, len);
 //         }
 
-//         inline auto do_set_qstring_at_( \
+//         inline auto do_set_qstring_at_(
 //               int offset, const QString& value) -> void {
 //            ByteArray::set_qstring_at(offset, value);
 //         }
@@ -659,9 +662,9 @@ namespace seville
 //            ByteArray::append_u8(value);
 //         }
 
-         inline auto do_read_in_netmsg_header_from_socket_ptr_( \
+         inline auto do_read_in_netmsg_header_from_socket_ptr_(
                QTcpSocket* socket_ptr) -> int {
-            auto n_expected_bytes_to_read = \
+            auto n_expected_bytes_to_read =
                   NetMsgOffset::kPayloadOffset - my_rep_.size();
 
             //auto readHeaderOk = 0 <= nExpectedBytesToRead;
@@ -671,10 +674,10 @@ namespace seville
                return 0;
 
             auto n_bytes_available = socket_ptr->bytesAvailable();
-            auto should_read_partial = \
+            auto should_read_partial =
                   n_bytes_available < n_expected_bytes_to_read;
-            auto n_bytes_to_read = \
-                  (should_read_partial * n_bytes_available) | \
+            auto n_bytes_to_read =
+                  (should_read_partial * n_bytes_available) |
                   (!should_read_partial * n_expected_bytes_to_read);
 
             my_rep_.append(socket_ptr->read(n_bytes_to_read));
@@ -682,13 +685,13 @@ namespace seville
             //auto netMsgSizeN = this->size();
             //auto nBytesRead = finalNetMsgSize - initialNetMsgSize;
             if (NetMsgSize::kMinimumSize == my_rep_.size())
-               my_rep_.reserve(NetMsgSize::kMinimumSize + \
+               my_rep_.reserve(NetMsgSize::kMinimumSize +
                        my_rep_.i32_at(NetMsgOffset::kLenOffset));
 
             return NetMsgSize::kMinimumSize == my_rep_.size();
          }
 
-         inline auto do_read_in_netmsg_body_from_socket_ptr_( \
+         inline auto do_read_in_netmsg_body_from_socket_ptr_(
                QTcpSocket* socket_ptr) -> int {
             auto size_0 = my_rep_.size();
             if (size_0 < NetMsgSize::kMinimumSize)
@@ -704,8 +707,8 @@ namespace seville
 
             auto n_bytes_available = socket_ptr->bytesAvailable();
             auto should_read_partial = n_bytes_available < n_bytes_expected;
-            auto n_bytes_to_read = \
-                  (should_read_partial * n_bytes_available) | \
+            auto n_bytes_to_read =
+                  (should_read_partial * n_bytes_available) |
                   (!should_read_partial * n_bytes_expected);
 
             // maybe reads should be chunked?
@@ -720,18 +723,18 @@ namespace seville
          /*
             if (0 < nNet::MsgBytesExpected)
             {
-               doReadDataIntoNet::Msg( \
+               doReadDataIntoNet::Msg(
                      netMsg, Net::Msg::kHeaderSize + nNet::MsgBytesExpected);
             }
 
             auto nNet::MsgBytesReadTotal = netMsg.size();
-            auto nPayloadBytesReadTotal = \
+            auto nPayloadBytesReadTotal =
                   nNet::MsgBytesReadTotal - Net::Msg::kHeaderSize;
             return nPayloadBytesReadTotal == nNet::MsgBytesExpected;
             */
          }
 
-         inline auto do_init_( \
+         inline auto do_init_(
                const char* data, int len, NetMsgOptions options) -> void {
             do_reset_();
 
@@ -744,8 +747,8 @@ namespace seville
             my_rep_.append(data, len);
          }
 
-         inline auto do_init_( \
-               const QByteArray& bytes_of_netmsg, NetMsgOptions options) \
+         inline auto do_init_(
+               const QByteArray& bytes_of_netmsg, NetMsgOptions options)
                -> void {
             do_reset_();
 
@@ -753,9 +756,9 @@ namespace seville
             my_rep_.append(bytes_of_netmsg);
          }
 
-         inline auto do_init_( \
-               const Host::ByteOrder& client_byte_order, \
-               const Host::ByteOrder& server_byte_order, \
+         inline auto do_init_(
+               const Host::ByteOrder& client_byte_order,
+               const Host::ByteOrder& server_byte_order,
                NetMsgOptions options) -> void {
             do_reset_();
 

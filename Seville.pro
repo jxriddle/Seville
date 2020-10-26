@@ -46,7 +46,8 @@ SOURCES += \
     seville/view/dialog/connectdialog.cc \
     seville/view/widget/clientwidget.cc \
     seville/view/widget/logwidget.cc \
-    seville/view/widget/tabwidget.cc
+    seville/view/widget/tabwidget.cc \
+    seville/view/window/mainwindow.cc
     seville/view/window/mainwindow.cc \
 
 HEADERS += \

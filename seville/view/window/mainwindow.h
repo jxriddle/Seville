@@ -39,10 +39,106 @@ namespace seville
          {
          Q_OBJECT
 
+         public:
+            explicit MainWindow(QWidget* widget_parent_ptr = nullptr);
+            //virtual ~MainWindow(void) override;
+
+         public slots:
+            void on_top_level_changed(bool flag_should_be_visible)
+            {
+               my_widget_log_ptr_->set_line_edit_chat_visible(
+                        flag_should_be_visible);
+            }
+
+            void on_new_host_connection_action_triggered(void)
+            {
+               auto widget_client_active_ptr =
+                     static_cast<widget::ClientWidget *>(
+                        my_widget_tab_ptr_->currentWidget());
+
+               //connect(palTabWidget, resize);
+               widget_client_active_ptr->prompt_new_connection();
+            }
+
+            void on_close_host_connection_action_triggered(void)
+            {
+               // if last tab is closed, quit application
+               if (my_widget_tab_ptr_->count() <= 2) {
+                  QApplication::quit();
+               }
+
+               my_widget_tab_ptr_->removeTab(
+                        my_widget_tab_ptr_->currentIndex());
+            }
+
+            void on_quit_app_action_triggered(void)
+            {
+               QApplication::quit();
+            }
+
+            //void on_palRoomWidgetClicked(void);
+            //void on_tabWidgetTabBarClicked(int index);
+            //void on_lineEditAddressReturnPressed(void);
+            //void on_tabWidgetTabCloseRequested(int index);
+            /*
+            void MainWindow::doOnTabWidgetTabBarClicked(int index)
+            {
+               // New tab
+               if (index == tabWidget_->count() - 1) {
+                  //QMessageBox::information(this, "New Tab", "New tab");
+                  QWidget *tabPage = new QWidget(tabWidget_);
+                  myTabWidget->insertTab(myTabWidget->count() - 1, tabPage, tr("New Tab"));
+               }
+            }
+
+            void MainWindow::doOnLineEditAddressReturnPressed()
+            {
+               // connect(
+            }
+
+            void MainWindow::doOnTabWidgetTabCloseRequested(int index)
+            {
+               (void)index;
+               if (index == myTabWidget->count() - 1) {
+                  myTabWidget->setCurrentIndex(myTabWidget->count() - 2);
+               }
+            }
+            */
+
+            void on_about_app_action_triggered(void)
+            {
+               auto dialog_about = new dialog::AboutDialog(this);
+               dialog_about->exec();
+            }
+
+            void on_toggle_log_window_action_triggered(void)
+            {
+               if (!my_widget_log_ptr_->isVisible())
+                  my_widget_log_ptr_->show();
+               else
+                  my_widget_log_ptr_->hide();
+            }
+
+            //void do_deinit(void)
+            //{
+            //   if (my_widget_log_ptr_ != nullptr)
+            //      delete(my_widget_log_ptr_);
+               /*
+               if (this->menuBar != nullptr)
+               {
+                  delete this->menuBar;
+               }
+               if (this->tabWidget != nullptr)
+               {
+                  delete this->tabWidget;
+               }
+               */
+            //}
+
          private:
-            AppTabWidget* my_widget_tab_ptr_;
+            view::widget::TabWidget* my_widget_tab_ptr_;
             QDockWidget* my_widget_dock_log_ptr_;
-            LogWidget* my_widget_log_ptr_;
+            view::widget::LogWidget* my_widget_log_ptr_;
             QVBoxLayout* my_layout_main_ptr_;
             QTabBar* my_tabbar_ptr_;
             QMenuBar* my_menubar_ptr_;
@@ -62,24 +158,24 @@ namespace seville
             QAction* my_action_toggle_log_ptr_;
             QStatusBar* my_statusbar_ptr_;
 
-            void do_setup_view_(void)
+            auto do_setup_view_(void) -> void
             {
                // Window
                setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
                setUnifiedTitleAndToolBarOnMac(true);
 
-               QScreen *primary_screen = QGuiApplication::primaryScreen();
-               auto screen = primary_screen->geometry();
+               QScreen* primary_screen_ptr = QGuiApplication::primaryScreen();
+               auto screen = primary_screen_ptr->geometry();
 
-               QSize window_size_default = QSize( \
-                        static_cast<int>(.67*screen.width()), \
+               QSize window_size_default = QSize(
+                        static_cast<int>(.67*screen.width()),
                         static_cast<int>(.67*screen.height()));
 
-               setGeometry(QStyle::alignedRect( \
-                              Qt::LeftToRight, \
-                              Qt::AlignCenter, \
-                              window_size_default, \
-                              primary_screen->geometry()));
+               setGeometry(QStyle::alignedRect(
+                              Qt::LeftToRight,
+                              Qt::AlignCenter,
+                              window_size_default,
+                              primary_screen_ptr->geometry()));
 
                setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
                adjustSize();
@@ -91,13 +187,13 @@ namespace seville
                //mainLayout_->addWidget(menuBar_, 0, 0);
 
                // Tab Widget
-               my_widget_tab_ptr_ = new AppTabWidget(this);
+               my_widget_tab_ptr_ = new view::widget::TabWidget(this);
                my_widget_tab_ptr_->setGeometry(0, 0, width(), height()); // x, y, w, h
                layout()->setSpacing(0);
                //layout()->addWidget(tabWidget_);
-               auto widget_client_pointer = new ClientWidget(this);
+               auto widget_client_ptr = new view::widget::ClientWidget(this);
                //connect(palRoomWidget, )
-               my_widget_tab_ptr_->addNewTab(widget_client_pointer);
+               my_widget_tab_ptr_->add_new_tab(widget_client_ptr);
                //mainLayout_->setSpacing(0);
                //mainLayout_->addWidget(tabWidget_, 1);
 
@@ -117,7 +213,7 @@ namespace seville
                restoreState(settings.value("mainWindowState").toByteArray());
             }
 
-            void do_setup_actions_(void)
+            auto do_setup_actions_(void) -> void
             {
                // Create Actions
                my_action_new_host_connection_ptr_ = new QAction(tr("&Connect"), this);
@@ -144,7 +240,7 @@ namespace seville
                my_action_toggle_log_ptr_->setShortcut(Qt::CTRL | Qt::Key_L);
             }
 
-            void do_setup_menus_(void)
+            auto do_setup_menus_(void) -> void
             {
                // Create Menu Bar
                my_menubar_ptr_ = new QMenuBar(this);
@@ -179,165 +275,54 @@ namespace seville
                setMenuBar(my_menubar_ptr_);
             }
 
-            void do_setup_docks_(void)
+            auto do_setup_docks_(void) -> void
             {
-               auto widget_palace_client_pointer = \
-                     static_cast<ClientWidget *>( \
+               auto widget_palace_client_ptr =
+                     static_cast<widget::ClientWidget *>(
                         my_widget_tab_ptr_->currentWidget());
-               auto palace_client_pointer = \
-                     widget_palace_client_pointer->palaceClientPointer();
+               auto palace_client_ptr =
+                     widget_palace_client_ptr->palace_client_ptr();
 
-               my_widget_log_ptr_ = new PalaceLogWidget(pPalaceClient, this);
-               my_widget_log_ptr_->setLineEditChatVisible( \
+               my_widget_log_ptr_ = new view::widget::LogWidget(this);
+               my_widget_log_ptr_->set_palace_client_ptr(palace_client_ptr);
+
+               my_widget_log_ptr_->set_line_edit_chat_visible(
                         my_widget_log_ptr_->isWindow());
 
                my_widget_dock_log_ptr_ = new QDockWidget(tr("Log"), this);
-               my_widget_dock_log_ptr_->setAllowedAreas( \
-                        Qt::LeftDockWidgetArea | \
-                        Qt::BottomDockWidgetArea | \
-                        Qt::RightDockWidgetArea | \
-                        Qt::TopDockWidgetArea \
-                     );
+               my_widget_dock_log_ptr_->setAllowedAreas(
+                        Qt::LeftDockWidgetArea |
+                        Qt::BottomDockWidgetArea |
+                        Qt::RightDockWidgetArea |
+                        Qt::TopDockWidgetArea);
 
                my_widget_dock_log_ptr_->setWidget(my_widget_log_ptr_);
                addDockWidget(Qt::RightDockWidgetArea, my_widget_dock_log_ptr_);
             }
 
-            void do_setup_events_(void)
+            auto do_setup_events_(void) -> void
             {
                // Connect Action Signals to Slots
                connect(my_widget_dock_log_ptr_, &QDockWidget::topLevelChanged,
-                       this, &seville::view::MainWindow::on_topLevelChanged);
+                       this, &seville::view::window::MainWindow::on_top_level_changed);
 
                connect(my_action_new_host_connection_ptr_, &QAction::triggered,
-                       this, &seville::view::MainWindow::on_newHostConnectionActionTriggered);
+                       this, &seville::view::window::MainWindow::on_new_host_connection_action_triggered);
 
                connect(my_action_close_host_connection_ptr_, &QAction::triggered,
-                       this, &seville::view::MainWindow::on_closeHostConnectionActionTriggered);
+                       this, &seville::view::window::MainWindow::on_close_host_connection_action_triggered);
 
                connect(my_action_quit_app_ptr_, &QAction::triggered,
-                       this, &seville::view::MainWindow::on_quitAppActionTriggered);
+                       this, &seville::view::window::MainWindow::on_quit_app_action_triggered);
 
                connect(my_action_about_app_ptr_, &QAction::triggered,
-                       this, &seville::view::MainWindow::on_aboutAppActionTriggered);
+                       this, &seville::view::window::MainWindow::on_about_app_action_triggered);
 
                connect(my_action_toggle_log_ptr_, &QAction::triggered,
-                       this, &seville::view::MainWindow::on_toggleLogWindowActionTriggered);
+                       this, &seville::view::window::MainWindow::on_toggle_log_window_action_triggered);
             }
 
-         protected:
-            void resizeEvent(QResizeEvent* pEvent) override
-            {
-               //menuBar_->setGeometry(0, 0, width(), menuBar_->height());
-               //tabWidget_->setGeometry(0, 0, width(), height());
-               //tabWidget_->resize();
-
-               //PalRoomWidget* palRoomWidget = static_cast<PalRoomWidget*>(myTabWidget->currentWidget());
-               //palRoomWidget->resize(event->size());
-               QMainWindow::resizeEvent(pEvent);
-            }
-
-            void closeEvent(QCloseEvent* pEvent) override
-            {
-               (void)pEvent;
-               QSettings settings;
-               settings.setValue("mainWindowGeometry", saveGeometry());
-               settings.setValue("mainWindowState", saveState());
-               QApplication::quit();
-            }
-
-         public slots:
-            void on_topLevelChanged(bool flag_should_be_visible)
-            {
-               my_widget_log_ptr_->setLineEditChatVisible( \
-                        flag_should_be_visible);
-            }
-
-            void on_newHostConnectionAction_triggered(void)
-            {
-               auto widget_client_active_ptr = \
-                     static_cast<PalaceClientWidget *>( \
-                        my_widget_tab_ptr_->currentWidget());
-
-               //connect(palTabWidget, resize);
-               widget_client_active_ptr->promptNewConnection();
-            }
-
-            void on_closeHostConnectionAction_triggered(void)
-            {
-               // if last tab is closed, quit application
-               if (my_widget_tab_ptr_->count() <= 2) {
-                  QApplication::quit();
-               }
-
-               my_widget_tab_ptr_->removeTab(my_widget_tab_ptr_->currentIndex());
-            }
-
-            void on_quitAppAction_triggered(void)
-            {
-               QApplication::quit();
-            }
-
-            //void on_palRoomWidgetClicked(void);
-            //void on_tabWidgetTabBarClicked(int index);
-            //void on_lineEditAddressReturnPressed(void);
-            //void on_tabWidgetTabCloseRequested(int index);
-            /*
-            void MainWindow::doOnTabWidgetTabBarClicked(int index)
-            {
-               // New tab
-               if (index == tabWidget_->count() - 1) {
-                  //QMessageBox::information(this, "New Tab", "New tab");
-                  QWidget *tabPage = new QWidget(tabWidget_);
-                  myTabWidget->insertTab(myTabWidget->count() - 1, tabPage, tr("New Tab"));
-               }
-            }
-
-            void MainWindow::doOnLineEditAddressReturnPressed()
-            {
-               // connect(
-            }
-
-            void MainWindow::doOnTabWidgetTabCloseRequested(int index)
-            {
-               (void)index;
-               if (index == myTabWidget->count() - 1) {
-                  myTabWidget->setCurrentIndex(myTabWidget->count() - 2);
-               }
-            }
-            */
-
-            void on_aboutAppActionTriggered(void)
-            {
-               auto aboutDialog = new AboutDialog(this);
-               aboutDialog->exec();
-            }
-
-            void on_toggleLogWindowActionTriggered(void)
-            {
-               if (!my_widget_log_ptr_->isVisible())
-                  my_widget_log_ptr_->show();
-               else
-                  my_widget_log_ptr_->hide();
-            }
-
-            //void do_deinit(void)
-            //{
-            //   if (my_widget_log_ptr_ != nullptr)
-            //      delete(my_widget_log_ptr_);
-               /*
-               if (this->menuBar != nullptr)
-               {
-                  delete this->menuBar;
-               }
-               if (this->tabWidget != nullptr)
-               {
-                  delete this->tabWidget;
-               }
-               */
-            //}
-
-            void do_init(void)
+            auto do_init_(void) -> void
             {
                do_setup_view_();
                do_setup_actions_();
@@ -346,9 +331,26 @@ namespace seville
                do_setup_events_();
             }
 
-         public:
-            virtual ~MainWindow(void) override;
-            explicit MainWindow(QWidget* widget_parent_ptr = nullptr);
+         protected:
+            void resizeEvent(QResizeEvent* event_ptr) override
+            {
+               //menuBar_->setGeometry(0, 0, width(), menuBar_->height());
+               //tabWidget_->setGeometry(0, 0, width(), height());
+               //tabWidget_->resize();
+
+               //PalRoomWidget* palRoomWidget = static_cast<PalRoomWidget*>(myTabWidget->currentWidget());
+               //palRoomWidget->resize(event->size());
+               QMainWindow::resizeEvent(event_ptr);
+            }
+
+            void closeEvent(QCloseEvent* event_ptr) override
+            {
+               (void)event_ptr;
+               QSettings settings;
+               settings.setValue("mainWindowGeometry", saveGeometry());
+               settings.setValue("mainWindowState", saveState());
+               QApplication::quit();
+            }
          };
       }
    }

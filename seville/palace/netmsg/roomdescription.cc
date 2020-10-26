@@ -24,13 +24,26 @@ namespace seville
          auto RoomDescription::New(NetMsgOptions options)
                -> std::unique_ptr<RoomDescription>
          {
-            auto instance = std::make_unique<RoomDescription>();
-            instance.set_options(options);
+            auto instance = std::make_unique<RoomDescription>(options);
+            //instance.set_options(options);
 //            if (instance.has_value())
 //               instance.value()->
 //                     setShouldSwapEndiannessFlag(shouldSwapEndianness);
 
             return instance;
+         }
+
+         RoomDescription::RoomDescription(void)
+         {
+            do_reset_();
+         }
+
+         RoomDescription::RoomDescription(NetMsgOptions options)
+         {
+            do_reset_();
+
+            set_should_swap_endianness_flag(
+                     options & NetMsgOptions::kEndianSwap);
          }
 
 //         auto RoomDescription::Copy(const NetMsg& netmsg)
@@ -47,10 +60,11 @@ namespace seville
          auto RoomDescription::do_reset_(void) -> void
          {
             rep_ref_mut_().truncate(NetMsgSize::kMinimumSize);
-            rep_ref_mut_().reserve(kRoomDescriptionSize);
-            rep_ref_mut_().set_id(netmsg::NetMsgKind::kRoomKind);
-            rep_ref_mut_().set_len(netmsg::kSizeOfRoomDescriptionInBytes);
-            rep_ref_mut_().set_ref(0);
+            rep_ref_mut_().reserve(NetMsgSize::kRoomDescriptionSize);
+
+            set_id(NetMsgKind::kRoomKind);
+            set_len(NetMsgSize::kRoomDescriptionSize);
+            set_ref(0);
          }
       }
    }

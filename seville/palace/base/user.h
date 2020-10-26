@@ -55,7 +55,7 @@ namespace seville
             return my_username_;
          }
 
-         inline auto setUsername(const QString& value) -> void {
+         inline auto set_username(const QString& value) -> void {
             my_username_ = value;
          }
 
@@ -71,23 +71,23 @@ namespace seville
             return my_id_;
          }
 
-         inline auto setId(u32 value) -> void {
+         inline auto set_id(u32 value) -> void {
             my_id_ = value;
          }
 
-         inline auto idCrc(void) const -> u32 {
+         inline auto id_crc(void) const -> u32 {
             return my_id_crc_;
          }
 
-         inline auto setIdCrc(u32 value) -> void {
+         inline auto set_id_crc(u32 value) -> void {
             my_id_crc_ = value;
          }
 
-         inline auto idCounter(void) const -> u32 {
+         inline auto id_counter(void) const -> u32 {
             return my_id_counter_;
          }
 
-         inline auto setIdCounter(u32 value) -> void {
+         inline auto set_id_counter(u32 value) -> void {
             my_id_counter_ = value;
          }
 
@@ -95,7 +95,7 @@ namespace seville
             return my_id_changed_;
          }
 
-         inline auto setIdChanged(bool value) -> void {
+         inline auto set_id_changed(bool value) -> void {
             my_id_changed_ = value;
          }
 

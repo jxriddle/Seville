@@ -6,13 +6,13 @@ namespace seville
    {
       Server::~Server()
       {
-         do_deinit();
+         do_deinit_();
       }
 
       Server::Server()
          : QObject()
       {
-         do_init();
+         do_init_();
       }
    }
 }
