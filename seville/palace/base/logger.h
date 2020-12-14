@@ -34,7 +34,7 @@ namespace seville
 
          //virtual ~Logger(void);
 
-         static auto New(void) -> std::unique_ptr<Logger>;
+         static auto New(void) -> Logger*;
 
          inline auto mode(void) const -> LoggerMode {
             return my_mode_;
@@ -133,7 +133,7 @@ namespace seville
 
       signals:
          // should be a generic messageLogged method with an enum type parameter instead? eh.
-         void message_logged(const LogMessage& log);
+         void message_was_logged(const LogMessage& logMessage);
 
       private:
          LoggerMode my_mode_;

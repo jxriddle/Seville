@@ -19,8 +19,8 @@ namespace seville
       static auto New(void) -> std::unique_ptr<ByteArray>;
       //std::optional<ByteArray*>;
 
-      inline auto pascal_string_at(int offset, u8 maxlen) const -> std::string {
-         return do_pascal_string_at_(offset, maxlen);
+      inline auto pascal_string_at(int offset) const -> std::string {
+         return do_pascal_string_at_(offset);
       }
 
       inline auto set_pascal_string_at(int offset, std::string value) -> void {
@@ -43,8 +43,8 @@ namespace seville
          do_set_string_at_(offset, value);
       }
 
-      inline auto pascal_qstring_at(int offset, u8 maxlen) const -> QString {
-         return do_pascal_qstring_at_(offset, maxlen);
+      inline auto pascal_qstring_at(int offset) const -> QString {
+         return do_pascal_qstring_at_(offset);
       }
 
       inline auto set_pascal_qstring_at(int offset, const QString& value) -> void {
@@ -160,7 +160,7 @@ namespace seville
       }
 
       inline auto append_u8(u8 value) -> void {
-         do_append_u8_(static_cast<char>(value));
+         do_append_u8_(static_cast<unsigned char>(value));
       }
 
    private:
@@ -171,22 +171,22 @@ namespace seville
             set_u8_at(offset+i, static_cast<u8>(value.at(i)));
       }
 
-      auto do_pascal_string_at_(int offset, u8 maxlen) const -> std::string {
+      auto do_pascal_string_at_(int offset) const -> std::string {
          std::string value;
 
          auto len = do_u8_at_(offset);
          u8 i = 1;
          auto c = this->i8_at(offset+i);
-         while (i < maxlen && i < len && c != '\0') {
+         while (i <= len) { // && c != '\0') {
             value.push_back(c);
             i++;
             c = do_i8_at_(offset+i);
          }
 
-         if (value.size() == sizeof(u8) || value.size() == maxlen)
-            value.pop_back();
+         //if (value.size() == sizeof(u8) || value.size() == maxlen)
+         //   value.pop_back();
 
-         value.push_back('\0');
+         //value.push_back('\0');
 
          return value;
       }
@@ -224,11 +224,14 @@ namespace seville
             set_u8_at(offset+static_cast<i32>(i), static_cast<u8>(value.at(i)));
       }
 
-      auto do_string_at_(int offset, int len) const -> std::string {
+      auto do_string_at_(int offset, int maxlen) const -> std::string {
          std::string value;
 
-         for (auto i = 0; i < len; i++)
+         int i = 0;
+         while (this->at(offset+i) && i < maxlen) {
             value.push_back(this->at(offset+i));
+            i++;
+         }
 
          return value;
       }
@@ -237,8 +240,8 @@ namespace seville
          do_set_pascal_string_at_(offset, value.toStdString());
       }
 
-      auto do_pascal_qstring_at_(int offset, u8 maxlen) const -> QString {
-         auto s = do_pascal_string_at_(offset, maxlen);
+      auto do_pascal_qstring_at_(int offset) const -> QString {
+         auto s = do_pascal_string_at_(offset);
          return QString::fromStdString(s);
       }
 
@@ -255,8 +258,8 @@ namespace seville
          do_set_string_at_(offset, value.toStdString());
       }
 
-      auto do_qstring_at_(int offset, int len) const -> QString {
-         auto s = do_string_at_(offset, len);
+      auto do_qstring_at_(int offset, int maxlen) const -> QString {
+         auto s = do_string_at_(offset, maxlen);
          return QString::fromStdString(s);
       }
 

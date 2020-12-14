@@ -10,19 +10,18 @@ namespace seville
    {
       namespace netmsg
       {
-         HttpServerLocation::HttpServerLocation( \
-               const NetMsg& netmsg, NetMsgOptions options) \
-            : NetMsg(netmsg, options)
+         HttpServerLocation::HttpServerLocation(NetMsgOptions options)
+            : NetMsg(options)
          {
             do_init_();
          }
 
-         void HttpServerLocation::do_init_(void)
+         auto HttpServerLocation::do_init_(void) -> void
          {
-            rep_ref_mut_().truncate(NetMsgSize::kMinimumSize);
-            rep_ref_mut_().reserve(NetMsgSize::kHttpServerLocationSize);
+            truncate(NetMsgSize::kMinimumSize);
+            reserve(NetMsgSize::kHttpServerLocationSize);
 
-            set_id(NetMsgSize::kHttpServerLocationSize);
+            set_id(NetMsgKind::kHttpServerLocationKind);
             set_len(NetMsgSize::kHttpServerLocationPayloadSize);
             set_ref(0);
          }

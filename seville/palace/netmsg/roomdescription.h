@@ -21,16 +21,16 @@ namespace seville
          {
          public:
             enum RoomDescriptionSize {
-               kMaximumDefaultNameSize = 1024,
-               kMaximumArtistNameSize = 1024,
-               kMaximumBackgroundImageNameSize = 1024,
+               kMaximumDefaultNameSize = 255,
+               kMaximumArtistNameSize = 255,
+               kMaximumBackgroundImageNameSize = 255,
             };
 
             enum RoomDescriptionOffset {
                kFlagsOffset = NetMsgOffset::kPayloadOffset,
                kFaceOffset = NetMsgOffset::kPayloadOffset+4,
                kRoomIdOffset = NetMsgOffset::kPayloadOffset+8,
-               kRoomNameOffset = NetMsgOffset::kPayloadOffset+10,
+               kRoomNameOffsetOffset = NetMsgOffset::kPayloadOffset+10,
                kBackgroundImageNameOffsetOffset =
                      NetMsgOffset::kPayloadOffset+12,
                kArtistNameOffsetOffset = NetMsgOffset::kPayloadOffset+14,
@@ -46,11 +46,12 @@ namespace seville
                kFirstLoosePropOffset = NetMsgOffset::kPayloadOffset+34,
                kReservedOffset = NetMsgOffset::kPayloadOffset+36,
                kRoomDataLenOffset = NetMsgOffset::kPayloadOffset+38,
+               kRoomData = NetMsgOffset::kPayloadOffset+40,
             };
 
             static auto New(
                   NetMsgOptions options = NetMsgOptions::kNoEndianSwap)
-                  -> std::unique_ptr<RoomDescription>;
+                  -> RoomDescription*;
 
             static auto Copy(
                   const NetMsg& netmsg)
@@ -151,16 +152,16 @@ namespace seville
 //               return value;
 //            }
 
-            auto artist_name(void) const -> QString {
-               return rep_ref_().qstring_at(
-                        kPayloadOffset + do_artist_name_offset_(),
+            inline auto artist_name(void) const -> QString {
+               return qstring_at(
+                        kRoomData + do_artist_name_offset_(),
                         kMaximumArtistNameSize);
             }
 
-            auto background_image_name(void) const -> QString {
-               return rep_ref_().qstring_at(
-                        kPayloadOffset + do_background_image_name_offset_(),
-                        kMaximumBackgroundImageNameSize);
+            inline auto background_image_name(void) const -> QString {
+               return pascal_qstring_at(
+                        kRoomData + do_background_image_name_offset_());
+                        //kMaximumBackgroundImageNameSize);
             }
 
 //            auto background_image(void) const -> QImage {
@@ -183,75 +184,75 @@ namespace seville
             auto do_set_options_(NetMsgOptions options);
 
             inline auto do_flags_(void) const -> u32 {
-               return rep_ref_().u32_at(kFlagsOffset);
+               return u32_at(kFlagsOffset);
             }
 
             inline auto do_face_(void) const -> u32 {
-               return rep_ref_().u32_at(kFaceOffset);
+               return u32_at(kFaceOffset);
             }
 
             inline auto do_room_id_(void) const -> u16 {
-               return rep_ref_().u16_at(kRoomIdOffset);
+               return u16_at(kRoomIdOffset);
             }
 
             inline auto do_room_name_offset_(void) const -> u16 {
-               return rep_ref_().u16_at(kRoomNameOffset);
+               return u16_at(kRoomNameOffsetOffset);
             }
 
             inline auto do_background_image_name_offset_(void) const -> u16 {
-               return rep_ref_().u16_at(kBackgroundImageNameOffsetOffset);
+               return u16_at(kBackgroundImageNameOffsetOffset);
             }
 
             inline auto do_artist_name_offset_(void) const -> u16 {
-               return rep_ref_().u16_at(kArtistNameOffsetOffset);
+               return u16_at(kArtistNameOffsetOffset);
             }
 
             inline auto do_password_offset_(void) const -> u16 {
-               return rep_ref_().u16_at(kPasswordOffsetOffset);
+               return u16_at(kPasswordOffsetOffset);
             }
 
             inline auto do_hotspot_count_(void) const -> u16 {
-               return rep_ref_().u16_at(kHotspotCountOffset);
+               return u16_at(kHotspotCountOffset);
             }
 
             inline auto do_hotspot_offset_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+20);
+               return u16_at(NetMsgOffset::kPayloadOffset+20);
             }
 
             inline auto do_room_image_count_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+22);
+               return u16_at(NetMsgOffset::kPayloadOffset+22);
             }
 
             inline auto do_background_image_offset_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+24);
+               return u16_at(NetMsgOffset::kPayloadOffset+24);
             }
 
             inline auto do_draw_commands_count_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+26);
+               return u16_at(NetMsgOffset::kPayloadOffset+26);
             }
 
             inline auto do_first_draw_command_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+28);
+               return u16_at(NetMsgOffset::kPayloadOffset+28);
             }
 
             inline auto do_room_user_count_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+30);
+               return u16_at(NetMsgOffset::kPayloadOffset+30);
             }
 
             inline auto do_loose_prop_count_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+32);
+               return u16_at(NetMsgOffset::kPayloadOffset+32);
             }
 
             inline auto do_first_loose_prop_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+34);
+               return u16_at(NetMsgOffset::kPayloadOffset+34);
             }
 
             inline auto do_reserved_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+36);
+               return u16_at(NetMsgOffset::kPayloadOffset+36);
             }
 
             inline auto do_room_data_len_(void) const -> u16 {
-               return rep_ref_().u16_at(NetMsgOffset::kPayloadOffset+38);
+               return u16_at(NetMsgOffset::kPayloadOffset+38);
             }
          };
       }

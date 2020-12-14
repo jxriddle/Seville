@@ -15,14 +15,14 @@ namespace seville
       {
          class ClientWidget : public QWidget
          {
-            Q_OBJECT
+         Q_OBJECT
 
          public:
-            explicit ClientWidget(QWidget* widget_parent_ptr = nullptr);
+            explicit ClientWidget(QWidget* parent_widget_ptr = nullptr);
             //virtual ~ClientWidget(void);
 
             inline palace::Client* palace_client_ptr(void) {
-               return my_client_palace_ptr_;
+               return my_palace_client_ptr_;
             }
 
             inline auto prompt_new_connection(void) -> void {
@@ -30,25 +30,26 @@ namespace seville
             }
 
          protected:
-            auto mousePressEvent(QMouseEvent* event_ptr) -> void;
+            auto mousePressEvent(QMouseEvent* mouse_event_ptr) -> void;
 
-            //void resizeEvent(QResizeEvent *event_ptr) override;
+            //void resizeEvent(QResizeEvent* resize_event_ptr) override;
 
          signals:
+            void background_image_did_change();
 
          public slots:
             //void updateGeometry(void);
 
-            //auto on_background_image_label_resized(QResizeEvent* event_ptr)
-            //    -> void;
+            //auto on_background_image_label_resized(
+            // QResizeEvent* resize_event_ptr) -> void;
 
-            void on_background_changed(void);
+            void on_background_image_did_change(void);
 
          private:
-            palace::Client* my_client_palace_ptr_;
-            QLabel* my_label_image_background_ptr_;
-            QScrollArea* my_scrollarea_ptr_;
-            QVBoxLayout* my_layout_widget_ptr_;
+            palace::Client* my_palace_client_ptr_;
+            QLabel* my_background_image_label_ptr_;
+            QScrollArea* my_scroll_area_ptr_;
+            QVBoxLayout* my_primary_layout_ptr_;
             QPixmap my_pixmap_background_image_;
             double my_scale_factor_;
 

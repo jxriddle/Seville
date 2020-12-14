@@ -22,22 +22,22 @@ namespace seville
             Q_OBJECT
 
             public:
-               explicit TabWidget(QWidget* widget_parent_ptr = nullptr);
+               explicit TabWidget(QWidget* parent_widget_ptr = nullptr);
                virtual ~TabWidget(void);
 
-               auto add_new_tab(QWidget* widget_contents_ptr = nullptr)
+               auto add_new_tab(QWidget* content_widget_ptr = nullptr)
                      -> void;
 
             public slots:
                void on_tab_moved_triggered(void);
-               void on_tab_closed_triggered(int index);
+               void on_did_request_close_tab(int index);
                //auto on_plus_button_clicked(void) -> void;
 
             private:
                //AppTabBar myAppTabBar;
 
                auto do_setup_view_(void) -> void;
-               auto do_add_new_tab_(QWidget* widget_contents_ptr = nullptr)
+               auto do_add_new_tab_(QWidget* content_widget_ptr = nullptr)
                      -> void;
          };
       }

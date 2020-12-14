@@ -47,7 +47,8 @@ SOURCES += \
     seville/view/widget/clientwidget.cc \
     seville/view/widget/logwidget.cc \
     seville/view/widget/tabwidget.cc \
-    seville/view/window/mainwindow.cc
+    seville/view/window/mainwindow.cc \
+    seville/palace/netmsg/talk.cc
     seville/view/window/mainwindow.cc \
 
 HEADERS += \
@@ -72,7 +73,8 @@ HEADERS += \
     seville/view/widget/clientwidget.h \
     seville/view/widget/logwidget.h \
     seville/view/widget/tabwidget.h \
-    seville/view/window/mainwindow.h
+    seville/view/window/mainwindow.h \
+    seville/palace/netmsg/talk.h
 
 DISTFILES +=
 

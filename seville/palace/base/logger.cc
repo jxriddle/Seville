@@ -4,12 +4,20 @@ namespace seville
 {
    namespace palace
    {
-      Logger::Logger(void) {}
+      Logger::Logger(void)
+      {
+         do_init_();
+      }
 
       // Logger::~Logger(void) {}
 
-      auto Logger::New(void) -> std::unique_ptr<Logger> {
-         auto instance = std::make_unique<Logger>();
+      auto Logger::New(void) -> Logger*
+      {
+         auto instance = new Logger();
+
+         instance->my_messages_unique_ptr_ =
+               std::make_unique<std::vector<LogMessage>>();
+         instance->my_mode_ = LoggerMode::kDefaultMode;
 
          return instance;
       }
@@ -20,10 +28,10 @@ namespace seville
          my_mode_ = mode;
       }
 
-      auto Logger::do_log_message_(const LogMessage& message) -> void
+      auto Logger::do_log_message_(const LogMessage& logMessage) -> void
       {
-         my_messages_unique_ptr_->push_back(message);
-         emit message_logged(message);
+         my_messages_unique_ptr_->push_back(logMessage);
+         emit message_was_logged(logMessage);
       }
 
 //      auto Logger::do_log_message_unique_ptr_(

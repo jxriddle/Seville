@@ -21,15 +21,14 @@ namespace seville
                kUrlOffset = NetMsgOffset::kPayloadOffset,
             };
 
-            HttpServerLocation(
-                  const NetMsg& netmsg, NetMsgOptions options = kNoEndianSwap);
+            HttpServerLocation(NetMsgOptions options = kNoEndianSwap);
 
             inline auto url(void) -> QString {
-               return rep_ref_().qstring_at(kUrlOffset, kMaximumUrlSize);
+               return qstring_at(kUrlOffset, kMaximumUrlSize);
             }
 
             inline auto set_url(const QString& value) -> void {
-               rep_ref_mut_().set_pascal_qstring_at(kUrlOffset, value);
+               set_pascal_qstring_at(kUrlOffset, value);
             }
 
             private:

@@ -21,10 +21,9 @@ namespace seville
 //            do_reset();
 //         }
 
-         auto RoomDescription::New(NetMsgOptions options)
-               -> std::unique_ptr<RoomDescription>
+         auto RoomDescription::New(NetMsgOptions options) -> RoomDescription*
          {
-            auto instance = std::make_unique<RoomDescription>(options);
+            auto instance = new RoomDescription(options);
             //instance.set_options(options);
 //            if (instance.has_value())
 //               instance.value()->
@@ -59,8 +58,8 @@ namespace seville
 
          auto RoomDescription::do_reset_(void) -> void
          {
-            rep_ref_mut_().truncate(NetMsgSize::kMinimumSize);
-            rep_ref_mut_().reserve(NetMsgSize::kRoomDescriptionSize);
+            truncate(NetMsgSize::kMinimumSize);
+            reserve(NetMsgSize::kRoomDescriptionSize);
 
             set_id(NetMsgKind::kRoomKind);
             set_len(NetMsgSize::kRoomDescriptionSize);

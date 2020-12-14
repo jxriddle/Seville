@@ -6,8 +6,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
+#include "seville/base/bytearray.h"
 #include "seville/base/types.h"
-#include "seville/palace/netmsg/roomdescription.h"
 
 namespace seville
 {
@@ -21,10 +21,9 @@ namespace seville
          void background_did_change(void);
 
       public:
-         static auto New(QObject* object_parent_ptr = nullptr) ->
-               std::unique_ptr<Room>
+         static auto New(QObject* object_parent_ptr = nullptr) -> Room*
          {
-            auto instance_ptr = std::make_unique<Room>(object_parent_ptr);
+            auto instance_ptr = new Room(object_parent_ptr);
 
             instance_ptr->do_reset_();
             instance_ptr->do_setup_events_();
@@ -33,63 +32,115 @@ namespace seville
          }
 
          explicit Room(QObject* object_parent_ptr = nullptr);
-         Room(const Room& room, QObject* object_parent_ptr = nullptr);
+         //Room(const Room& room, QObject* object_parent_ptr = nullptr);
          //virtual ~Room(void);
 
-         inline auto id(void) const -> u16 {
-            return my_id_;
+         inline auto room_id(void) const -> u16 {
+            return my_room_id_;
          }
 
-         inline auto set_id(const u16& value) -> void {
-            my_id_ = value;
+         inline auto set_room_id(u16 value) -> void {
+            my_room_id_ = value;
          }
 
          inline auto flags(void) const -> u32 {
             return my_flags_;
          }
 
-         inline auto set_flags(const u32& value) -> void {
+         inline auto set_flags(u32 value) -> void {
             my_flags_ = value;
+         }
+
+         inline auto face(void) const -> u32 {
+            return my_face_;
+         }
+
+         inline auto set_face(u32 value) -> void {
+            my_face_ = value;
+         }
+
+         inline auto reserved(void) const -> u16 {
+            return my_reserved_;
+         }
+
+         inline auto set_reserved(u16 value) -> void {
+            my_reserved_ = value;
+         }
+
+         inline auto user_count(void) const -> u16 {
+            return my_user_count_;
+         }
+
+         inline auto set_user_count(u16 value) -> void {
+            my_user_count_ = value;
+         }
+
+         inline auto hotspot_count(void) const -> u16 {
+            return my_hotspot_count_;
+         }
+
+         inline auto set_hotspot_count(u16 value) -> void {
+            my_hotspot_count_ = value;
+         }
+
+         inline auto image_count(void) const -> u16 {
+            return my_image_count_;
+         }
+
+         inline auto set_image_count(u16 value) -> void {
+            my_image_count_ = value;
+         }
+
+         inline auto loose_prop_count(void) const -> u16 {
+            return my_loose_prop_count_;
+         }
+
+         inline auto set_loose_prop_count(u16 value) -> void {
+            my_loose_prop_count_ = value;
+         }
+
+         inline auto draw_commands_count(void) const -> u16 {
+            return my_draw_commands_count_;
+         }
+
+         inline auto set_draw_commands_count(u16 value) -> void {
+            my_draw_commands_count_ = value;
+         }
+
+         inline auto room_name(void) const -> QString {
+            return my_room_name_;
+         }
+
+         inline auto set_room_name(const QString& value) {
+            my_room_name_ = value;
+         }
+
+         inline auto background_image_name(void) -> QString {
+            return my_background_image_name_;
          }
 
          inline auto set_background_image_name(
                const QString& background_image_name) -> void {
-            my_name_image_background_ = background_image_name;
+            my_background_image_name_ = background_image_name;
          }
 
-         inline auto background_image_name(void) -> QString {
-            return my_name_image_background_;
-         }
-
-         inline auto set_from_room_description(
-               const netmsg::RoomDescription& room_description) -> void {
-            my_id_ = room_description.room_id();
-            my_flags_ = room_description.flags();
-            my_face_ = room_description.face();
-            my_reserved_ = room_description.reserved();
-            my_count_users_ = room_description.room_user_count();
-            my_count_images_ = room_description.room_image_count();
-            my_count_props_loose_ = room_description.loose_prop_count();
-            my_count_commands_draw_ = room_description.draw_commands_count();
-            my_name_image_background_ =
-                  room_description.background_image_name();
-
-            //do_setBackgroundImageBytes();
+         inline auto background_image(void) const -> QImage {
+            return QImage::fromData(my_background_image_byte_array_);
          }
 
          inline auto set_background_image(
                const QImage& background_image) -> void {
             auto bits = background_image.bits();
-            my_byte_array_image_background_.clear();
-            my_byte_array_image_background_.resize(0);
-            my_byte_array_image_background_.append(
+            my_background_image_byte_array_.clear();
+            my_background_image_byte_array_.resize(0);
+            my_background_image_byte_array_.append(
                      reinterpret_cast<const char*>(bits));
 
             emit background_did_change();
          }
 
-         inline auto background_image(void) const -> QImage {
-            return QImage::fromData(my_byte_array_image_background_);
+         inline auto background_image_bytes(void) const -> QByteArray {
+            return my_background_image_byte_array_;
          }
 
          inline auto set_background_image_bytes(
@@ -97,12 +148,8 @@ namespace seville
             do_set_background_image_bytes_(background_image_bytes);
          }
 
-         inline auto background_image_bytes(void) const -> QByteArray {
-            return my_byte_array_image_background_;
-         }
-
          inline auto background_image_bytes_ptr(void) -> QByteArray* {
-            return &my_byte_array_image_background_;
+            return &my_background_image_byte_array_;
          }
 
          inline auto reset(void) -> void {
@@ -110,16 +157,18 @@ namespace seville
          }
 
       private:
-         u16 my_id_;
-         QByteArray my_byte_array_image_background_;
          u32 my_flags_;
          u32 my_face_;
-         u16 my_count_images_;
-         u16 my_count_commands_draw_;
-         u16 my_count_users_;
-         u16 my_count_props_loose_;
+         u16 my_room_id_;
+         u16 my_hotspot_count_;
+         u16 my_image_count_;
+         u16 my_draw_commands_count_;
+         u16 my_user_count_;
+         u16 my_loose_prop_count_;
          u16 my_reserved_;
-         QString my_name_image_background_;
+         QByteArray my_background_image_byte_array_;
+         QString my_background_image_name_;
+         QString my_room_name_;
 
          auto do_setup_events_(void) -> void
          {
@@ -127,34 +176,34 @@ namespace seville
 
          void do_reset_(void)
          {
-            my_id_ = 0;
+            my_room_id_ = 0;
             my_flags_ = 0;
             my_face_ = 0;
-            my_count_images_ = 0;
-            my_count_commands_draw_ = 0;
-            my_count_users_ = 0;
-            my_count_props_loose_ = 0;
+            my_image_count_ = 0;
+            my_draw_commands_count_ = 0;
+            my_user_count_ = 0;
+            my_loose_prop_count_ = 0;
             my_reserved_ = 0;
-            my_name_image_background_ = "";
+            my_background_image_name_ = "";
 
-            my_byte_array_image_background_.truncate(0);
+            my_background_image_byte_array_.truncate(0);
          }
 
          void do_set_background_image_bytes_(
                const ByteArray& backgroundImageBytes)
          {
-            my_byte_array_image_background_.clear();
-            my_byte_array_image_background_.resize(0);
-            my_byte_array_image_background_.append(backgroundImageBytes);
+            my_background_image_byte_array_.clear();
+            my_background_image_byte_array_.resize(0);
+            my_background_image_byte_array_.append(backgroundImageBytes);
 
             emit background_did_change();
          }
 
          void do_assign_(const Room& room)
          {
-            my_id_ = room.my_id_;
-            my_byte_array_image_background_ =
-                  room.my_byte_array_image_background_;
+            my_room_id_ = room.my_room_id_;
+            my_background_image_byte_array_ =
+                  room.my_background_image_byte_array_;
             //my_backgroundImage = room.my_backgroundImage;
          }
 

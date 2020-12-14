@@ -12,16 +12,16 @@ namespace seville
             do_init_();
          }
 
-         NetMsgLogon::NetMsgLogon(const NetMsg& netmsg, NetMsgOptions options)
-            : NetMsg(netmsg, options)
-         {
-            do_init_();
-         }
+//         NetMsgLogon::NetMsgLogon(const NetMsg& netmsg, NetMsgOptions options)
+//            : NetMsg(netmsg, options)
+//         {
+//            do_init_();
+//         }
 
          auto NetMsgLogon::do_init_(void) -> void
          {
-            rep_ref_mut_().truncate(NetMsgSize::kMinimumSize);
-            rep_ref_mut_().reserve(NetMsgSize::kLogonSize);
+            truncate(NetMsgSize::kMinimumSize);
+            reserve(NetMsgSize::kLogonSize);
 
             set_id(NetMsgKind::kLogonKind);
             set_len(NetMsgSize::kLogonSize);

@@ -155,7 +155,7 @@ namespace seville
          };
 
       // : public QObject, public QByteArray {};
-      class NetMsg // : public ByteArray
+      class NetMsg : public ByteArray
       {
       public:
          static inline auto SwapI64(i64 value) -> i64 {
@@ -231,64 +231,66 @@ namespace seville
                const NetMsg& netmsg,
                NetMsgOptions options = NetMsgOptions::kNoEndianSwap);
 
-         inline auto to_byte_array(void) const -> const ByteArray& {
-            return my_rep_;
-         }
+         virtual ~NetMsg(void);
 
-         inline auto to_bytearray_mut(void) -> ByteArray& {
-            return my_rep_;
-         }
+//         inline auto to_byte_array(void) const -> const ByteArray& {
+//            return my_rep_;
+//         }
 
-         inline auto from_bytearray(ByteArray& value) -> void {
-            my_rep_ = value;
-         }
+//         inline auto to_bytearray_mut(void) -> ByteArray& {
+//            return my_rep_;
+//         }
+
+//         inline auto from_bytearray(ByteArray& value) -> void {
+//            my_rep_ = value;
+//         }
 
          inline auto should_swap_endianness_flag(void) const -> bool {
-            return my_flag_swap_endian_;
+            return my_swap_endian_flag_;
          }
 
          inline auto set_should_swap_endianness_flag(bool value) -> void {
-            my_flag_swap_endian_ = value;
+            my_swap_endian_flag_ = value;
          }
 
          inline auto client_byteorder(void) const -> Host::ByteOrder {
-            return my_byteorder_client_;
+            return my_client_byte_order_;
          }
 
          inline auto set_client_byteorder(Host::ByteOrder value) -> void {
-            my_byteorder_client_ = value;
+            my_client_byte_order_ = value;
          }
 
          inline auto server_byteorder(void) const -> Host::ByteOrder {
-            return my_byteorder_server_;
+            return my_server_byte_order_;
          }
 
          inline auto set_server_byteorder(Host::ByteOrder value) -> void {
-            my_byteorder_server_ = value;
+            my_server_byte_order_ = value;
          }
 
          inline auto id(void) const -> u32 {
-            return my_rep_.u32_at(kIdOffset);
+            return u32_at(kIdOffset);
          }
 
          inline auto set_id(u32 value) -> void {
-            my_rep_.set_u32_at(kIdOffset, value);
+            set_u32_at(kIdOffset, value);
          }
 
          inline auto len(void) const -> i32 {
-            return my_rep_.i32_at(kLenOffset);
+            return i32_at(kLenOffset);
          }
 
          inline auto set_len(i32 value) -> void {
-            my_rep_.set_i32_at(kLenOffset, value);
+            set_i32_at(kLenOffset, value);
          }
 
          inline auto ref(void) const -> u32 {
-            return my_rep_.u32_at(kRefOffset);
+            return u32_at(kRefOffset);
          }
 
          inline auto set_ref(u32 value) -> void {
-            my_rep_.set_u32_at(kRefOffset, value);
+            set_u32_at(kRefOffset, value);
          }
 
          inline auto reset(void) -> void {
@@ -299,8 +301,8 @@ namespace seville
                QTcpSocket* socket_ptr) -> int {
             // read in header
             auto flag_read_header_ok = 0;
-            auto size = my_rep_.size();
-            if (size < NetMsgOffset::kPayloadOffset) {
+            auto len = this->size();
+            if (len < NetMsgOffset::kPayloadOffset) {
                flag_read_header_ok =
                      do_read_in_netmsg_header_from_socket_ptr_(socket_ptr);
             }
@@ -443,28 +445,29 @@ namespace seville
 //         inline auto append_u8(u8 value) -> void {
 //            do_append_u8_(value);
 //         }
-      protected:
-         inline auto rep_ref_(void) const -> const ByteArray& {
-            return my_rep_;
-         }
 
-         inline auto rep_ref_mut_(void) -> ByteArray& {
-            return my_rep_;
-         }
+//      protected:
+//         inline auto rep_ref_(void) const -> const ByteArray& {
+//            return my_rep_;
+//         }
 
-         inline auto set_rep_(ByteArray& value) -> void {
-            my_rep_ = value;
-         }
+//         inline auto rep_ref_mut_(void) -> ByteArray& {
+//            return my_rep_;
+//         }
+
+//         inline auto set_rep_(ByteArray& value) -> void {
+//            my_rep_ = value;
+//         }
 
       private:
-         ByteArray my_rep_;
-         Host::ByteOrder my_byteorder_client_;
-         Host::ByteOrder my_byteorder_server_;
-         bool my_flag_swap_endian_;
+         //ByteArray my_rep_;
+         Host::ByteOrder my_client_byte_order_;
+         Host::ByteOrder my_server_byte_order_;
+         bool my_swap_endian_flag_;
 
          inline auto do_maybe_swap_i64_(i64 value) const -> i64 {
             //auto cond = doDetermineShouldSwapEndianness();
-            auto cond = my_flag_swap_endian_;
+            auto cond = my_swap_endian_flag_;
             i64 swapped_value = SwapI64(value);
             auto result =
                   static_cast<i64>(cond) * swapped_value |
@@ -475,7 +478,7 @@ namespace seville
 
          inline auto do_maybe_swap_u64_(u64 value) const -> u64 {
             //auto cond = doDetermineShouldSwapEndianness();
-            auto cond = my_flag_swap_endian_;
+            auto cond = my_swap_endian_flag_;
             u64 swapped_value = SwapU64(value);
             auto result =
                   static_cast<u64>(cond) * swapped_value |
@@ -486,7 +489,7 @@ namespace seville
 
          inline auto do_maybe_swap_i32_(i32 value) const -> i32 {
             //auto cond = doDetermineShouldSwapEndianness();
-            auto cond = my_flag_swap_endian_;
+            auto cond = my_swap_endian_flag_;
             auto swapped_value = SwapI32(value);
             auto result =
                   static_cast<i32>(cond) * swapped_value |
@@ -497,7 +500,7 @@ namespace seville
 
          inline auto do_maybe_swap_u32_(u32 value) const -> u32 {
             //auto cond = doDetermineShouldSwapEndianness();
-            auto cond = my_flag_swap_endian_;
+            auto cond = my_swap_endian_flag_;
             auto swapped_value = SwapU32(value);
             auto result =
                   static_cast<u32>(cond) * swapped_value |
@@ -508,7 +511,7 @@ namespace seville
 
          inline auto do_maybe_swap_u16_(u16 value) const -> u16 {
             //auto cond = doDetermineShouldSwapEndianness();
-            auto cond = my_flag_swap_endian_;
+            auto cond = my_swap_endian_flag_;
             auto swapped_value = SwapU16(value);
             auto result = static_cast<u16>(
                      static_cast<u16>(cond) * swapped_value |
@@ -519,7 +522,7 @@ namespace seville
 
          inline auto do_maybe_swap_i16_(i16 value) const -> i16 {
             //auto cond = doDetermineShouldSwapEndianness();
-            auto cond = my_flag_swap_endian_;
+            auto cond = my_swap_endian_flag_;
             auto swapped_value = SwapI16(value);
             auto result = static_cast<i16>(
                      static_cast<i16>(cond) * swapped_value |
@@ -665,7 +668,7 @@ namespace seville
          inline auto do_read_in_netmsg_header_from_socket_ptr_(
                QTcpSocket* socket_ptr) -> int {
             auto n_expected_bytes_to_read =
-                  NetMsgOffset::kPayloadOffset - my_rep_.size();
+                  NetMsgOffset::kPayloadOffset - size();
 
             //auto readHeaderOk = 0 <= nExpectedBytesToRead;
             if (0 == n_expected_bytes_to_read)
@@ -680,20 +683,20 @@ namespace seville
                   (should_read_partial * n_bytes_available) |
                   (!should_read_partial * n_expected_bytes_to_read);
 
-            my_rep_.append(socket_ptr->read(n_bytes_to_read));
+            append(socket_ptr->read(n_bytes_to_read));
 
             //auto netMsgSizeN = this->size();
             //auto nBytesRead = finalNetMsgSize - initialNetMsgSize;
-            if (NetMsgSize::kMinimumSize == my_rep_.size())
-               my_rep_.reserve(NetMsgSize::kMinimumSize +
-                       my_rep_.i32_at(NetMsgOffset::kLenOffset));
+            if (NetMsgSize::kMinimumSize == size())
+               reserve(NetMsgSize::kMinimumSize +
+                       i32_at(NetMsgOffset::kLenOffset));
 
-            return NetMsgSize::kMinimumSize == my_rep_.size();
+            return NetMsgSize::kMinimumSize == size();
          }
 
          inline auto do_read_in_netmsg_body_from_socket_ptr_(
                QTcpSocket* socket_ptr) -> int {
-            auto size_0 = my_rep_.size();
+            auto size_0 = size();
             if (size_0 < NetMsgSize::kMinimumSize)
                return 0;
 
@@ -712,14 +715,14 @@ namespace seville
                   (!should_read_partial * n_bytes_expected);
 
             // maybe reads should be chunked?
-            my_rep_.append(socket_ptr->read(n_bytes_to_read));
+            append(socket_ptr->read(n_bytes_to_read));
 
             //auto sizeN = this->size();
             //auto nBytesRead = finalNetMsgSize - initialNetMsgSize;
 
             auto n_expected_total_bytes = NetMsgOffset::kPayloadOffset + len();
 
-            return n_expected_total_bytes == my_rep_.size();
+            return n_expected_total_bytes == size();
          /*
             if (0 < nNet::MsgBytesExpected)
             {
@@ -743,49 +746,49 @@ namespace seville
             //id_ = p[kPalMsgIdOffset];
             //len_ = p[kPalMsgLenOffset];
             //ref_ = p[kPalMsgRefOffset];
-            my_flag_swap_endian_ = options & NetMsgOptions::kEndianSwap;
-            my_rep_.append(data, len);
+            my_swap_endian_flag_ = options & NetMsgOptions::kEndianSwap;
+            append(data, len);
          }
 
-         inline auto do_init_(
-               const QByteArray& bytes_of_netmsg, NetMsgOptions options)
-               -> void {
-            do_reset_();
+//         inline auto do_init_(
+//               const QByteArray& bytes_of_netmsg, NetMsgOptions options)
+//               -> void {
+//            do_reset_();
 
-            my_flag_swap_endian_ = options & NetMsgOptions::kEndianSwap;
-            my_rep_.append(bytes_of_netmsg);
-         }
+//            my_swap_endian_flag_ = options & NetMsgOptions::kEndianSwap;
+//            append(bytes_of_netmsg);
+//         }
 
-         inline auto do_init_(
-               const Host::ByteOrder& client_byte_order,
-               const Host::ByteOrder& server_byte_order,
-               NetMsgOptions options) -> void {
-            do_reset_();
+//         inline auto do_init_(
+//               const Host::ByteOrder& client_byte_order,
+//               const Host::ByteOrder& server_byte_order,
+//               NetMsgOptions options) -> void {
+//            do_reset_();
 
-            my_byteorder_client_ = client_byte_order;
-            my_byteorder_server_ = server_byte_order;
-            my_flag_swap_endian_ = options & NetMsgOptions::kEndianSwap;
-         }
+//            my_client_byte_order_ = client_byte_order;
+//            my_server_byte_order_ = server_byte_order;
+//            my_swap_endian_flag_ = options & NetMsgOptions::kEndianSwap;
+//         }
 
          inline auto do_init_(NetMsgOptions options) -> void {
             do_reset_();
 
-            my_flag_swap_endian_ = options;
+            my_swap_endian_flag_ = options;
          }
 
-         inline auto do_init_(
-               const NetMsg& netmsg, NetMsgOptions options) -> void {
-            do_reset_();
-            //id_ = palMsg.id_;
-            //len_ = palMsg.len_;
-            //ref_ = palMsg.ref_;
-            my_flag_swap_endian_ = options & NetMsgOptions::kEndianSwap;
-            my_rep_.append(netmsg.my_rep_);
-         }
+//         inline auto do_init_(
+//               const NetMsg& netmsg, NetMsgOptions options) -> void {
+//            do_reset_();
+//            //id_ = palMsg.id_;
+//            //len_ = palMsg.len_;
+//            //ref_ = palMsg.ref_;
+//            my_swap_endian_flag_ = options & NetMsgOptions::kEndianSwap;
+//            append(netmsg);
+//         }
 
          inline auto do_reset_(void) -> void {
-            my_rep_.truncate(0);
-            my_rep_.reserve(NetMsgSize::kMinimumSize);
+            truncate(0);
+            reserve(NetMsgSize::kMinimumSize);
          }
       };
    }

@@ -285,6 +285,7 @@ namespace seville
 
       signals:
          void background_image_did_load(void);
+         void connection_state_did_change(void);
 
       private:
          Logger my_logger_;
