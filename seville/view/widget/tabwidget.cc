@@ -39,14 +39,16 @@ namespace seville
             setMovable(true);
 
             // Layout
-            QVBoxLayout *layout_ptr = new QVBoxLayout(this);
+            auto layout_ptr = new QVBoxLayout(this);
+            //auto layout_ptr = new QGridLayout(this);
             layout_ptr->setContentsMargins(0, 0, 0, 0);
             layout_ptr->setMargin(0);
-            layout_ptr->addStretch(1);
-            this->setLayout(layout_ptr);
+            //layout_ptr->addStretch(1);
+            setLayout(layout_ptr);
             //tabWidget_->setSizePolicy();
+            resize(minimumSizeHint());
 
-            setStyleSheet("border: 1px solid blue");
+            // setStyleSheet("border: 1px solid blue");
          }
 
          void TabWidget::do_setup_events_(void)
@@ -73,9 +75,8 @@ namespace seville
             auto client_widget_ptr =
                   static_cast<widget::ClientWidget*>(content_widget_ptr);
 
-            if (client_widget_ptr == nullptr) {
+            if (client_widget_ptr == nullptr)
                client_widget_ptr = new ClientWidget(this);
-            }
 
             this->addTab(client_widget_ptr, tr("New Connection"));
                          //.arg(QString::number(this->count())));
@@ -109,12 +110,15 @@ namespace seville
 
          void TabWidget::on_client_tab_widget_did_resize(int width, int height)
          {
+            (void)width;
+            (void)height;
             auto sender = QObject::sender();
             if (currentWidget() == sender) {
                //auto client_widget_ptr =
                //      static_cast<widget::ClientWidget*>(sender);
                //client_widget_ptr->;
-               this->resize(width, height);
+               //resize(width, height);
+               resize(minimumSizeHint());
             }
          }
 

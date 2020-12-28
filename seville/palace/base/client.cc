@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
+#include <QTcpSocket>
 
 //#include "seville/base/log.h"
 #include "seville/palace/base/host.h"
@@ -469,9 +470,15 @@ namespace seville
 
       auto Client::do_receive_ping_(void) -> int
       {
-         // stub
-         auto result = 0;
-         return result;
+         auto pong_msg = palace::NetMsg();
+         pong_msg.set_id(NetMsgKind::kPongKind);
+         pong_msg.set_len(0);
+         //pong_msg.set_ref(my_user_.id());
+         pong_msg.set_ref(0);
+         my_socket_.write(pong_msg);
+         my_socket_.flush();
+         my_logger_.debug(QString("Sent Pong"));
+         return 0;
       }
 
       auto Client::do_receive_pong_(void) -> int
@@ -513,49 +520,52 @@ namespace seville
       {
          auto data_offset = 40;
 
-         my_current_room_.set_flags(
-                  my_netmsg_.u32_at(NetMsgOffset::kPayloadOffset));
+         auto flags = my_netmsg_.u32_at(NetMsgOffset::kPayloadOffset);
+         my_current_room_.set_flags(flags);
 
-         my_current_room_.set_face(
-                  my_netmsg_.u32_at(NetMsgOffset::kPayloadOffset+4));
+         auto face = my_netmsg_.u32_at(NetMsgOffset::kPayloadOffset+4);
+         my_current_room_.set_face(face);
 
-         my_current_room_.set_room_id(
-                  my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+8));
+         auto room_id = my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+8);
+         my_current_room_.set_room_id(room_id);
 
          auto room_name_offset =
                my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+10);
 
          auto background_image_name_offset =
-               my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+12);
-
-         auto artist_name_offset =
                my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+14);
 
-         auto password_offset =
+         auto artist_name_offset =
                my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+16);
 
-         my_current_room_.set_hotspot_count(
-                  my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+18));
+         auto password_offset =
+               my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+18);
+
+         auto hotspot_count =
+               my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+20);
+         my_current_room_.set_hotspot_count(hotspot_count);
 
          auto hotspot_offset =
-               my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+20);
+               my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+22);
 
-         my_current_room_.set_image_count(
-                  my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+22));
+         auto image_count = my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+24);
+         my_current_room_.set_image_count(image_count);
 
-         my_current_room_.set_loose_prop_count(
-                  my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+26));
+         auto loose_prop_count =
+               my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+26);
+         my_current_room_.set_loose_prop_count(loose_prop_count);
 
-         my_current_room_.set_draw_commands_count(
-                  my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+28));
+         auto draw_commands_count =
+               my_netmsg_.u16_at(NetMsgOffset::kPayloadOffset+28);
+         my_current_room_.set_draw_commands_count(draw_commands_count);
 
-         my_current_room_.set_room_name(
-                  my_netmsg_.pascal_qstring_at(
-                     data_offset + room_name_offset));
+         auto room_name = my_netmsg_.pascal_qstring_at(
+                  data_offset + room_name_offset);
+         my_current_room_.set_room_name(room_name);
 
-         my_current_room_.set_background_image_name(
-                  my_netmsg_.pascal_qstring_at(
-                     data_offset + background_image_name_offset));
+         auto background_image_name = my_netmsg_.pascal_qstring_at(
+                  data_offset + background_image_name_offset);
+         my_current_room_.set_background_image_name(background_image_name);
 
          auto background_image_uri =
                my_server_.http_server_location() + "/" +
@@ -693,10 +703,12 @@ namespace seville
       {
          //auto msgChat = dynamic_cast<netmsg::Talk*>(&my_netmsg_);
          //msgChat->set_
-         auto user_id = my_netmsg_.u16_at(NetMsgOffset::kRefOffset);
-         auto user_name = "<someone>"; //my_current_room_.userData(user_id);
+         auto user_id = my_netmsg_.u32_at(NetMsgOffset::kRefOffset);
+         auto len = my_netmsg_.u32_at(NetMsgOffset::kLenOffset);
+         auto user_name = QString::number(user_id); //"<someone>"; //my_current_room_.userData(user_id);
          auto message =
-               my_netmsg_.pascal_qstring_at(NetMsgOffset::kPayloadOffset);
+               //my_netmsg_.pascal_qstring_at(NetMsgOffset::kPayloadOffset);
+               my_netmsg_.qstring_at(NetMsgOffset::kPayloadOffset, len);
          my_logger_.chat(user_name, message);
          return 0;
       }

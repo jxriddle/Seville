@@ -49,22 +49,27 @@ namespace seville
 
          void ClientWidget::do_setup_view_(void)
          {
-            my_primary_layout_ptr_ = new QVBoxLayout(this);
-            my_primary_layout_ptr_->setMargin(0);
-            my_primary_layout_ptr_->setContentsMargins(0, 0, 0, 0);
-            my_primary_layout_ptr_->setSpacing(0);
-            my_primary_layout_ptr_->addStretch(1);
+            my_layout_ptr_ = new QVBoxLayout(this);
+            //my_primary_layout_ptr_->setMargin(0);
+            //my_primary_layout_ptr_->setContentsMargins(0, 0, 0, 0);
+            //my_primary_layout_ptr_->setSpacing(0);
+            //my_primary_layout_ptr_->addStretch(1);
 
             my_scroll_area_ptr_ = new QScrollArea(this);
+
             my_background_image_label_ptr_ = new QLabel(this);
+
             my_scroll_area_ptr_->setHorizontalScrollBarPolicy(
                      Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+
             my_scroll_area_ptr_->setVerticalScrollBarPolicy(
                      Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-            my_scroll_area_ptr_->setSizePolicy(
-                     QSizePolicy::Maximum, QSizePolicy::Maximum);
-            my_scroll_area_ptr_->setWidgetResizable(true);
+            //my_scroll_area_ptr_->setSizePolicy(
+            //         QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+            //my_scroll_area_ptr_->setWidgetResizable(true);
             my_scroll_area_ptr_->setWidget(my_background_image_label_ptr_);
+
             //my_scrollarea_ptr_->setStyleSheet("border 1px solid red");
 
 //            auto layout_scroll_area_ptr = new QHBoxLayout(my_scrollarea_ptr_);
@@ -76,7 +81,7 @@ namespace seville
 //            layout_scroll_area_ptr->setSpacing(0);
 //            my_scrollarea_ptr_->setLayout(layout_scroll_area_ptr);
 
-            my_primary_layout_ptr_->addWidget(my_scroll_area_ptr_);
+            my_layout_ptr_->addWidget(my_scroll_area_ptr_);
 
             //PalRoom& room = myPalClient->currentRoom();
             auto image_filename =
@@ -85,11 +90,11 @@ namespace seville
             //qCDebug(SevilleApp()->log_category()) << filename_image;
             //qCDebug(log_seville) << image_filename;
 
+            setLayout(my_layout_ptr_);
+
             do_set_background_image_from_file_(image_filename);
 
-            setLayout(my_primary_layout_ptr_);
-
-            setStyleSheet("border: 1px solid red");
+            //setStyleSheet("border: 1px solid red");
          }
 
          void ClientWidget::do_setup_events_(void)
@@ -108,6 +113,9 @@ namespace seville
 
          void ClientWidget::do_set_background_image_(const QPixmap& pixmap)
          {
+            auto width = pixmap.width();
+            auto height = pixmap.height();
+
             my_background_image_label_ptr_->setBackgroundRole(QPalette::Base);
             my_background_image_label_ptr_->setSizePolicy(
                      QSizePolicy::MinimumExpanding,
@@ -119,25 +127,27 @@ namespace seville
             //myBackgroundImageLabel->setGeometry(0, 0, 500, 500);
 
             my_scroll_area_ptr_->setBackgroundRole(QPalette::Dark);
-            my_scroll_area_ptr_->setWidget(my_background_image_label_ptr_);
-            //my_scrollarea_ptr_->setGeometry(pixmap.rect());
-            //my_scrollarea_ptr_->setGeometry(
+            //my_scroll_area_ptr_->setWidget(my_background_image_label_ptr_);
+            //my_scroll_area_ptr_->setGeometry(pixmap.rect());
+            //my_scroll_area_ptr_->setGeometry(
             // my_label_background_image_ptr_->geometry());
             my_scroll_area_ptr_->setVisible(true);
 
             //my_scrollarea_ptr_->setFixedSize(
             // my_label_image_background_ptr_->size());
-            if (0 < my_background_image_label_ptr_->size().width() &&
-                0 < my_background_image_label_ptr_->size().height()) {
-               my_scroll_area_ptr_->resize(
-                        my_background_image_label_ptr_->size());
+            //if (0 < my_background_image_label_ptr_->size().width() &&
+            //    0 < my_background_image_label_ptr_->size().height()) {
+            //   my_scroll_area_ptr_->resize(
+            //            my_background_image_label_ptr_->size());
                //this->setFixedSize(my_label_image_background_ptr_->size());
-               this->resize(my_background_image_label_ptr_->size());
-            }
+            //   this->resize(my_background_image_label_ptr_->size());
+            //}
 
-            auto width = pixmap.width();
-            auto height = pixmap.height();
             my_background_image_label_ptr_->setGeometry(0, 0, width, height);
+            //my_background_image_label_ptr_->resize(minimumSizeHint());
+            my_background_image_label_ptr_->adjustSize();
+            resize(minimumSizeHint());
+            //adjustSize();
 
             emit did_resize(width, height);
          }

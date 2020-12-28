@@ -167,27 +167,16 @@ namespace seville
       auto do_set_pascal_string_at_(int offset, const std::string& value) -> void {
          auto len = static_cast<u8>(value.length());
          do_set_u8_at_(offset, len);
-         for (u8 i = 1; i < len; i++)
-            set_u8_at(offset+i, static_cast<u8>(value.at(i)));
+
+         for (u8 i = 0; i < len; i++)
+            set_u8_at(offset+i+1, static_cast<u8>(value.at(i)));
       }
 
       auto do_pascal_string_at_(int offset) const -> std::string {
          std::string value;
-
          auto len = do_u8_at_(offset);
-         u8 i = 1;
-         auto c = this->i8_at(offset+i);
-         while (i <= len) { // && c != '\0') {
-            value.push_back(c);
-            i++;
-            c = do_i8_at_(offset+i);
-         }
-
-         //if (value.size() == sizeof(u8) || value.size() == maxlen)
-         //   value.pop_back();
-
-         //value.push_back('\0');
-
+         for (u8 i = 0; i < len; i++)
+            value.push_back(do_i8_at_(offset+i+1));
          return value;
       }
 

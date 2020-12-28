@@ -1,3 +1,5 @@
+#include <QMessageBox>
+
 #include "mainwindow.h"
 
 namespace seville
@@ -42,8 +44,13 @@ namespace seville
          //void MainWindow::on_client_widget_background_did_change(void)
          void MainWindow::on_client_widget_did_resize(int width, int height)
          {
-            this->resize(width, height);
-            this->adjustSize();
+            //resize(minimumSizeHint());
+            resize(width+10, height+10);
+            adjustSize();
+            auto msgbox = new QMessageBox(this);
+            msgbox->setText("MainWindow resize called");
+            msgbox->open();
+            msgbox->exec();
          }
 
          void MainWindow::on_quit_app_action_triggered(void)
@@ -116,21 +123,20 @@ namespace seville
             setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
             setUnifiedTitleAndToolBarOnMac(true);
 
-            QScreen* primary_screen_ptr = QGuiApplication::primaryScreen();
-            auto screen = primary_screen_ptr->geometry();
+//            auto primary_screen_ptr = QGuiApplication::primaryScreen();
+//            auto screen = primary_screen_ptr->geometry();
+//            auto default_window_size = QSize(
+//                     static_cast<int>(.67*screen.width()),
+//                     static_cast<int>(.67*screen.height()));
 
-            QSize window_size_default = QSize(
-                     static_cast<int>(.67*screen.width()),
-                     static_cast<int>(.67*screen.height()));
+//            setGeometry(QStyle::alignedRect(
+//                           Qt::LeftToRight,
+//                           Qt::AlignCenter,
+//                           default_window_size,
+//                           primary_screen_ptr->geometry()));
 
-            setGeometry(QStyle::alignedRect(
-                           Qt::LeftToRight,
-                           Qt::AlignCenter,
-                           window_size_default,
-                           primary_screen_ptr->geometry()));
-
-            setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-            adjustSize();
+            //setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+            //adjustSize();
 
             //setContentsMargins(0, menuBar_->height(), 0, 0); // left, top, right, bottom
             //setContentsMargins(0, 0, 0, 0);
@@ -143,9 +149,9 @@ namespace seville
             my_tab_widget_ptr_->setGeometry(0, 0, width(), height()); // x, y, w, h
             layout()->setSpacing(0);
             //layout()->addWidget(tabWidget_);
-            auto widget_client_ptr = new view::widget::ClientWidget(this);
+            auto client_widget_ptr = new view::widget::ClientWidget(this);
             //connect(palRoomWidget, )
-            my_tab_widget_ptr_->add_new_tab(widget_client_ptr);
+            my_tab_widget_ptr_->add_new_tab(client_widget_ptr);
             //mainLayout_->setSpacing(0);
             //mainLayout_->addWidget(tabWidget_, 1);
 
@@ -160,9 +166,9 @@ namespace seville
             // Set Main Window to Tab Widget
             setCentralWidget(my_tab_widget_ptr_);
 
-            QSettings settings;
-            restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-            restoreState(settings.value("mainWindowState").toByteArray());
+            //QSettings settings;
+            //restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+            //restoreState(settings.value("mainWindowState").toByteArray());
          }
 
          auto MainWindow::do_setup_actions_(void) -> void
@@ -283,16 +289,16 @@ namespace seville
             do_setup_events_();
          }
 
-         void MainWindow::resizeEvent(QResizeEvent* event_ptr)
-         {
-            //menuBar_->setGeometry(0, 0, width(), menuBar_->height());
-            //tabWidget_->setGeometry(0, 0, width(), height());
-            //tabWidget_->resize();
+//         void MainWindow::resizeEvent(QResizeEvent* event_ptr)
+//         {
+//            //menuBar_->setGeometry(0, 0, width(), menuBar_->height());
+//            //tabWidget_->setGeometry(0, 0, width(), height());
+//            //tabWidget_->resize();
 
-            //PalRoomWidget* palRoomWidget = static_cast<PalRoomWidget*>(myTabWidget->currentWidget());
-            //palRoomWidget->resize(event->size());
-            QMainWindow::resizeEvent(event_ptr);
-         }
+//            //PalRoomWidget* palRoomWidget = static_cast<PalRoomWidget*>(myTabWidget->currentWidget());
+//            //palRoomWidget->resize(event->size());
+//            QMainWindow::resizeEvent(event_ptr);
+//         }
 
          void MainWindow::closeEvent(QCloseEvent* event_ptr)
          {

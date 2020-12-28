@@ -50,7 +50,7 @@ namespace seville
             palace::Client* my_palace_client_ptr_;
             QLabel* my_background_image_label_ptr_;
             QScrollArea* my_scroll_area_ptr_;
-            QVBoxLayout* my_primary_layout_ptr_;
+            QVBoxLayout* my_layout_ptr_;
             QPixmap my_pixmap_background_image_;
             double my_scale_factor_;
 

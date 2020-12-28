@@ -53,6 +53,10 @@ namespace seville
             //void on_client_widget_background_did_change(void);
             void on_client_widget_did_resize(int width, int height);
 
+         protected:
+            //void resizeEvent(QResizeEvent* event_ptr) override;
+            void closeEvent(QCloseEvent* event_ptr) override;
+
          private:
             view::widget::TabWidget* my_tab_widget_ptr_;
             QDockWidget* my_dock_log_widget_ptr_;
@@ -82,10 +86,6 @@ namespace seville
             auto do_setup_docks_(void) -> void;
             auto do_setup_events_(void) -> void;
             auto do_init_(void) -> void;
-
-         protected:
-            void resizeEvent(QResizeEvent* event_ptr) override;
-            void closeEvent(QCloseEvent* event_ptr) override;
          };
       }
    }
