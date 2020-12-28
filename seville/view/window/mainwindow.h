@@ -50,7 +50,8 @@ namespace seville
             void on_quit_app_action_triggered(void);
             void on_about_app_action_triggered(void);
             void on_toggle_log_window_action_triggered(void);
-            void on_client_widget_background_did_change(void);
+            //void on_client_widget_background_did_change(void);
+            void on_client_widget_did_resize(int width, int height);
 
          private:
             view::widget::TabWidget* my_tab_widget_ptr_;

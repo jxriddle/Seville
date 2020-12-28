@@ -1,13 +1,12 @@
-//#include "uiapptabbar.h"
-#include "tabwidget.h"
-
-#include <iostream>
-
 #include <QToolButton>
 #include <QTabWidget>
 #include <QCloseEvent>
 #include <QObject>
 #include <QApplication>
+
+//#include "uiapptabbar.h"
+#include "tabwidget.h"
+#include "clientwidget.h"
 
 namespace seville
 {
@@ -19,6 +18,7 @@ namespace seville
             : QTabWidget(parent_widget_ptr)
          {
              do_setup_view_();
+             do_setup_events_();
          }
 
          TabWidget::~TabWidget(void)
@@ -46,6 +46,11 @@ namespace seville
             this->setLayout(layout_ptr);
             //tabWidget_->setSizePolicy();
 
+            setStyleSheet("border: 1px solid blue");
+         }
+
+         void TabWidget::do_setup_events_(void)
+         {
             //connect(tb, SIGNAL(clicked()), this, SLOT(on_addTab_triggered()));
             //this->connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tab_closed_triggered(int)));
             connect(this, &seville::view::widget::TabWidget::
@@ -55,19 +60,30 @@ namespace seville
             ////connect(appTabBar.PlusButton(), SIGNAL(clicked()), this, SLOT(on_plusButton_clicked()));
             ////connect(&appTabBar, SIGNAL(tabMoved(int, int)), this, SLOT(on_tabMoved_triggered()));
             //connect(this, SIGNAL(removeTab(int)), this, SLOT(on_tabClosed_triggered(int)));
+
+            //auto widget = this->widget(0); //currentWidget();
+            //this->widget(0);
          }
 
          void TabWidget::do_add_new_tab_(QWidget* content_widget_ptr)
+//               widget::ClientWidget* client_widget_ptr)
          {
             // new tab
-            QWidget *new_tab_ptr = content_widget_ptr;
-            if (new_tab_ptr == nullptr) {
-               new_tab_ptr = new QWidget(this);
+            //QWidget *new_tab_ptr = content_widget_ptr;
+            auto client_widget_ptr =
+                  static_cast<widget::ClientWidget*>(content_widget_ptr);
+
+            if (client_widget_ptr == nullptr) {
+               client_widget_ptr = new ClientWidget(this);
             }
 
-            this->addTab(new_tab_ptr, tr("Connect to Palace"));
+            this->addTab(client_widget_ptr, tr("New Connection"));
                          //.arg(QString::number(this->count())));
-            this->setCurrentWidget(new_tab_ptr);
+            this->setCurrentWidget(client_widget_ptr);
+
+            connect(
+               client_widget_ptr, &ClientWidget::did_resize,
+               this, &TabWidget::on_client_tab_widget_did_resize);
          }
 
          void TabWidget::on_tab_moved_triggered(void)
@@ -76,11 +92,30 @@ namespace seville
 
          void TabWidget::on_did_request_close_tab(int index)
          {
-            delete widget(index);
+            auto client_widget_ptr =
+                  static_cast<widget::ClientWidget*>(widget(index));
+
+            disconnect(
+               client_widget_ptr, &ClientWidget::did_resize,
+               this, &TabWidget::on_client_tab_widget_did_resize);
+
+            this->removeTab(index);
+            delete client_widget_ptr;
+
             if (count() <= 0) {
                QApplication::quit();
             }
-            this->removeTab(index);
+         }
+
+         void TabWidget::on_client_tab_widget_did_resize(int width, int height)
+         {
+            auto sender = QObject::sender();
+            if (currentWidget() == sender) {
+               //auto client_widget_ptr =
+               //      static_cast<widget::ClientWidget*>(sender);
+               //client_widget_ptr->;
+               this->resize(width, height);
+            }
          }
 
          //void AppTabWidget::on_plusButton_clicked()

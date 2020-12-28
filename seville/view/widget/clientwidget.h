@@ -35,7 +35,7 @@ namespace seville
             //void resizeEvent(QResizeEvent* resize_event_ptr) override;
 
          signals:
-            void background_image_did_change();
+            void did_resize(int width, int height);
 
          public slots:
             //void updateGeometry(void);
@@ -43,7 +43,8 @@ namespace seville
             //auto on_background_image_label_resized(
             // QResizeEvent* resize_event_ptr) -> void;
 
-            void on_background_image_did_change(void);
+            //void on_background_image_did_change(int width, int height);
+            void on_background_image_did_load(void);
 
          private:
             palace::Client* my_palace_client_ptr_;
@@ -56,7 +57,7 @@ namespace seville
             auto do_setup_view_(void) -> void;
             auto do_setup_events_(void) -> void;
 
-            auto do_set_background_image_(QPixmap& pixmap) -> void;
+            auto do_set_background_image_(const QPixmap& pixmap) -> void;
             auto do_set_background_image_from_file_(QString image_path) -> void;
             //auto do_resize_background_image(QSize size) -> void;
             auto do_prompt_new_connection_(QWidget* widget_parent_ptr) -> void;

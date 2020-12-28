@@ -88,6 +88,8 @@ namespace seville
             do_set_background_image_from_file_(image_filename);
 
             setLayout(my_primary_layout_ptr_);
+
+            setStyleSheet("border: 1px solid red");
          }
 
          void ClientWidget::do_setup_events_(void)
@@ -101,10 +103,10 @@ namespace seville
                   &seville::palace::Client::background_image_did_load,
                   this,
                   &seville::view::widget::ClientWidget::
-                     on_background_image_did_change);
+                     on_background_image_did_load);
          }
 
-         void ClientWidget::do_set_background_image_(QPixmap& pixmap)
+         void ClientWidget::do_set_background_image_(const QPixmap& pixmap)
          {
             my_background_image_label_ptr_->setBackgroundRole(QPalette::Base);
             my_background_image_label_ptr_->setSizePolicy(
@@ -133,7 +135,11 @@ namespace seville
                this->resize(my_background_image_label_ptr_->size());
             }
 
-            emit background_image_did_change();
+            auto width = pixmap.width();
+            auto height = pixmap.height();
+            my_background_image_label_ptr_->setGeometry(0, 0, width, height);
+
+            emit did_resize(width, height);
          }
 
          void ClientWidget::do_set_background_image_from_file_(
@@ -181,13 +187,21 @@ namespace seville
             }
          }
 
-         auto ClientWidget::on_background_image_did_change(void) -> void
+         //auto ClientWidget::on_background_image_did_change(int width, int height) -> void
+         //{
+            //auto background_image =
+            //      my_palace_client_ptr_->current_room_ptr()->background_image();
+            //my_background_image_label_ptr_->setGeometry(
+            //         0, 0, background_image.width(), background_image.height());
+            //my_layout_widget_ptr_->setGeometry();
+            //auto pixmap = QPixmap::fromImage(background_image);
+            //do_set_background_image_(pixmap);
+         //}
+
+         auto ClientWidget::on_background_image_did_load(void) -> void
          {
             auto background_image =
                   my_palace_client_ptr_->current_room_ptr()->background_image();
-            my_background_image_label_ptr_->setGeometry(
-                     0, 0, background_image.width(), background_image.height());
-            //my_layout_widget_ptr_->setGeometry();
             auto pixmap = QPixmap::fromImage(background_image);
             do_set_background_image_(pixmap);
          }

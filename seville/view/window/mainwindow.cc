@@ -39,8 +39,10 @@ namespace seville
                      my_tab_widget_ptr_->currentIndex());
          }
 
-         void MainWindow::on_client_widget_background_did_change(void)
+         //void MainWindow::on_client_widget_background_did_change(void)
+         void MainWindow::on_client_widget_did_resize(int width, int height)
          {
+            this->resize(width, height);
             this->adjustSize();
          }
 

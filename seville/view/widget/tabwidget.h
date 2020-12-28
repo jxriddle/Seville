@@ -32,6 +32,7 @@ namespace seville
                void on_tab_moved_triggered(void);
                void on_did_request_close_tab(int index);
                //auto on_plus_button_clicked(void) -> void;
+               void on_client_tab_widget_did_resize(int width, int height);
 
             private:
                //AppTabBar myAppTabBar;
@@ -39,6 +40,7 @@ namespace seville
                auto do_setup_view_(void) -> void;
                auto do_add_new_tab_(QWidget* content_widget_ptr = nullptr)
                      -> void;
+               auto do_setup_events_(void) -> void;
          };
       }
    }
