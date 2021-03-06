@@ -1,3 +1,3 @@
 # Seville
 
-A Libre 2D Chat Client
+2D Chat Client
