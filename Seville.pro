@@ -26,55 +26,49 @@ CONFIG += c++17
 
 
 SOURCES += \
-    seville/base/app.cc \
     seville/base/bytearray.cc \
     seville/base/main.cc \
-    seville/palace/base/cipher.cc \
-    seville/palace/base/client.cc \
-    seville/palace/base/host.cc \
-    seville/palace/base/logger.cc \
-    seville/palace/base/logmessage.cc \
-    seville/palace/base/netmsg.cc \
-    seville/palace/base/prop.cc \
-    seville/palace/base/room.cc \
-    seville/palace/base/server.cc \
-    seville/palace/base/user.cc \
-    seville/palace/netmsg/httpserverlocation.cc \
-    seville/palace/netmsg/logon.cc \
-    seville/palace/netmsg/roomdescription.cc \
-    seville/view/dialog/aboutdialog.cc \
-    seville/view/dialog/connectdialog.cc \
-    seville/view/widget/clientwidget.cc \
-    seville/view/widget/logwidget.cc \
-    seville/view/widget/tabwidget.cc \
-    seville/view/window/mainwindow.cc \
-    seville/palace/netmsg/talk.cc
-    seville/view/window/mainwindow.cc \
+    seville/base/sevilleapp.cc \
+    seville/palace/cipher.cc \
+    seville/palace/client.cc \
+    seville/palace/host.cc \
+    seville/palace/hotspot.cc \
+    seville/palace/log.cc \
+    seville/palace/logentry.cc \
+    seville/palace/netmsg.cc \
+    seville/palace/prop.cc \
+    seville/palace/room.cc \
+    seville/palace/server.cc \
+    seville/palace/user.cc \
+    seville/view/aboutdialog.cc \
+    seville/view/connectdialog.cc \
+    seville/view/logwidget.cc \
+    seville/view/palaceclientwidget.cc \
+    seville/view/tabwidget.cc \
+    seville/view/mainwindow.cc
 
 HEADERS += \
-    seville/base/app.h \
+    seville/base/logcategories.h \
+    seville/base/sevilleapp.h \
     seville/base/types.h \
     seville/base/bytearray.h \
-    seville/palace/base/cipher.h \
-    seville/palace/base/client.h \
-    seville/palace/base/host.h \
-    seville/palace/base/logger.h \
-    seville/palace/base/logmessage.h \
-    seville/palace/base/netmsg.h \
-    seville/palace/base/prop.h \
-    seville/palace/base/room.h \
-    seville/palace/base/server.h \
-    seville/palace/base/user.h \
-    seville/palace/netmsg/httpserverlocation.h \
-    seville/palace/netmsg/logon.h \
-    seville/palace/netmsg/roomdescription.h \
-    seville/view/dialog/aboutdialog.h \
-    seville/view/dialog/connectdialog.h \
-    seville/view/widget/clientwidget.h \
-    seville/view/widget/logwidget.h \
-    seville/view/widget/tabwidget.h \
-    seville/view/window/mainwindow.h \
-    seville/palace/netmsg/talk.h
+    seville/palace/cipher.h \
+    seville/palace/client.h \
+    seville/palace/host.h \
+    seville/palace/hotspot.h \
+    seville/palace/log.h \
+    seville/palace/logentry.h \
+    seville/palace/netmsg.h \
+    seville/palace/prop.h \
+    seville/palace/room.h \
+    seville/palace/server.h \
+    seville/palace/user.h \
+    seville/view/aboutdialog.h \
+    seville/view/connectdialog.h \
+    seville/view/logwidget.h \
+    seville/view/palaceclientwidget.h \
+    seville/view/tabwidget.h \
+    seville/view/mainwindow.h
 
 DISTFILES +=
 

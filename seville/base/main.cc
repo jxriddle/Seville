@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include "seville/base/app.h"
+#include "seville/base/logcategories.h"
+#include "seville/base/sevilleapp.h"
 
 /*
 void msgHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
@@ -13,9 +14,9 @@ void msgHandler(QtMsgType type, const QMessageLogContext& context, const QString
 }
 */
 
-seville::SevilleApp app_seville;
+seville::SevilleApp sevilleApp;
 
 int main(int argc, char *argv[])
 {
-   return app_seville.main(argc, argv);
+   return sevilleApp.main(argc, argv);
 }

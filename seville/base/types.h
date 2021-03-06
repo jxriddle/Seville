@@ -17,17 +17,17 @@ namespace seville
    typedef double f64;
 
    union bi64 {
-      i64 qword;
+      i64 qwordValue;
       unsigned char ch[sizeof(i64)];
    };
 
    union bi32 {
-      i32 dword;
+      i32 dwordValue;
       unsigned char ch[sizeof(i32)];
    };
 
    union bi16 {
-      i16 word;
+      i16 wordValue;
       unsigned char ch[sizeof(i16)];
    };
 }

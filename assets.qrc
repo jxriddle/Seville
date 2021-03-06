@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>seville/assets/images/test-pattern.png</file>
+        <file>seville/assets/images/defaultsmileys.png</file>
     </qresource>
 </RCC>
