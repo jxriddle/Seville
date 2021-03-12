@@ -1,3 +1,3 @@
 # Seville
 
-2D Chat Client
+Open Source 2D Chat Client
