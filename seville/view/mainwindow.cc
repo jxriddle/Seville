@@ -12,12 +12,12 @@ namespace seville
          do_init();
       }
 
-      void MainWindow::on_changeTopLevelEvent(bool shouldBeVisibleFlag)
+      void MainWindow::on_topLevelDidChange(bool shouldBeVisibleFlag)
       {
          my_logWidgetPtr->setChatLineEditIsVisible(shouldBeVisibleFlag);
       }
 
-      void MainWindow::on_openHostConnectionEvent(void)
+      void MainWindow::on_openHostConnectionDidTrigger(void)
       {
          auto activeClientWidgetPtr =
                static_cast<PalaceClientWidget *>(
@@ -27,8 +27,10 @@ namespace seville
          activeClientWidgetPtr->promptOpenConnection();
       }
 
-      void MainWindow::on_closeHostConnectionEvent(void)
+      void MainWindow::on_closeHostConnectionDidTrigger(void)
       {
+         //auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
+
          my_tabWidgetPtr->removeTab(my_tabWidgetPtr->currentIndex());
       }
 
@@ -63,7 +65,7 @@ namespace seville
          }
       }
 
-      void MainWindow::on_quitAppEvent(void)
+      void MainWindow::on_quitAppDidTrigger(void)
       {
          QApplication::quit();
       }
@@ -97,13 +99,13 @@ namespace seville
       }
       */
 
-      void MainWindow::on_aboutAppEvent(void)
+      void MainWindow::on_aboutAppDidTrigger(void)
       {
          auto dialog_about = new AboutDialog(this);
          dialog_about->exec();
       }
 
-      void MainWindow::on_toggleLogWindowEvent(void)
+      void MainWindow::on_logWindowWasToggled(void)
       {
          my_logWidgetPtr->setVisible(!my_logWidgetPtr->isVisible());
          //if (!my_mainLogWidgetPtr->isVisible())
@@ -268,7 +270,8 @@ namespace seville
          my_logDockWidgetPtr->setAllowedAreas(
                   Qt::LeftDockWidgetArea |
                   Qt::BottomDockWidgetArea |
-                  Qt::RightDockWidgetArea |                  Qt::TopDockWidgetArea);
+                  Qt::RightDockWidgetArea |
+                  Qt::TopDockWidgetArea);
 
          my_logDockWidgetPtr->setWidget(my_logWidgetPtr);
          addDockWidget(Qt::RightDockWidgetArea, my_logDockWidgetPtr);
@@ -281,27 +284,27 @@ namespace seville
          //        this, &seville::view::MainWindow::on_changeTopLevelEvent);
 
          connect(my_openHostConnectionActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_openHostConnectionEvent);
+                 this, &seville::view::MainWindow::on_openHostConnectionDidTrigger);
 
          connect(my_closeHostConnectionActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_closeHostConnectionEvent);
+                 this, &seville::view::MainWindow::on_closeHostConnectionDidTrigger);
 
          connect(my_quitAppActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_quitAppEvent);
+                 this, &seville::view::MainWindow::on_quitAppDidTrigger);
 
          connect(my_aboutAppActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_aboutAppEvent);
+                 this, &seville::view::MainWindow::on_aboutAppDidTrigger);
 
          connect(my_toggleLogActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_toggleLogWindowEvent);
+                 this, &seville::view::MainWindow::on_logWindowWasToggled);
       }
 
       auto MainWindow::do_setupSizing(void) -> void
       {
          //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-         setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-         my_mainLayoutPtr->setSizeConstraint(QLayout::SetMinimumSize);
+         //my_mainLayoutPtr->setSizeConstraint(QLayout::SetMinimumSize);
          my_mainLayoutPtr->setSpacing(0);
          my_mainLayoutPtr->setMargin(0);
          my_mainLayoutPtr->setContentsMargins(0, 0, 0, 0);
@@ -319,7 +322,7 @@ namespace seville
       {
          do_setupView();
          do_setupActions();
-         //do_setupDocks();
+         do_setupDocks();
          do_setupMenus();
          do_setupEvents();
          do_setupSizing();

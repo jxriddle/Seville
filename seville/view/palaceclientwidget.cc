@@ -10,6 +10,7 @@
 #include <QLoggingCategory>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QScrollBar>
 
 #include "seville/base/sevilleapp.h"
 #include "seville/palace/log.h"
@@ -72,9 +73,19 @@ namespace seville
 
          my_scrollAreaPtr->setSizePolicy(
                   QSizePolicy::Preferred, QSizePolicy::Preferred);
+         //my_scrollAreaPtr->setSizePolicy(
+         //         QSizePolicy::Preferred, QSizePolicy::Preferred);
+         auto scrollAreaLayoutPtr = new QVBoxLayout(my_scrollAreaPtr);
+         my_scrollAreaPtr->setLayout(scrollAreaLayoutPtr);
+         //my_scrollAreaPtr->setSizePolicy(
+         //         QSizePolicy::Maximum, QSizePolicy::Maximum);
 
          my_scrollAreaPtr->setWidgetResizable(false);
          my_scrollAreaPtr->setWidget(my_backgroundImageLabelPtr);
+
+         my_scrollAreaPtr->setFixedSize(my_backgroundImageLabelPtr->size());
+         //my_scrollAreaPtr->setFixedWidth(my_backgroundImageLabelPtr->width() + 10);
+         //my_scrollAreaPtr->setFixedHeight(my_backgroundImageLabelPtr->height() + 10);
 
          //my_scrollarea_ptr_->setStyleSheet("border 1px solid red");
 
@@ -94,8 +105,8 @@ namespace seville
          //qCDebug(SevilleApp()->log_category()) << filename_image;
          //qCDebug(log_seville) << image_filename;
 
-         //my_chatLineEditPtr = new QLineEdit(this);
-         //my_layoutPtr->addWidget(my_chatLineEditPtr);
+         my_chatLineEditPtr = new QLineEdit(this);
+         my_mainLayoutPtr->addWidget(my_chatLineEditPtr);
 
          setLayout(my_mainLayoutPtr);
 
@@ -133,40 +144,77 @@ namespace seville
                  mainWindowPtr,
                  &seville::view::MainWindow::on_clientConnectionStateDidChange);
 
-//         connect(my_chatLineEditPtr,
-//                 &QLineEdit::returnPressed,
-//                 this,
-//                 &seville::view::PalaceClientWidget::
-//                 on_chatLineEditDidPressReturn);
+         connect(my_chatLineEditPtr,
+                 &QLineEdit::returnPressed,
+                 this,
+                 &seville::view::PalaceClientWidget::
+                 on_chatLineEditDidPressReturn);
       }
 
       auto PalaceClientWidget::do_setupSizing(void) -> void
       {
-         my_mainLayoutPtr->setSizeConstraint(QLayout::SetMinimumSize);
+         //my_mainLayoutPtr->setSizeConstraint(QLayout::SetMinimumSize);
 
          //my_primary_layout_ptr_->setMargin(0);
          //my_primary_layout_ptr_->setContentsMargins(0, 0, 0, 0);
          //my_primary_layout_ptr_->setSpacing(0);
          //my_primary_layout_ptr_->addStretch(1);
+         //my_mainLayoutPtr->setSizeConstraint(QLayout::SetFixedSize);
+         //my_scrollAreaPtr->layout()->setSizeConstraint(QLayout::SetFixedSize);
       }
 
       void PalaceClientWidget::do_setBackgroundImage(const QPixmap& pixmap)
       {
+         //auto backgroundImageLabelSize0 = my_backgroundImageLabelPtr->size();
+
          my_backgroundImagePixmap = pixmap;
 
+         //my_backgroundImageLabelPtr->setStyleSheet("border: 1px solid red");
          my_backgroundImageLabelPtr->setBackgroundRole(QPalette::Base);
          my_backgroundImageLabelPtr->setPixmap(pixmap);
          my_backgroundImageLabelPtr->setMask(pixmap.mask());
+         //my_backgroundImageLabelPtr->setFixedSize(pixmap.size());
          my_backgroundImageLabelPtr->adjustSize();
-         //my_backgroundImageLabelPtr->resize(my_backgroundImageLabelPtr->minimumSizeHint());
+         //my_backgroundImageLabelPtr->resize(
+         //       my_backgroundImageLabelPtr->minimumSizeHint());
 
-         my_scrollAreaPtr->setBackgroundRole(QPalette::Dark);
+         //nauto backgroundImageLabelSizeDelta =
+         //      my_backgroundImageLabelPtr->size() - backgroundImageLabelSize0;
+
+         //my_scrollAreaPtr->setSizePolicy(QSizePolicy::Fixed);
+         //my_scrollAreaPtr->setBackgroundRole(QPalette::Dark);
+         //my_scrollAreaPtr->resize(my_backgroundImageLabelPtr->size());
          //my_scrollAreaPtr->resize(my_scrollAreaPtr->minimumSizeHint());
-         my_scrollAreaPtr->updateGeometry();
+         //my_scrollAreaPtr->setMaximumSize(pixmap.size());
+         //my_scrollAreaPtr->setFixedSize(my_backgroundImageLabelPtr->size());
+         //my_scrollAreaPtr->setFixedWidth(
+         //         my_backgroundImageLabelPtr->width() + 4);
+         my_scrollAreaPtr->setFixedWidth(
+                  my_backgroundImageLabelPtr->width() + 4);
+         //auto frameWidth = my_backgroundImageLabelPtr->frameWidth();
+         //(void)frameWidth;
+                  //my_scrollAreaPtr->horizontalScrollBar()->size().width());
+         my_scrollAreaPtr->setFixedHeight(
+                  my_backgroundImageLabelPtr->height() + 4);
+         //my_scrollAreaPtr->setStyleSheet("border: 1px solid red");
+         //my_scrollAreaPtr->updateGeometry();
          my_scrollAreaPtr->adjustSize();
 
-         updateGeometry();
-         adjustSize();
+         //updateGeometry();
+         //adjustSize();
+
+//         auto mainWindowPtr = static_cast<QMainWindow*>(parent());
+//         if (mainWindowPtr != nullptr) {
+//            //mainWindowPtr->resize(pixmap.size());
+//            mainWindowPtr->updateGeometry();
+//            mainWindowPtr->adjustSize();
+
+//            mainWindowPtr->window()->updateGeometry();
+//            mainWindowPtr->window()->adjustSize();
+
+//            //mainWindowPtr->window()->layout()->update();
+//            //mainWindowPtr->window()->adjustSize();
+//         }
 
 //         if (my_palaceClientPtr != nullptr) {
 //            auto scrollAreaSizeHint = my_scrollAreaPtr->sizeHint();
@@ -191,7 +239,7 @@ namespace seville
 
 //         auto pixmapSize = my_backgroundImagePixmap.size();
 
-         emit widgetBackgroundDidChangeEvent();
+//         emit widgetBackgroundDidChangeEvent();
 //                  pixmapSize.width(), pixmapSize.height());
       }
 
@@ -271,8 +319,6 @@ namespace seville
          if (mainWindowPtr != nullptr) {
             mainWindowPtr->adjustSize();
          }
-
-
       }
 
       auto PalaceClientWidget::on_connectionStateDidChange(
@@ -287,11 +333,11 @@ namespace seville
          //   do_clearBackgroundImage();
       }
 
-//      auto PalaceClientWidget::on_chatLineEditDidPressReturn(void) -> void
-//      {
-//         auto text = my_chatLineEditPtr->text();
-//         my_palaceClientPtr->chat(text);
-//         my_chatLineEditPtr->clear();
-//      }
+      auto PalaceClientWidget::on_chatLineEditDidPressReturn(void) -> void
+      {
+         auto text = my_chatLineEditPtr->text();
+         my_palaceClientPtr->chat(text);
+         my_chatLineEditPtr->clear();
+      }
    }
 }

@@ -54,12 +54,12 @@ namespace seville
          }
 
       public slots:
-         void on_changeTopLevelEvent(bool shouldBeVisibleFlag);
-         void on_openHostConnectionEvent(void);
-         void on_closeHostConnectionEvent(void);
-         void on_quitAppEvent(void);
-         void on_aboutAppEvent(void);
-         void on_toggleLogWindowEvent(void);
+         void on_topLevelDidChange(bool shouldBeVisibleFlag);
+         void on_openHostConnectionDidTrigger(void);
+         void on_closeHostConnectionDidTrigger(void);
+         void on_quitAppDidTrigger(void);
+         void on_aboutAppDidTrigger(void);
+         void on_logWindowWasToggled(void);
          //void on_client_widget_background_did_change(void);
          //void on_clientWidgetDidResize(int width, int height);
          void on_clientConnectionStateDidChange(

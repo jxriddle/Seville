@@ -25,66 +25,60 @@ namespace seville
          return instance_ptr;
       }
 
-      auto Cipher::encipher(
-            const QByteArray& input,
-            i32 bytelimit_input) -> QByteArray
+      auto Cipher::encipher(const QByteArray& plaintext, i32 plaintextLimit)
+         -> QByteArray
       {
-         auto output = QByteArray();
-         auto bytesize_input = input.length();
-         if (bytesize_input <= 0)
-            return output;
+         auto cleanPlaintext = QByteArray();
+         auto plaintextLength = plaintext.length();
 
-         for (auto i = 0; i < bytesize_input && i < bytelimit_input; i++)
-            output.insert(i, input[i]);
+         if (plaintextLength <= 0)
+            return QByteArray();
 
-         auto lut_idx = u32{0};
-         char stored_byte = 0;
-         for (auto i = bytesize_input - 1; 0 <= i; i--) {
-            output[i] = static_cast<char>(
-                        static_cast<i16>(input[i]) ^
-                        my_lut[lut_idx++] ^
-                        static_cast<i16>(stored_byte));
-
-            stored_byte =
-                  static_cast<char>(
-                     static_cast<i16>(output[i]) ^ my_lut[lut_idx++]);
+         auto len = 0;
+         while (len < plaintextLength && len < plaintextLimit) {
+            //cleanPlaintext = plaintext.mid(0, plaintextLimit);
+            cleanPlaintext.append(plaintext[len]);
+            len++;
          }
 
-         output.append('\0');
-         return output;
+         auto ciphertext = QByteArray();
+         ciphertext.resize(len);
+         auto j = i32{0};
+         auto spareByte = u8{0};
+         for (auto i = len - 1; 0 <= i; i--) {
+            ciphertext[i] =
+                  static_cast<u8>(cleanPlaintext[i] ^ my_lut[j++] ^ spareByte);
+            spareByte = static_cast<u8>(ciphertext[i] ^ my_lut[j++]);
+         }
+         //ciphertext.append('\0');
+
+         return ciphertext;
       }
 
-      auto Cipher::decipher(const QByteArray& input) -> QByteArray
+      auto Cipher::decipher(const QByteArray& ciphertext) -> QByteArray
       {
-         auto output = QByteArray();
-         auto bytesize_input = input.length();
-         if (bytesize_input <= 0) {
-            return output;
+         auto ciphertextLen = ciphertext.length();
+
+         if (ciphertextLen <= 0)
+            return QByteArray();
+
+         auto plaintext = QByteArray();
+         plaintext.resize(ciphertextLen);
+         auto j = i32{0};
+         auto spareByte = u8{0};
+         for (auto i = ciphertextLen - 1; 0 <= i; i--) {
+            plaintext[i] =
+                  static_cast<u8>(ciphertext[i] ^ my_lut[j++] ^ spareByte);
+            spareByte = static_cast<u8>(ciphertext[i] ^ my_lut[j++]);
          }
+         plaintext.append('\0');
 
-         auto i_lookuptable = u32{0};
-         char stored_byte = 0;
-         for (auto i = bytesize_input - 1; 0 <= i; i--) {
-            output[i] =
-                  static_cast<char>(
-                     static_cast<i16>(input[i]) ^
-                     my_lut[i_lookuptable++] ^
-                  static_cast<i16>(stored_byte));
-
-            stored_byte =
-                  static_cast<char>(
-                     static_cast<i16>(input[i]) ^
-                     my_lut[i_lookuptable++]);
-         }
-
-         output.append('\0');
-         return output;
+         return plaintext;
       }
 
       auto Cipher::randomF64(void) -> f64
       {
-         return static_cast<f64>(
-               static_cast<f64>(randomI32()) / static_cast<f64>(0x7fffffff));
+         return static_cast<f64>(randomI32()) / static_cast<f64>(0x7fffffff);
       }
 
       auto Cipher::randomI32(void) -> i32
@@ -93,8 +87,7 @@ namespace seville
          auto quotient = seed / 0x1f31d;
          auto remainder = seed % 0x1f31d;
          auto a = 0x41a7 * remainder - 0xb14 * quotient;
-         setSeed(a + ((a <= 0) * 0x7fffffff));
-
+         setSeed(a + (a <= 0) * 0x7fffffff);
          return my_seed;
       }
 
@@ -116,20 +109,23 @@ namespace seville
 
       auto Cipher::do_clear(void) -> void
       {
-         my_seed = 1;
+         my_seed = 0;
       }
 
       auto Cipher::do_setSeed(int seed) -> void
       {
-         my_seed = (!seed) | seed;
+         my_seed = seed | !seed;
       }
 
       auto Cipher::do_init(void) -> void
       {
          my_seed = 0xa2c2a;
-         for (auto i = u32{0}; i < kLookupTableElementCount; i++) {
+         //for (auto i = u32{0}; i < kLookupTableElementCount; i++) {
+         for (auto i = 0; i < kLookupTableElementCount; i++) {
             my_lut[i] = randomI16(kLookupTableValueMax);
          }
+
+         my_seed = 1;
       }
    }
 }

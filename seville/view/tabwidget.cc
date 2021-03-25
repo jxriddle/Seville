@@ -38,6 +38,11 @@ namespace seville
          }
       }
 
+      auto TabWidget::currentPalaceClientPtr(void) -> palace::Client*
+      {
+         return my_currentPalaceClientPtr;
+      }
+
       auto TabWidget::clear(void) -> void
       {
          do_clear();
@@ -147,6 +152,7 @@ namespace seville
          if (mainWindowPtr != nullptr) {
             mainWindowPtr->updateGeometry();
             mainWindowPtr->adjustSize();
+
             mainWindowPtr->window()->layout()->update();
             mainWindowPtr->window()->adjustSize();
          }

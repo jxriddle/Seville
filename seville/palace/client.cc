@@ -40,7 +40,7 @@ namespace seville
          if (my_netMsg.size() < NetMsg::kHeaderSize)
             readHeaderOk = do_readNetMsgHeaderFromSocket();
          if (NetMsg::kHeaderSize <= my_netMsg.size())
-             readContentOk = do_readNetMsgContentFromSocket();
+             readContentOk = do_readNetMsgContentFromSocket(my_netMsg.len());
          return readHeaderOk && readContentOk;
       }
 
@@ -76,7 +76,7 @@ namespace seville
          return NetMsg::kHeaderSize == netMsgHeaderSize;
       }
 
-      int Client::do_readNetMsgContentFromSocket(void) {
+      int Client::do_readNetMsgContentFromSocket(i32 len) {
             //QTcpSocket* socket_ptr) -> int {
          auto contentSize_0 = my_netMsg.contentSize();
          //if (size_0 < NetMsg::kHeaderSize)
@@ -84,8 +84,8 @@ namespace seville
 
          //auto body_size = size_0 - NetMsg::kHeaderSize;
 
-         auto nBytesToCompleteContent = i32(
-                  my_netMsg.len() - contentSize_0);
+         auto nBytesToCompleteContent = i32(len - contentSize_0);
+         //         my_netMsg.len() - contentSize_0);
 
          if (0 == nBytesToCompleteContent)
             return 1;
@@ -105,9 +105,9 @@ namespace seville
          //auto sizeN = this->size();
          //auto nBytesRead = finalNetMsgSize - initialNetMsgSize;
 
-         auto nExpectedTotalBytesInBody = my_netMsg.len();
+         //auto nExpectedTotalBytesInBody = len;
 
-         return nExpectedTotalBytesInBody == my_netMsg.contentSize();
+         return len == my_netMsg.contentSize();
       /*
          if (0 < nNet::MsgBytesExpected)
          {
@@ -135,7 +135,8 @@ namespace seville
             &my_socket, QOverload<QAbstractSocket::SocketError>::of(
                      &QAbstractSocket::errorOccurred),
                   this, &Client::on_socketErrorDidOccur);
-                  //this, [this](QAbstractSocket::SocketError error) {  //&Client::on_socketError
+                  //this, [this](QAbstractSocket::SocketError error) {
+                  //&Client::on_socketError
                //QAbstractSocket::SocketError::
 
 //            connect(
@@ -242,86 +243,87 @@ namespace seville
 //         }
       }
 
-      auto Client::on_socketErrorDidOccur(QAbstractSocket::SocketError error)
-         -> void
+      auto Client::on_socketErrorDidOccur(
+            QAbstractSocket::SocketError socketError) -> void
       {
-         if (error == QAbstractSocket::SocketError::AddressInUseError) {
+         switch (socketError) {
+         case QAbstractSocket::SocketError::AddressInUseError:
             my_logger.appendErrorMessage("Address in use");
-         }
-         else if (error == QAbstractSocket::SocketError::ConnectionRefusedError) {
+            break;
+         case QAbstractSocket::SocketError::ConnectionRefusedError:
             my_logger.appendErrorMessage("Connection refused");
-         }
-         else if (error == QAbstractSocket::SocketError::DatagramTooLargeError) {
+            break;
+         case QAbstractSocket::SocketError::DatagramTooLargeError:
             my_logger.appendErrorMessage("Datagram too large");
-         }
-         else if (error == QAbstractSocket::SocketError::HostNotFoundError) {
+            break;
+         case QAbstractSocket::SocketError::HostNotFoundError:
             my_logger.appendErrorMessage("Host not found");
-         }
-         else if (error == QAbstractSocket::SocketError::NetworkError) {
+            break;
+         case QAbstractSocket::SocketError::NetworkError:
             my_logger.appendErrorMessage("Network error");
-         }
-         else if (error == QAbstractSocket::SocketError::OperationError) {
+            break;
+         case QAbstractSocket::SocketError::OperationError:
             my_logger.appendErrorMessage("Operation error");
-         }
-         else if (error == QAbstractSocket::SocketError::ProxyAuthenticationRequiredError) {
+            break;
+         case QAbstractSocket::SocketError::ProxyAuthenticationRequiredError:
             my_logger.appendErrorMessage("Proxy authentication required");
-         }
-         else if (error == QAbstractSocket::SocketError::ProxyConnectionClosedError) {
+            break;
+         case QAbstractSocket::SocketError::ProxyConnectionClosedError:
             my_logger.appendErrorMessage("Proxy connection closed");
-         }
-         else if (error == QAbstractSocket::SocketError::ProxyConnectionRefusedError) {
+            break;
+         case QAbstractSocket::SocketError::ProxyConnectionRefusedError:
             my_logger.appendErrorMessage("Proxy connection refused");
-         }
-         else if (error == QAbstractSocket::SocketError::ProxyConnectionTimeoutError) {
+            break;
+         case QAbstractSocket::SocketError::ProxyConnectionTimeoutError:
             my_logger.appendErrorMessage("Proxy connection timeout");
-         }
-         else if (error == QAbstractSocket::SocketError::ProxyNotFoundError) {
+            break;
+         case QAbstractSocket::SocketError::ProxyNotFoundError:
             my_logger.appendErrorMessage("Proxy not found");
-         }
-         else if (error == QAbstractSocket::SocketError::ProxyProtocolError) {
+            break;
+         case QAbstractSocket::SocketError::ProxyProtocolError:
             my_logger.appendErrorMessage("Proxy protocol error");
-         }
-         else if (error == QAbstractSocket::SocketError::RemoteHostClosedError) {
+            break;
+         case QAbstractSocket::SocketError::RemoteHostClosedError:
             my_logger.appendErrorMessage("Remote host closed connection");
-         }
-         else if (error == QAbstractSocket::SocketError::SocketAccessError) {
+            break;
+         case QAbstractSocket::SocketError::SocketAccessError:
             my_logger.appendErrorMessage("Socket access error");
-         }
-         else if (error == QAbstractSocket::SocketError::SocketAddressNotAvailableError) {
+            break;
+         case QAbstractSocket::SocketError::SocketAddressNotAvailableError:
             my_logger.appendErrorMessage("Socket address not available");
-         }
-         else if (error == QAbstractSocket::SocketError::SocketResourceError) {
+            break;
+         case QAbstractSocket::SocketError::SocketResourceError:
             my_logger.appendErrorMessage("Socket resource error");
-         }
-         else if (error == QAbstractSocket::SocketTimeoutError) {
+            break;
+         case QAbstractSocket::SocketError::SocketTimeoutError:
             my_logger.appendErrorMessage("Socket timeout error");
-         }
-         else if (error == QAbstractSocket::SocketError::SslHandshakeFailedError) {
+            break;
+         case QAbstractSocket::SocketError::SslHandshakeFailedError:
             my_logger.appendErrorMessage("SSL handshake failed");
-         }
-         else if (error == QAbstractSocket::SocketError::SslInternalError) {
+            break;
+         case QAbstractSocket::SocketError::SslInternalError:
             my_logger.appendErrorMessage("SSL internal error");
-         }
-         else if (error == QAbstractSocket::SocketError::SslInvalidUserDataError) {
+            break;
+         case QAbstractSocket::SocketError::SslInvalidUserDataError:
             my_logger.appendErrorMessage("SSL invalid user data");
-         }
-         else if (error == QAbstractSocket::SocketError::TemporaryError) {
+            break;
+         case QAbstractSocket::SocketError::TemporaryError:
             my_logger.appendErrorMessage("Temporary error");
-         }
-         else if (error == QAbstractSocket::SocketError::UnfinishedSocketOperationError) {
+            break;
+         case QAbstractSocket::SocketError::UnfinishedSocketOperationError:
             my_logger.appendErrorMessage("Unfinished socket operation error");
-         }
-         else if (error == QAbstractSocket::SocketError::UnknownSocketError) {
+            break;
+         case QAbstractSocket::SocketError::UnknownSocketError:
             my_logger.appendErrorMessage("Unknown socket error");
-         }
-         else if (error == QAbstractSocket::SocketError::UnsupportedSocketOperationError) {
+            break;
+         case QAbstractSocket::SocketError::UnsupportedSocketOperationError:
             my_logger.appendErrorMessage("Unsupported socket operation");
-         }
-         else {
+            break;
+         default:
             my_logger.appendErrorMessage("Unknown Socket Error");
          }
 
-         qCDebug(seville_log) << "ERROR: Socket Error";
+         //qCDebug(seville_log) << "ERROR: Socket Error";
 
          do_setConnectionState(ConnectionState::kDisconnectedState);
       }
@@ -346,6 +348,7 @@ namespace seville
 //            my_transferTimerId = 0;
 //         }
 
+         //while (do_readNetMsgHeaderFromSocket())
          while (do_receiveNetMsgFromSocket())
          {
 //            if (my_netMsgBody.size() < NetMsg::kHeaderSize)
@@ -369,8 +372,8 @@ namespace seville
 
                if (do_determineServerByteOrder() < 0)  //myNetMsg) < 0)
                {
-                  qCDebug(seville_log) <<
-                        "ERROR: Could not determine server byte order!";
+                  my_logger.appendDebugMessage(
+                           "ERROR: Could not determine server byte order!");
                   return;
                }
 
@@ -384,7 +387,6 @@ namespace seville
 
                if (do_sendLogon() < 0)
                {
-                  qCDebug(seville_log) << "ERROR: Could not send Logon!";
                   my_logger.appendErrorMessage("Error sending logon");
                   return;
                }
@@ -392,14 +394,12 @@ namespace seville
                do_setConnectionState(ConnectionState::kConnectedState);
                my_logger.appendInfoMessage(
                         QString("Connected to %1").arg(my_server.hostname()));
-               qCDebug(seville_log) << "Connected to " << my_server.hostname();
             }
             else if (my_connectionState == ConnectionState::kConnectedState &&
                      NetMsg::kHeaderSize <= my_netMsg.size() &&
                      netMsgId == NetMsg::kConnectionErrorKind)
             {
                do_setConnectionState(ConnectionState::kDisconnectedState);
-               qCDebug(seville_log) << "Disconnected by server";
                my_logger.appendErrorMessage("Disconnected by server");
             }
             else if (my_connectionState == ConnectionState::kConnectedState)
@@ -407,7 +407,6 @@ namespace seville
                do_routeReceivedNetMsg();
             }
 
-            //qCDebug(log_seville) << "Resetting NetMsg";
             my_netMsg.clear();
          }
 
@@ -417,7 +416,8 @@ namespace seville
          //my_pongTime.currentTime();
       }
 
-      auto Client::do_setConnectionState(ConnectionState connectionState) -> void
+      auto Client::do_setConnectionState(
+            ConnectionState connectionState) -> void
       {
          if (connectionState != ConnectionState::kConnectedState)
             my_pingTimer.stop();
@@ -461,11 +461,6 @@ namespace seville
                .arg(actualHostTcpPort)
                .arg(actualInitialRoom);
 
-         qCDebug(seville_log, "Connecting to palace://%s@%s:%d/%d",
-                 username.toUtf8().data(),
-                 host.toUtf8().data(),
-                 actualHostTcpPort, actualInitialRoom);
-
          my_logger.appendInfoMessage(logMsg);
 
          my_user.setUsername(username);
@@ -473,7 +468,7 @@ namespace seville
          my_server.setPort(actualHostTcpPort);
          my_room.setId(actualInitialRoom);
 
-         qCDebug(seville_log) << "Handshaking";
+         my_logger.appendDebugMessage("Handshaking");
          do_setConnectionState(ConnectionState::kHandshakingState);
          my_socket.connectToHost(host, actualHostTcpPort);
          my_pingTimer.setInterval(60000);
@@ -521,30 +516,29 @@ namespace seville
          //            (!littleEndianFlag * id);
 
          auto clientIsBigEndian = (my_byteOrder == HostByteOrder::kBigEndian);
-//         auto serverByteOrderIfServerEndianMatch =
-//               clientIsBigEndian * HostByteOrder::kBigEndian |
-//               !clientIsBigEndian * HostByteOrder::kLittleEndian;
          auto serverByteOrderIfServerEndianMismatch =
                !clientIsBigEndian * HostByteOrder::kBigEndian |
                clientIsBigEndian * HostByteOrder::kLittleEndian;
 
-         if (kind == NetMsg::kUnknownServerKind) {
-            qCDebug(seville_log) << "Server has Unknown Byte Order";
+         switch (kind) {
+         case NetMsg::kUnknownServerKind:
+            my_logger.appendDebugMessage("Server has Unknown Byte Order");
             my_server.setByteOrder(HostByteOrder::kUnknownEndian);
             result = 0;
-         }
-         else if (kind == NetMsg::kServerEndianMatchKind) {
-            qCDebug(seville_log) << "Server endian matches client";
+            break;
+         case NetMsg::kServerEndianMatchKind:
+            my_logger.appendDebugMessage("Server endian matches client");
             my_server.setByteOrder(my_byteOrder);
             result = 1;
-         }
-         else if (kind == NetMsg::kServerEndianMismatchKind) {
-            qCDebug(seville_log) << "Server endian does not match client";
+            break;
+         case NetMsg::kServerEndianMismatchKind:
+            my_logger.appendDebugMessage("Server endian does not match client");
             my_server.setByteOrder(serverByteOrderIfServerEndianMismatch);
             result = 1;
-         }
-         else {
-            qCDebug(seville_log) << "Server did not indicate its Byte Order";
+            break;
+         default:
+            my_logger.appendDebugMessage(
+                     "Server did not indicate its Byte Order");
             my_server.setByteOrder(HostByteOrder::kUnknownEndian);
             result = 0;
          }
@@ -592,8 +586,8 @@ namespace seville
                my_connectionState != ConnectionState::kConnectedState;
       }
 
-      auto Client::do_determineShouldSwapEndianness(void) const ->
-         NetMsgOptions
+      auto Client::do_determineShouldSwapEndianness(void) const
+         -> NetMsgOptions
       {
          auto notUnknownClientByteOrder =
                my_byteOrder != HostByteOrder::kUnknownEndian;
@@ -625,11 +619,13 @@ namespace seville
        */
       auto Client::do_receiveAltLogon(void) -> int
       {
+         my_logger.appendDebugMessage("> AltLogon");
+
          //auto netmsg_logon = static_cast<netmsg::NetMsgLogon>(my_netmsg_);
          //QDataStream in(my_netMsgBody);
          //in.skipRawData(76);
          //my_netmsg_in_.u32At(NetMsg::kPayloadOffset+80);
-         my_netMsg.setStreamCursorPosition(NetMsg::kHeaderSize);
+         //my_netMsg.setStreamCursorPosition(NetMsg::kHeaderSize);
 
          auto puidCounter = my_netMsg.streamReadU32();
                   //NetMsg::kLogonPuidCounterOffset);
@@ -645,10 +641,10 @@ namespace seville
             my_user.setIdCrc(puidCrc);
             my_user.setIdCounter(puidCounter);
             my_user.setIdChanged(true);
-            my_logger.appendDebugMessage("My palace user id changed by server");
+            my_logger.appendDebugMessage("My user id changed by server");
          }
          else {
-            my_logger.appendDebugMessage("My palace user id unchanged");
+            my_logger.appendDebugMessage("My user id remains unchanged");
          }
 
          return 0;
@@ -656,6 +652,8 @@ namespace seville
 
       auto Client::do_receiveAltRoomDescription(void) -> int
       {
+         my_logger.appendDebugMessage("> AltRoomDescription");
+
          // stub
          auto result = 0;
          return result;
@@ -663,6 +661,8 @@ namespace seville
 
       auto Client::do_receiveAssetIncoming(void) -> int
       {
+         my_logger.appendDebugMessage("> AssetIncoming");
+
          // stub
          auto result = 0;
          return result;
@@ -670,6 +670,8 @@ namespace seville
 
       auto Client::do_receiveAssetQuery(void) -> int
       {
+         my_logger.appendDebugMessage("> AssetQuery");
+
          // stub
          auto result = 0;
          return result;
@@ -677,6 +679,8 @@ namespace seville
 
       auto Client::do_receiveAuthenticate(void) -> int
       {
+         my_logger.appendDebugMessage("> Authenticate");
+
          // stub
          auto result = 0;
          return result;
@@ -684,6 +688,8 @@ namespace seville
 
       auto Client::do_receiveBlowthru(void) -> int
       {
+         my_logger.appendDebugMessage("> BlowThru");
+
          // stub
          auto result = 0;
          return result;
@@ -691,6 +697,8 @@ namespace seville
 
       auto Client::do_receiveConnectionError(void) -> int
       {
+         my_logger.appendDebugMessage("> ConnectionError");
+
          do_disconnectFromHost();
          my_logger.appendInfoMessage("Disconnected.");
 
@@ -700,6 +708,8 @@ namespace seville
 
       auto Client::do_receiveDoorLock(void) -> int
       {
+         my_logger.appendDebugMessage("> DoorLock");
+
          // stub
          auto result = 0;
          return result;
@@ -707,6 +717,8 @@ namespace seville
 
       auto Client::do_receiveDoorUnlock(void) -> int
       {
+         my_logger.appendDebugMessage("> DoorUnlock");
+
          // stub
          auto result = 0;
          return result;
@@ -714,6 +726,8 @@ namespace seville
 
       auto Client::do_receiveDraw(void) -> int
       {
+         my_logger.appendDebugMessage("> Draw");
+
          // stub
          auto result = 0;
          return result;
@@ -721,8 +735,10 @@ namespace seville
 
       auto Client::do_receiveHttpServerLocation(void) -> int
       {
+         my_logger.appendDebugMessage("> HttpServerLocation");
+
          auto result = 0;
-         my_netMsg.setStreamCursorPosition(NetMsg::kHeaderSize);
+         //my_netMsg.setStreamCursorPosition(NetMsg::kHeaderSize);
 
          auto url = my_netMsg.streamReadQString(256);
          my_server.setHttpServerLocation(url);
@@ -733,6 +749,8 @@ namespace seville
 
       auto Client::do_receiveMovement(void) -> int
       {
+         my_logger.appendDebugMessage("> Movement");
+
          // stub
          auto result = 0;
          return result;
@@ -740,6 +758,8 @@ namespace seville
 
       auto Client::do_receiveNavigationError(void) -> int
       {
+         my_logger.appendDebugMessage("> NavError!");
+
          // stub
          auto result = 0;
          return result;
@@ -747,6 +767,8 @@ namespace seville
 
       auto Client::do_receivePictureMove(void) -> int
       {
+         my_logger.appendDebugMessage("> PictMove");
+
          // stub
          auto result = 0;
          return result;
@@ -754,7 +776,9 @@ namespace seville
 
       auto Client::do_receivePing(void) -> int
       {
-         //my_logger.appendDebugMessage("Received Ping");
+         my_logger.appendDebugMessage("Ping!");
+
+         //my_logger.appendDebugMessage("> Ping!");
 
          do_sendPong();
          return 0;
@@ -762,9 +786,11 @@ namespace seville
 
       auto Client::do_receivePong(void) -> int
       {
+         my_logger.appendDebugMessage("> Pong");
+
          // stub
          // reset ping timer?
-         //my_logger.appendDebugMessage("Received Pong");
+         //my_logger.appendDebugMessage("> Pong!");
 
          auto result = 0;
          return result;
@@ -772,6 +798,8 @@ namespace seville
 
       auto Client::do_receivePropDelete(void) -> int
       {
+         my_logger.appendDebugMessage("> PropDelete");
+
          // stub
          auto result = 0;
          return result;
@@ -779,6 +807,8 @@ namespace seville
 
       auto Client::do_receivePropMove(void) -> int
       {
+         my_logger.appendDebugMessage("> PropMove");
+
          // stub
          auto result = 0;
          return result;
@@ -786,6 +816,8 @@ namespace seville
 
       auto Client::do_receivePropNew(void) -> int
       {
+         my_logger.appendDebugMessage("> PropNew");
+
          // stub
          auto result = 0;
          return result;
@@ -793,6 +825,8 @@ namespace seville
 
       auto Client::do_receiveRoomDescend(void) -> int
       {
+         my_logger.appendDebugMessage("> RoomDescend");
+
          // stub
          auto result = 0;
          return result;
@@ -800,7 +834,7 @@ namespace seville
 
       auto Client::do_receiveRoomDescription(void) -> int
       {
-         my_netMsg.setStreamCursorPosition(NetMsg::kHeaderSize);
+         my_logger.appendDebugMessage("> RoomDescription");
 
          my_room.setFlags(my_netMsg.streamReadU32());
          my_room.setFace(my_netMsg.streamReadU32());
@@ -870,6 +904,8 @@ namespace seville
 
       auto Client::do_receiveRoomUserList(void) -> int
       {
+         my_logger.appendDebugMessage("> RoomUserList");
+
          auto result = 0;
 
          my_room.userListPtr()->clear();
@@ -888,6 +924,8 @@ namespace seville
 
       auto Client::do_receiveServerVersion(void) -> int
       {
+         my_logger.appendDebugMessage("> ServerVersion");
+
          auto serverVersion = my_netMsg.u32At(NetMsg::kRefOffset);
          my_server.setVersion(serverVersion);
          my_logger.appendDebugMessage(
@@ -897,6 +935,8 @@ namespace seville
 
       auto Client::do_receiveServerInfo(void) -> int
       {
+         my_logger.appendDebugMessage("> ServerInfo");
+
          auto result = 0;
          // stub
 
@@ -905,13 +945,14 @@ namespace seville
 
       auto Client::do_receiveUserNew(void) -> int
       {
-         auto user = User();
+         my_logger.appendDebugMessage("> UserNew");
 
-         my_netMsg.setStreamCursorPosition(NetMsg::kHeaderSize);
+         auto user = User();
 
          user.setId(my_netMsg.streamReadI32());
          user.setY(my_netMsg.streamReadI16());
          user.setX(my_netMsg.streamReadI16());
+
          for (auto i = 0; i < User::kNumPropCells; i++) {
             auto prop = Prop();
             prop.setId(my_netMsg.streamReadU32());
@@ -946,6 +987,8 @@ namespace seville
 
       auto Client::do_receiveUserColor(void) -> int
       {
+         my_logger.appendDebugMessage("> UserColor");
+
          // stub
          auto result = 0;
          return result;
@@ -953,6 +996,8 @@ namespace seville
 
       auto Client::do_receiveUserExitRoom(void) -> int
       {
+         my_logger.appendDebugMessage("> UserExitRoom");
+
          // stub
          auto result = 0;
          return result;
@@ -960,6 +1005,8 @@ namespace seville
 
       auto Client::do_receiveUserFace(void) -> int
       {
+         my_logger.appendDebugMessage("> UserFace");
+
          // stub
          auto result = 0;
          return result;
@@ -967,12 +1014,16 @@ namespace seville
 
       auto Client::do_receiveUserProp(void) -> int
       {
+         my_logger.appendDebugMessage("> UserProp");
+
          auto result = 0;
          return result;
       }
 
       auto Client::do_receiveUserDescription(void) -> int
       {
+         my_logger.appendDebugMessage("> UserDescription");
+
          // stub
          auto result = 0;
          return result;
@@ -980,6 +1031,8 @@ namespace seville
 
       auto Client::do_receiveUserRename(void) -> int
       {
+         my_logger.appendDebugMessage("> UserRename");
+
          // stub
          auto result = 0;
          return result;
@@ -987,6 +1040,8 @@ namespace seville
 
       auto Client::do_receiveUserLeaving(void) -> int
       {
+         my_logger.appendDebugMessage("> UserLeaving");
+
          // stub
          auto result = 0;
          return result;
@@ -994,6 +1049,8 @@ namespace seville
 
       auto Client::do_receiveUserLoggedOnAndMax(void) -> int
       {
+         my_logger.appendDebugMessage("> UserLoggedOnAndMax");
+
          // stub
          auto result = 0;
          return result;
@@ -1001,6 +1058,8 @@ namespace seville
 
       auto Client::do_receiveUserStatus(void) -> int
       {
+         my_logger.appendDebugMessage("> UserStatus");
+
          // stub
          auto result = 0;
          return result;
@@ -1008,6 +1067,8 @@ namespace seville
 
       auto Client::do_receiveServerRoomList(void) -> int
       {
+         my_logger.appendDebugMessage("> ServerRoomList");
+
          // stub
          auto result = 0;
          return result;
@@ -1015,6 +1076,8 @@ namespace seville
 
       auto Client::do_receiveServerUserList(void) -> int
       {
+         my_logger.appendDebugMessage("> ServerUserList");
+
          // stub
          auto result = 0;
          return result;
@@ -1022,6 +1085,8 @@ namespace seville
 
       auto Client::do_receiveSpotMove(void) -> int
       {
+         my_logger.appendDebugMessage("> SpotMove");
+
          // stub
          auto result = 0;
          return result;
@@ -1029,6 +1094,8 @@ namespace seville
 
       auto Client::do_receiveSpotState(void) -> int
       {
+         my_logger.appendDebugMessage("> SpotState");
+
          // stub
          auto result = 0;
          return result;
@@ -1036,9 +1103,11 @@ namespace seville
 
       auto Client::do_receiveTalk(void) -> int
       {
+         my_logger.appendDebugMessage("> Talk");
+
          auto userId = my_netMsg.ref();
          auto user = my_room.userWithId(userId);
-         auto message = my_netMsg.streamReadPascalQString();
+         auto message = my_netMsg.streamReadByteArray(my_netMsg.len());
 
          my_logger.appendChatMessage(user.username(), message);
 
@@ -1047,20 +1116,33 @@ namespace seville
 
       auto Client::do_receiveWhisper(void) -> int
       {
+         my_logger.appendDebugMessage("> Whisper");
+
          // stub
          auto result = 0;
          return result;
       }
 
-      auto Client::do_receiveXtalk(void) -> int
+      auto Client::do_receiveXTalk(void) -> int
       {
-         // stub
-         auto result = 0;
-         return result;
+         my_logger.appendDebugMessage("> XTalk");
+
+         auto userId = my_netMsg.ref();
+         auto user = my_room.userWithId(userId);
+         auto messageLen = my_netMsg.streamReadU16();
+         auto cipherLen = messageLen - 3;
+         auto ciphertext = my_netMsg.streamReadByteArray(cipherLen);
+         auto message = my_cipher.decipher(ciphertext);
+
+         my_logger.appendChatMessage(user.username(), message);
+
+         return 0;
       }
 
-      auto Client::do_receiveXwhisper(void) -> int
+      auto Client::do_receiveXWhisper(void) -> int
       {
+         my_logger.appendDebugMessage("> XWhisper");
+
          // stub
          auto result = 0;
          return result;
@@ -1119,325 +1201,143 @@ namespace seville
             //    res = sendLogon_();
             //    break;
 
-         my_netMsg.resetStreamCursorPosition();
+         my_netMsg.setStreamCursorPosition(NetMsg::kHeaderSize);
 
-         if (NetMsg::kAltLogonKind == kind) {
-             //netmsg::sizes[netmsg::AltLogonKind] == size) {
-            auto message = QString("Received AltLogon"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kLogonSize != size)
-               //my_logger_.debug("(but size did not match!)");
+         switch(kind) {
+         case NetMsg::kAltLogonKind:
             result = do_receiveAltLogon();
-         } else if (NetMsg::kConnectionErrorKind == kind) {
-            auto message = QString("Received ConnectionError"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kConnectionErrorSize != size)
-               //my_logger_.debug("(but size did not match!)");
-            //auto connectionError =
-            //dynamic_cast<const netmsg::ConnectionError&>(myNetMsg);
+            break;
+         case NetMsg::kConnectionErrorKind:
             result = do_receiveConnectionError();
-         } else if (NetMsg::kServerVersionKind == kind) {
-            auto message = QString("Received ServerVersion"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kServerVersionSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kServerVersionKind:
             result = do_receiveServerVersion();
-         } else if (NetMsg::kServerInfoKind == kind) {
-            auto message = QString("Received ServerInfo"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kServerInfoSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kServerInfoKind:
             result = do_receiveServerInfo();
-         } else if (NetMsg::kUserStatusKind == kind) {
-            auto message = QString("Received UserStatus"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserStatusSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserStatusKind:
             result = do_receiveUserStatus();
-         } else if (NetMsg::kUserLoggedOnAndMaxKind == kind) {
-            auto message =
-                  QString("Received UserLoggedOnAndMax"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserLoggedOnAndMaxSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserLoggedOnAndMaxKind:
             result = do_receiveUserLoggedOnAndMax();
-         } else if (NetMsg::kHttpServerLocationKind == kind) {
-            auto message =
-                  QString("Received HttpServerLocation"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (size < NetMsgSize::kHttpServerLocationSize)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kHttpServerLocationKind:
             result = do_receiveHttpServerLocation();
-         } else if (NetMsg::kRoomUserListKind == kind) {
-            auto message = QString("Received RoomUserList"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (size < NetMsgSize::kRoomUserListSize)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kRoomUserListKind:
             result = do_receiveRoomUserList();
-         } else if (NetMsg::kServerUserListKind == kind) {
-            auto message = QString("Received ServerUserList"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (size < NetMsgSize::kServerUserListSize)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kServerUserListKind:
             result = do_receiveServerUserList();
-         } else if (NetMsg::kServerRoomListKind == kind) {
-            auto message = QString("Received ServerRoomList"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (size < NetMsgSize::kServerRoomListSize)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kServerRoomListKind:
             result = do_receiveServerRoomList();
-         } else if (NetMsg::kRoomDescendKind == kind) {
-            auto message = QString("Received RoomDescend"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (size < NetMsgSize::kRoomDescendedSize)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kRoomDescendKind:
             result = do_receiveRoomDescend();
-         } else if (NetMsg::kUserNewKind == kind) {
-            auto message = QString("Received UserNew"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserNewSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserNewKind:
             result = do_receiveUserNew();
-         } else if (NetMsg::kPingKind == kind) {
-            auto message = QString("Received Ping"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kPingSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kPingKind:
             result = do_receivePing();
-         } else if (NetMsg::kPongKind == kind) {
-            auto message = QString("Received Pong"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kPongSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kPongKind:
             result = do_receivePong();
-         } else if (NetMsg::kXTalkKind == kind) {
-            auto message = QString("Received XTalk"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (size < NetMsgSize::kXTalkSize)
-               //my_logger_.debug("(but size did not match!)");
-            result = do_receiveXtalk();
-         } else if (NetMsg::kXWhisperKind == kind) {
-            auto message = QString("Received XWhisper"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (size < NetMsgSize::kXWhisperSize)
-               //my_logger_.debug("(but size did not match!)");
-            result = do_receiveXwhisper();
-         } else if (NetMsg::kTalkKind == kind) {
-            auto message = QString("Received Talk"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (size < NetMsgSize::kTalkSize)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kXTalkKind:
+            result = do_receiveXTalk();
+            break;
+         case NetMsg::kXWhisperKind:
+            result = do_receiveXWhisper();
+            break;
+         case NetMsg::kTalkKind:
             result = do_receiveTalk();
-         } else if (NetMsg::kWhisperKind == kind) {
-            auto message = QString("Received Whisper"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (size < NetMsgSize::kWhisperSize)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kWhisperKind:
             result = do_receiveWhisper();
-         } else if (NetMsg::kAssetIncomingKind == kind) {
-            auto message = QString("Received AssetIncoming"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kAssetIncomingSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kAssetIncomingKind:
             result = do_receiveAssetIncoming();
-         } else if (NetMsg::kAssetQueryKind == kind) {
-            auto message = QString("Received AssetQuery"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kAssetQuerySize != size)
-               //my_logger.appendDebugMessage("(but size did not match!");
+            break;
+         case NetMsg::kAssetQueryKind:
             result = do_receiveAssetQuery();
-         } else if (NetMsg::kMovementKind == kind) {
-            auto message = QString("Received Movement"); //.arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kMovementSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kMovementKind:
             result = do_receiveMovement();
-         } else if (NetMsg::kUserColorKind == kind) {
-            auto message = QString("Received UserColor"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserColorSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserColorKind:
             result = do_receiveUserColor();
-         } else if (NetMsg::kUserFaceKind == kind) {
-            auto message = QString("Received UserFace"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserFaceSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserFaceKind:
             result = do_receiveUserFace();
-         } else if (NetMsg::kUserPropKind == kind) {
-            auto message = QString("Received UserProp"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserPropSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserPropKind:
             result = do_receiveUserProp();
-         } else if (NetMsg::kUserDescriptionKind == kind) {
-            auto message = QString("Received UserDescription"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserDescriptionSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserDescriptionKind:
             result = do_receiveUserDescription();
-         } else if (NetMsg::kUserRenameKind == kind) {
-            auto message = QString("Received UserRename"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserRenameSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserRenameKind:
             result = do_receiveUserRename();
-         } else if (NetMsg::kUserLeavingKind == kind) {
-            auto message = QString("Received UserLeaving"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserLeavingSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserLeavingKind:
             result = do_receiveUserLeaving();
-         } else if (NetMsg::kUserExitRoomKind == kind) {
-            auto message = QString("Received UserExitRoom"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kUserExitRoomSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kUserExitRoomKind:
             result = do_receiveUserExitRoom();
-         } else if (NetMsg::kPropMoveKind == kind) {
-            auto message = QString("Received PropMove"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kPropMoveSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kPropMoveKind:
             result = do_receivePropMove();
-         } else if (NetMsg::kPropDeleteKind == kind) {
-            auto message = QString("Received PropDelete"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kPropDeleteSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kPropDeleteKind:
             result = do_receivePropDelete();
-         } else if (NetMsg::kPropNewKind == kind) {
-            auto message = QString("Received PropNew"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kPropNewSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kPropNewKind:
             result = do_receivePropNew();
-         } else if (NetMsg::kDoorLockKind == kind) {
-            auto message = QString("Received DoorLock"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kDoorLockSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kDoorLockKind:
             result = do_receiveDoorLock();
-         } else if (NetMsg::kDoorUnlockKind == kind) {
-            auto message = QString("Received DoorUnlock"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kDoorUnlockSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kDoorUnlockKind:
             result = do_receiveDoorUnlock();
-         } else if (NetMsg::kPictMoveKind == kind) {
-            auto message = QString("Received PictMove"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kPictMoveSize == size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kPictMoveKind:
             result = do_receivePictureMove();
-         } else if (NetMsg::kSpotStateKind == kind) {
-            auto message = QString("Received SpotState"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kSpotStateSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kSpotStateKind:
             result = do_receiveSpotState();
-         } else if (NetMsg::kSpotMoveKind == kind) {
-            auto message = QString("Received SpotMove"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kSpotMoveSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kSpotMoveKind:
             result = do_receiveSpotMove();
-         } else if (NetMsg::kDrawKind == kind) {
-            auto message = QString("Received Draw"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kDrawSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kDrawKind:
             result = do_receiveDraw();
-         } else if (NetMsg::kNavErrorKind == kind) {
-            auto message = QString("Received NavError"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kNavErrorSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kNavErrorKind:
             result = do_receiveNavigationError();
-         } else if (NetMsg::kBlowThruKind == kind) {
-            auto message = QString("Received BlowThru"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kBlowThruSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kBlowThruKind:
             result = do_receiveBlowthru();
-         } else if (NetMsg::kAuthenticateKind == kind) {
-            auto message = QString("Received Authenticate"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kAuthenticateSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kAuthenticateKind:
             result = do_receiveAuthenticate();
-         } else if (NetMsg::kAltRoomDescriptionKind == kind) {
-            auto message = QString("Received AltRoomDescription"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kAltRoomDescriptionSize != size)
-               //my_logger_.debug("(but size did not match!)");
+            break;
+         case NetMsg::kAltRoomDescriptionKind:
+            result = do_receiveAltRoomDescription();
+            break;
+         case NetMsg::kRoomDescriptionKind:
             result = do_receiveRoomDescription();
-         } else if (NetMsg::kRoomDescriptionKind == kind) {
-            auto message = QString("Received RoomDescription"); // (%1)").arg(size);
-            qCDebug(seville_log) << message;
-            my_logger.appendDebugMessage(message);
-            //if (NetMsgSize::kRoomDescriptionSize != size)
-               //my_logger_.debug("(but size did not match!)");
-            result = do_receiveRoomDescription();
-         } else {
-            auto message =
+            break;
+         default:
+            auto logMessage =
                   QString("Received Unknown NetMsg: { 0x%1, 0x%2, 0x%3 }")
                   .arg(my_netMsg.id(), 2, 16, QChar('0'))
                   .arg(my_netMsg.len(), 2, 16, QChar('0'))
                   .arg(my_netMsg.ref(), 2, 16, QChar('0'));
 
-            my_logger.appendDebugMessage(message);
-            qCDebug(seville_log) << "Received unknown NetMsg" << message;
-//            qCDebug(log_seville)
-//                  << "kind:  "
-//                  << QString("0x%1").arg(my_netmsg_.id(), 2, 16, QChar('0'));
-//            qCDebug(log_seville)
-//                  << "expected size: "
-//                  << QString("0x%1").arg(my_netmsg_.len(), 2, 16, QChar('0'));
-//            qCDebug(log_seville)
-//                  << "reference code: "
-//                  << QString("0x%1").arg(my_netmsg_.ref(), 2, 16, QChar('0'));
+            my_logger.appendDebugMessage(logMessage);
             result = 0;
          }
 
@@ -1446,7 +1346,6 @@ namespace seville
 
       auto Client::do_sendLogon(void) -> int
       {
-         auto result = 0;
          auto logonMsg = NetMsg(do_determineShouldSwapEndianness());
 
          //QByteArray logon_netmsg;
@@ -1603,9 +1502,7 @@ namespace seville
 
          //my_socket_.write(netmsg_logon);
          my_socket.write(logonMsg);
-         result = my_socket.flush();
-
-         return result;
+         return my_socket.flush();
       }
 
       auto Client::do_sendAuthenticate(
@@ -1619,27 +1516,26 @@ namespace seville
          if (!result)
             return result;
 
-         auto authMsg = NetMsg();
+         auto authMsg = NetMsg(do_determineShouldSwapEndianness());
+
          authMsg.setId(NetMsg::kAuthenticateKind);
          authMsg.setLen(0);
          authMsg.setRef(NetMsg::kNoRef);
 
          my_socket.write(authMsg);
-         my_socket.flush();
-
-         return result;
+         return my_socket.flush();
       }
 
       auto Client::do_sendTalk(const QString& text) -> int
       {
-         auto talkMsg = NetMsg();
+         auto talkMsg = NetMsg(do_determineShouldSwapEndianness());
 
          talkMsg.setId(NetMsg::kTalkKind);
-         // TODO (do_maybeSwapByteOrder(NetMsg::kTalkKind));
          talkMsg.setLen(text.length());
          talkMsg.setRef(my_user.id());
 
-         talkMsg.appendPascalQString(text);
+         talkMsg.append(text.toUtf8());
+         talkMsg.append('\0');
 
          my_socket.write(talkMsg);
          return my_socket.flush();
@@ -1647,17 +1543,18 @@ namespace seville
 
       auto Client::do_sendXTalk(const QString& text) -> int
       {
-         auto xTalkMsg = NetMsg();
+         auto xTalkMsg = NetMsg(do_determineShouldSwapEndianness());
 
          xTalkMsg.setId(NetMsg::kXTalkKind);
-         // TODO (do_maybeSwapByteOrder(NetMsg::kTalkKind));
-         xTalkMsg.setLen(text.length() + 3);
-         //xTalkMsg.setRef(my_user.id());
-         xTalkMsg.setRef(0);
+         auto len = text.length() + 3;
+         xTalkMsg.setLen(len);
+         xTalkMsg.setRef(my_user.id());
 
-         auto cipherText = my_cipher.encipher(text.toUtf8());
-         xTalkMsg.appendI16(cipherText.length() + 3);
-         xTalkMsg.appendQString(cipherText);
+         auto plaintext = text.toUtf8();
+         auto ciphertext = my_cipher.encipher(plaintext);
+         xTalkMsg.appendU16(len);
+         xTalkMsg.append(ciphertext);
+         xTalkMsg.append('\0');
 
          my_socket.write(xTalkMsg);
          return my_socket.flush();
@@ -1665,42 +1562,28 @@ namespace seville
 
       auto Client::do_sendPing(void) -> int
       {
-         auto pingMsg = palace::NetMsg();
+         auto pingMsg = palace::NetMsg(do_determineShouldSwapEndianness());
 
-//         pingMsg.setId(NetMsg::kPingKind);
-//         pingMsg.setLen(0);
-//         //ping_msg.setRef(my_user.id());
-//         pingMsg.setRef(NetMsg::kNoRef);
          pingMsg.setId(NetMsg::kPingKind);
          pingMsg.setLen(0);
          pingMsg.setRef(NetMsg::kNoRef);
 
          my_socket.write(pingMsg);
-         my_socket.flush();
-
-         my_logger.appendDebugMessage(QString("Sent Ping"));
-
-         return 0;
+         my_logger.appendDebugMessage(QString("Ping!"));
+         return my_socket.flush();
       }
 
       auto Client::do_sendPong(void) -> int
       {
-         auto pongMsg = palace::NetMsg();
+         auto pongMsg = palace::NetMsg(do_determineShouldSwapEndianness());
 
-//         pong_msg.setId(NetMsg::kPongKind);
-//         pong_msg.setLen(0);
-//         //pong_msg.set_ref(my_user_.id());
-//         pong_msg.setRef(0);
-         pongMsg.appendI32(NetMsg::kPongKind);
-         pongMsg.appendI32(0);
-         pongMsg.appendI32(NetMsg::kNoRef);
+         pongMsg.setId(NetMsg::kPongKind);
+         pongMsg.setLen(0);
+         pongMsg.setRef(NetMsg::kNoRef);
 
          my_socket.write(pongMsg);
-         my_socket.flush();
-
-         my_logger.appendDebugMessage(QString("Sent Pong"));
-
-         return 0;
+         my_logger.appendDebugMessage(QString("Pong!"));
+         return my_socket.flush();
       }
 
       auto Client::do_sendGotoRoom(i16 roomId) -> int
@@ -1711,7 +1594,7 @@ namespace seville
          my_room.userListPtr()->clear();
          my_room.setId(roomId);
 
-         auto gotoroomMsg = palace::NetMsg();
+         auto gotoroomMsg = palace::NetMsg(do_determineShouldSwapEndianness());
          gotoroomMsg.setId(NetMsg::kGotoRoomKind);
          gotoroomMsg.setLen(NetMsg::kGotoRoomLen);
          gotoroomMsg.setRef(NetMsg::kNoRef);
@@ -1719,9 +1602,7 @@ namespace seville
          gotoroomMsg.appendI16(roomId);
 
          my_socket.write(gotoroomMsg);
-         my_socket.flush();
-
-         return 0;
+         return my_socket.flush();
       }
 
       auto Client::do_sendMove(i16 x, i16 y) -> int
@@ -1738,10 +1619,8 @@ namespace seville
          moveMsg.appendI16(x);
 
          my_socket.write(moveMsg);
-         my_socket.flush();
-
          // emit userMove signal to invalidate view
-         return 0;
+         return my_socket.flush();
       }
 
       auto Client::do_deinit(void) -> void
@@ -1754,7 +1633,7 @@ namespace seville
          do_setupEvents();
 
          do_clear();
-         my_logger.setMode(LogMode::kDebugMode);
+         //my_logger.setMode(LogMode::kDebugMode);
          //my_logger_.setIsDebugMode(true);
       }
    }

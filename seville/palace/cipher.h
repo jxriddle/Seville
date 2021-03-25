@@ -25,10 +25,10 @@ namespace seville
          //std::optional<Cipher*>;
 
          auto encipher(
-               const QByteArray& input,
-               i32 byte_limit = kPlaintextLimit) -> QByteArray;
+               const QByteArray& plaintext,
+               i32 plaintextLimit = kPlaintextLimit) -> QByteArray;
 
-         auto decipher(const QByteArray& input) -> QByteArray;
+         auto decipher(const QByteArray& ciphertext) -> QByteArray;
 
          auto randomI8(i8 max) -> i8;
          auto randomI16(i16 max) -> i16;
@@ -53,11 +53,11 @@ namespace seville
 //         }
 
       private:
-         short my_lut[kLookupTableElementCount];
+         i16 my_lut[kLookupTableElementCount];
          i32 my_seed;
 
          auto do_init(void) -> void;
-         auto do_setSeed(int seed) -> void;
+         auto do_setSeed(i32 seed) -> void;
          auto do_deinit(void) -> void;
          auto do_clear(void) -> void;
       };

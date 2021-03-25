@@ -40,8 +40,9 @@ namespace seville
 
          inline auto userWithId(u32 userId) -> User {
             for (auto& user: my_userList) {
-               if (user.id() == userId)
+               if (user.id() == userId) {
                   return user;
+               }
             }
 
             return User();

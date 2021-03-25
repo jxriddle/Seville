@@ -289,7 +289,7 @@ namespace seville
 //            return do_headerSize();
 //         }
 
-         inline auto contentSize(void) -> u32 {
+         inline auto contentSize(void) -> i32 {
             return do_contentSize();
          }
 

@@ -362,6 +362,12 @@ namespace seville
          my_streamCursorPosition = 0;
       }
 
+      inline auto streamReadByteArray(i32 len) {
+         auto value = do_byteArrayAt(my_streamCursorPosition, len);
+         my_streamCursorPosition += len;
+         return value;
+      }
+
       inline auto streamReadI64(void) -> i64 {
          auto value = do_i64At(my_streamCursorPosition);
          my_streamCursorPosition += sizeof(i64);
@@ -725,7 +731,20 @@ namespace seville
 //         return QString::fromStdString(s);
 //      }
 
+      auto do_stdStringFromQString(const QString& value)
+         -> std::string {
+         std::string result;
+
+         for (auto i = 0; i < value.length(); i++) {
+            auto c = value[i].cell();
+            result += c;
+         }
+
+         return result;
+      }
+
       auto do_setQStringAt(int offset, const QString& value) -> void {
+         //auto stdString = do_stdStringFromQString(value);
          do_setStringAt(offset, value.toStdString());
       }
 
@@ -930,6 +949,14 @@ namespace seville
 
       auto do_setU8At(int offset, u8 value) -> void {
          insert(static_cast<int>(offset), static_cast<char>(value));
+      }
+
+      auto do_byteArrayAt(int offset, i32 len) -> ByteArray {
+         auto b = ByteArray();
+         for (auto i = 0; i < len; i++) {
+            b.appendU8(static_cast<u8>(at(offset + i)));
+         }
+         return b;
       }
 
       auto do_appendI64(i64 value) -> void {

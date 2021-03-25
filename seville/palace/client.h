@@ -280,7 +280,7 @@ namespace seville
          }
 
          inline auto disconnectFromHost(void) -> void {
-            my_logger.appendInfoMessage("Disconnected.");
+            //my_logger.appendInfoMessage("Disconnected.");
             do_disconnectFromHost();
             this->isBigEndian();
          }
@@ -367,7 +367,7 @@ namespace seville
 
          int do_receiveNetMsgFromSocket(void);
          int do_readNetMsgHeaderFromSocket(void);
-         int do_readNetMsgContentFromSocket(void);
+         int do_readNetMsgContentFromSocket(i32 len);
 
          void do_connectToHost(
                QString host,
@@ -423,8 +423,8 @@ namespace seville
          int do_receiveSpotState(void);
          int do_receiveTalk(void);
          int do_receiveWhisper(void);
-         int do_receiveXtalk(void);
-         int do_receiveXwhisper(void);
+         int do_receiveXTalk(void);
+         int do_receiveXWhisper(void);
 
          int do_sendLogon(void);
          int do_sendAuthenticate(

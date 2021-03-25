@@ -52,7 +52,7 @@ namespace seville
          void on_backgroundImageDidLoad(void);
          void on_connectionStateDidChange(
                palace::ConnectionState connectionState);
-         //void on_chatLineEditDidPressReturn(void);
+         void on_chatLineEditDidPressReturn(void);
          //void on_currentTabDidChange(int index);
 
       private:

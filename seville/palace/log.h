@@ -10,8 +10,8 @@
 #include <QString>
 #include <QWidget>
 
+#include "seville/base/sevilleapp.h"
 #include "seville/base/types.h"
-
 #include "seville/palace/logentry.h"
 
 namespace seville
@@ -126,6 +126,7 @@ namespace seville
          }
 
          inline auto appendDebugMessage(const QString& message) -> void {
+            qCDebug(seville_log) << message;
             if (LogMode::kDebugMode == my_mode)
                do_appendLogEntry(
                         LogEntry(
