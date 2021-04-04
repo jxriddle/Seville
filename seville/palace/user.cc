@@ -6,6 +6,7 @@ namespace seville
    {
       void User::do_clear(void)
       {
+         my_id = 0;
          my_color = 1;
          my_face = 1;
          my_x = 0;
@@ -24,6 +25,7 @@ namespace seville
 
       void User::do_assign(const User& user)
       {
+         my_id = user.my_id;
          my_color = user.my_color;
          my_face = user.my_face;
          my_x = user.my_x;
@@ -35,6 +37,7 @@ namespace seville
          my_regCrc = user.my_regCrc;
          my_username = user.my_username;
          my_wizardPassword = user.my_wizardPassword;
+         my_roomId = user.my_roomId;
 
          for (auto& prop: user.my_propList) {
             my_propList.push_back(prop);

@@ -33,15 +33,19 @@ namespace seville
          do_deinit();
       }
 
-      auto Client::do_receiveNetMsgFromSocket(void) -> int
+      //auto Client::do_receiveNetMsgFromSocket(void) -> int
+      auto Client::do_receiveNetMsgFromSocket(void) -> std::tuple<int, NetMsg>
       {
+         NetMsg netMsg;
+
          auto readHeaderOk = 0;
          auto readContentOk = 0;
          if (my_netMsg.size() < NetMsg::kHeaderSize)
             readHeaderOk = do_readNetMsgHeaderFromSocket();
          if (NetMsg::kHeaderSize <= my_netMsg.size())
              readContentOk = do_readNetMsgContentFromSocket(my_netMsg.len());
-         return readHeaderOk && readContentOk;
+         //return readHeaderOk && readContentOk;
+         return { readHeaderOk && readContentOk, netMsg };
       }
 
       int Client::do_readNetMsgHeaderFromSocket() { //_from_socket_ptr_(
@@ -71,7 +75,7 @@ namespace seville
          auto netMsgHeaderSize = my_netMsg.size();
 
          if (NetMsg::kHeaderSize == netMsgHeaderSize)
-            my_netMsg.reserve(NetMsg::kHeaderSize + my_netMsg.len());
+            my_netMsg.resize(NetMsg::kHeaderSize + my_netMsg.len());
 
          return NetMsg::kHeaderSize == netMsgHeaderSize;
       }
@@ -349,7 +353,8 @@ namespace seville
 //         }
 
          //while (do_readNetMsgHeaderFromSocket())
-         while (do_receiveNetMsgFromSocket())
+         auto netMsgPtr = do_receiveNetMsgFromSocket();
+         while (0 < my_socket.bytesAvailable() && netMsgPtr != nullptr)
          {
 //            if (my_netMsgBody.size() < NetMsg::kHeaderSize)
 //            {
@@ -407,7 +412,11 @@ namespace seville
                do_routeReceivedNetMsg();
             }
 
-            my_netMsg.clear();
+            auto lengthActual = my_netMsg.length();
+            auto lengthExpected = my_netMsg.len() + NetMsg::kHeaderSize;
+            if (NetMsg::kHeaderSize <= lengthActual &&
+                static_cast<i32>(lengthExpected) <= lengthActual)
+               my_netMsg.clear();
          }
 
          //my_pingTimer.start();
@@ -435,13 +444,21 @@ namespace seville
          if (text.length() <= 0)
             return;
 
-         // TODO is this a client command? interpret it here.
+         auto isLocalCommand = false;
+         if (text.toStdString() == "'who") {
+            isLocalCommand = true;
+            auto userListPtr = my_room.userListPtr();
+            for (auto i = u32{0}; i < userListPtr->size(); i++) {
+               auto user = my_room.userListPtr()->at(i);
+               my_logger.appendInfoMessage(
+                        QString("%1 (%2) is here")
+                        .arg(user.username())
+                        .arg(user.id()));
+            }
+         }
 
-         // TODO if not, send as a chat message.
-         do_sendXTalk(text);
-
-         // add the message to the log if it doesn't make a round trip.
-
+         if (!isLocalCommand)
+            do_sendXTalk(text);
       }
 
       auto Client::do_connectToHost(
@@ -913,9 +930,7 @@ namespace seville
          auto roomUserCount = i32(my_netMsg.ref());
          for (auto i = 0; i < roomUserCount; i++) {
             auto user = User();
-            // streamRead UserNew...
             do_receiveUserNew();
-
             my_room.userListPtr()->push_back(user);
          }
 
@@ -980,6 +995,7 @@ namespace seville
          user.setUsername(my_netMsg.streamReadPascalQString());
 
          my_room.userListPtr()->push_back(user);
+         my_room.setUserCount(my_room.userCount() + 1);
 
          auto result = 0;
          return result;
@@ -1129,12 +1145,20 @@ namespace seville
 
          auto userId = my_netMsg.ref();
          auto user = my_room.userWithId(userId);
+
          auto messageLen = my_netMsg.streamReadU16();
          auto cipherLen = messageLen - 3;
          auto ciphertext = my_netMsg.streamReadByteArray(cipherLen);
          auto message = my_cipher.decipher(ciphertext);
 
-         my_logger.appendChatMessage(user.username(), message);
+         auto username = user.username();
+         //auto id = user.id();
+         my_logger.appendChatMessage(
+//                  QString("%1 (%2)")
+//                  .arg(username)
+//                  .arg(id),
+         username,
+                  message);
 
          return 0;
       }
@@ -1346,7 +1370,8 @@ namespace seville
 
       auto Client::do_sendLogon(void) -> int
       {
-         auto logonMsg = NetMsg(do_determineShouldSwapEndianness());
+         auto shouldSwapEndianness = do_determineShouldSwapEndianness();
+         auto logonMsg = NetMsg(shouldSwapEndianness);
 
          //QByteArray logon_netmsg;
          //QDataStream out(&logon_netmsg, QIODevice::WriteOnly);
@@ -1370,10 +1395,10 @@ namespace seville
                   my_user.username(), NetMsg::kLogonMaximumUsernameSize);
          logonMsg.appendFixedPascalQString(
                   my_user.wizPass(), NetMsg::kLogonWizardPasswordSize);
-         logonMsg.appendU32(my_user.idCounter());
-         logonMsg.appendU32(my_user.idCrc());
          logonMsg.appendU32(
                   FlagAuxOptions::kAuthenticate | FlagAuxOptions::kWin32);
+         logonMsg.appendU32(my_user.idCounter());
+         logonMsg.appendU32(my_user.idCrc());
          logonMsg.appendU32(kMagicFromPChat);
          logonMsg.appendU32(kMagicFromPChat);
          logonMsg.appendU32(kMagicFromPChat);
@@ -1501,8 +1526,8 @@ namespace seville
 //         msg.appendU32(0); /* ul3dEngineCaps* */
 
          //my_socket_.write(netmsg_logon);
-         my_socket.write(logonMsg);
-         return my_socket.flush();
+         return my_socket.write(logonMsg);
+         //return my_socket.flush();
       }
 
       auto Client::do_sendAuthenticate(
@@ -1522,8 +1547,8 @@ namespace seville
          authMsg.setLen(0);
          authMsg.setRef(NetMsg::kNoRef);
 
-         my_socket.write(authMsg);
-         return my_socket.flush();
+         return my_socket.write(authMsg);
+         //return my_socket.flush();
       }
 
       auto Client::do_sendTalk(const QString& text) -> int
@@ -1537,8 +1562,8 @@ namespace seville
          talkMsg.append(text.toUtf8());
          talkMsg.append('\0');
 
-         my_socket.write(talkMsg);
-         return my_socket.flush();
+         return my_socket.write(talkMsg);
+         //return my_socket.flush();
       }
 
       auto Client::do_sendXTalk(const QString& text) -> int
@@ -1556,8 +1581,8 @@ namespace seville
          xTalkMsg.append(ciphertext);
          xTalkMsg.append('\0');
 
-         my_socket.write(xTalkMsg);
-         return my_socket.flush();
+         return my_socket.write(xTalkMsg);
+         //return my_socket.flush();
       }
 
       auto Client::do_sendPing(void) -> int
@@ -1568,9 +1593,9 @@ namespace seville
          pingMsg.setLen(0);
          pingMsg.setRef(NetMsg::kNoRef);
 
-         my_socket.write(pingMsg);
          my_logger.appendDebugMessage(QString("Ping!"));
-         return my_socket.flush();
+         return my_socket.write(pingMsg);
+         //return my_socket.flush();
       }
 
       auto Client::do_sendPong(void) -> int
@@ -1581,9 +1606,9 @@ namespace seville
          pongMsg.setLen(0);
          pongMsg.setRef(NetMsg::kNoRef);
 
-         my_socket.write(pongMsg);
          my_logger.appendDebugMessage(QString("Pong!"));
-         return my_socket.flush();
+         return my_socket.write(pongMsg);
+         //return my_socket.flush();
       }
 
       auto Client::do_sendGotoRoom(i16 roomId) -> int
@@ -1601,8 +1626,8 @@ namespace seville
 
          gotoroomMsg.appendI16(roomId);
 
-         my_socket.write(gotoroomMsg);
-         return my_socket.flush();
+         return my_socket.write(gotoroomMsg);
+         //return my_socket.flush();
       }
 
       auto Client::do_sendMove(i16 x, i16 y) -> int
@@ -1618,9 +1643,9 @@ namespace seville
          moveMsg.appendI16(y);
          moveMsg.appendI16(x);
 
-         my_socket.write(moveMsg);
          // emit userMove signal to invalidate view
-         return my_socket.flush();
+         return my_socket.write(moveMsg);
+         //return my_socket.flush();
       }
 
       auto Client::do_deinit(void) -> void

@@ -137,7 +137,8 @@ namespace seville
                  &seville::view::PalaceClientWidget::
                  on_connectionStateDidChange);
 
-         //auto mainWindowPtr = static_cast<view::MainWindow*>(this->parent()->parent());
+         //auto mainWindowPtr =
+         //static_cast<view::MainWindow*>(this->parent()->parent());
          auto mainWindowPtr = do_mainWindowPtr(); //sevilleApp.mainWindowPtr();
          connect(my_palaceClientPtr,
                  &seville::palace::Client::connectionStateDidChangeEvent,
@@ -294,7 +295,8 @@ namespace seville
          }
       }
 
-      //auto ClientWidget::on_background_image_did_change(int width, int height) -> void
+      //auto ClientWidget::on_background_image_did_change(
+      // int width, int height) -> void
       //{
          //auto background_image =
          //      my_palace_client_ptr_->current_room_ptr()->background_image();

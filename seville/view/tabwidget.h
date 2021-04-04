@@ -44,10 +44,13 @@ namespace seville
             palace::Client* my_currentPalaceClientPtr;
 
             auto do_setupView(void) -> void;
-            auto do_addNewTab(QWidget* contentWidgetPtr = nullptr) -> void;
             auto do_setupEvents(void) -> void;
             auto do_setupSizing(void) -> void;
+
+            auto do_addNewTab(QWidget* contentWidgetPtr = nullptr) -> void;
+
             auto do_clear(void) -> void;
+            auto do_init(QWidget* contentWidgetPtr = nullptr) -> void;
       };
    }
 }

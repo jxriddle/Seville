@@ -99,6 +99,8 @@ namespace seville
          auto do_setupEvents(void) -> void;
          auto do_setupSizing(void) -> void;
 
+         auto do_updateMenus(void) -> void;
+
          auto do_init(void) -> void;
       };
    }

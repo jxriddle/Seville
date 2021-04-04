@@ -30,7 +30,7 @@ namespace seville
       void MainWindow::on_closeHostConnectionDidTrigger(void)
       {
          //auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
-
+         do_updateMenus();
          my_tabWidgetPtr->removeTab(my_tabWidgetPtr->currentIndex());
       }
 
@@ -49,20 +49,8 @@ namespace seville
       void MainWindow::
       on_clientConnectionStateDidChange(palace::ConnectionState connectionState)
       {
-         if (palace::ConnectionState::kConnectedState ==
-               connectionState) {
-            my_openHostConnectionActionPtr->setEnabled(false);
-            my_closeHostConnectionActionPtr->setEnabled(true);
-         }
-         else if (palace::ConnectionState::kHandshakingState ==
-                  connectionState) {
-            my_openHostConnectionActionPtr->setEnabled(false);
-            my_closeHostConnectionActionPtr->setEnabled(true);
-         }
-         else { //if (palace::ConnectionState::kDisconnectedClientState) {
-            my_openHostConnectionActionPtr->setEnabled(true);
-            my_closeHostConnectionActionPtr->setEnabled(false);
-         }
+         (void)connectionState;
+         do_updateMenus();
       }
 
       void MainWindow::on_quitAppDidTrigger(void)
@@ -166,9 +154,9 @@ namespace seville
          my_mainLayoutPtr = layout();
 
          //layout()->addWidget(my_tabWidget_ptr);
-         auto clientWidget_ptr = new view::PalaceClientWidget(this);
+         //auto clientWidget_ptr = new view::PalaceClientWidget(this);
          //connect(palRoomWidget, )
-         my_tabWidgetPtr->addNewTab(clientWidget_ptr);
+         //my_tabWidgetPtr->addNewTab(clientWidget_ptr);
 
          //mainLayout_->setSpacing(0);
          //mainLayout_->addWidget(tabWidget_, 1);
@@ -241,9 +229,9 @@ namespace seville
          my_editMenuPtr->addSeparator();
 
          // Window Menu
-         //myWindowMenu->addAction(myToggleLogAction);
-         //my_windowMenuPtr->addAction(
-         //         my_logDockWidgetPtr->toggleViewAction());
+         //my_windowMenuPtr->addAction(my_toggleLogActionPtr);
+         my_windowMenuPtr->addAction(
+                  my_logDockWidgetPtr->toggleViewAction());
 
          // About Menu
          my_helpMenuPtr->addSeparator();
@@ -280,8 +268,8 @@ namespace seville
       auto MainWindow::do_setupEvents(void) -> void
       {
          // Connect Action Signals to Slots
-         //connect(my_logDockWidgetPtr, &QDockWidget::topLevelChanged,
-         //        this, &seville::view::MainWindow::on_changeTopLevelEvent);
+         connect(my_logDockWidgetPtr, &QDockWidget::topLevelChanged,
+                 this, &seville::view::MainWindow::on_topLevelDidChange);
 
          connect(my_openHostConnectionActionPtr, &QAction::triggered,
                  this, &seville::view::MainWindow::on_openHostConnectionDidTrigger);
@@ -316,6 +304,30 @@ namespace seville
 
          updateGeometry();
          adjustSize();
+      }
+
+      auto MainWindow::do_updateMenus(void) -> void
+      {
+         auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
+
+         if (palaceClientPtr != nullptr) {
+            auto connectionState = palaceClientPtr->connectionState();
+
+            switch (connectionState) {
+            case palace::ConnectionState::kConnectedState:
+               my_openHostConnectionActionPtr->setEnabled(false);
+               my_closeHostConnectionActionPtr->setEnabled(true);
+               break;
+            case palace::ConnectionState::kHandshakingState:
+               my_openHostConnectionActionPtr->setEnabled(false);
+               my_closeHostConnectionActionPtr->setEnabled(true);
+               break;
+            //case palace::ConnectionState::kDisconnectedState:
+            default:
+               my_openHostConnectionActionPtr->setEnabled(true);
+               my_closeHostConnectionActionPtr->setEnabled(false);
+            }
+         }
       }
 
       auto MainWindow::do_init(void) -> void
