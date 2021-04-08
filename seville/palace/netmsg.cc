@@ -32,6 +32,8 @@ namespace seville
 
       auto NetMsg::do_clear(void) -> void
       {
+         my_isValidFlag = 0;
+
          truncate(0);
          reserve(NetMsgSize::kHeaderSize);
          //my_headerFlags = 0;

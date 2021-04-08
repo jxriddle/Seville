@@ -261,6 +261,14 @@ namespace seville
 
          //virtual ~NetMsg(void);
 
+         inline auto isValid(void) -> int {
+            return my_isValidFlag;
+         }
+
+         inline auto setIsValid(int value) -> void {
+            my_isValidFlag = value;
+         }
+
          inline auto id(void) -> u32 {
             return do_id();
          }
@@ -384,6 +392,7 @@ namespace seville
          //ByteArray my_headerByteArray;
          //ByteArray my_bodyByteArray;
          //bool my_shouldSwapEndiannessFlag;
+         int my_isValidFlag;
 
          auto do_id(void) -> u32;
          auto do_setId(u32 value) -> void;

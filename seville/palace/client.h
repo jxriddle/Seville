@@ -357,89 +357,89 @@ namespace seville
 //         {
 
          //         }
-         void do_setupEvents(void);
-         void do_fetchBackgroundAsync(const QString &url);
-         void do_clear(void);
-         void do_resetReceiveTimer(void);
-         void do_readSocket(void);
+         auto do_setupEvents(void) -> void;
+         auto do_fetchBackgroundAsync(const QString &url) -> void;
+         auto do_clear(void) -> void;
+         auto do_resetReceiveTimer(void) -> void;
+         auto do_readSocket(void) -> void;
 
-         void do_setConnectionState(ConnectionState clientState);
+         auto do_setConnectionState(ConnectionState clientState) -> void;
 
-         int do_receiveNetMsgFromSocket(void);
-         int do_readNetMsgHeaderFromSocket(void);
-         int do_readNetMsgContentFromSocket(i32 len);
+         auto do_receiveNetMsgFromSocket(void) -> int;
+         auto do_readNetMsgHeaderFromSocket(void) -> int;
+         auto do_readNetMsgContentFromSocket(void) -> int;
 
-         void do_connectToHost(
+         auto do_connectToHost(
                QString host,
                int port = 9998,
                QString username = "Seville User",
-               int initialRoom = 0);
-         void do_disconnectFromHost(void);
+               int initialRoom = 0) -> void;
+         auto do_disconnectFromHost(void) -> void;
 
          auto do_roomChat(const QString& text) -> void;
 
-         void do_determineClientByteOrder(void);
-         int do_determineServerByteOrder(void);
-         bool do_determineIsConnected(void) const;
-         NetMsgOptions do_determineShouldSwapEndianness(void) const;
+         auto do_determineClientByteOrder(void) -> void;
+         auto do_determineServerByteOrder(void) -> int;
+         auto do_determineIsConnected(void) const -> bool;
+         auto do_determineShouldSwapEndianness(void) const -> NetMsgOptions;
 
-         int do_receiveAltLogon(void);
-         int do_receiveAltRoomDescription(void);
-         int do_receiveAssetIncoming(void);
-         int do_receiveAssetQuery(void);
-         int do_receiveAuthenticate(void);
-         int do_receiveBlowthru(void);
-         int do_receiveConnectionError(void);
-         int do_receiveDoorLock(void);
-         int do_receiveDoorUnlock(void);
-         int do_receiveDraw(void);
-         int do_receiveHttpServerLocation(void);
-         int do_receiveMovement(void);
-         int do_receiveNavigationError(void);
-         int do_receivePictureMove(void);
-         int do_receivePing(void);
-         int do_receivePong(void);
-         int do_receivePropDelete(void);
-         int do_receivePropMove(void);
-         int do_receivePropNew(void);
-         int do_receiveRoomDescend(void);
-         int do_receiveRoomDescription(void);
-         int do_receiveRoomUserList(void);
-         int do_receiveServerVersion(void);
-         int do_receiveServerInfo(void);
-         int do_receiveUserNew(void);
-         int do_receiveUserColor(void);
-         int do_receiveUserExitRoom(void);
-         int do_receiveUserFace(void);
-         int do_receiveUserProp(void);
-         int do_receiveUserDescription(void);
-         int do_receiveUserRename(void);
-         int do_receiveUserLeaving(void);
-         int do_receiveUserLoggedOnAndMax(void);
-         int do_receiveUserStatus(void);
-         int do_receiveServerRoomList(void);
-         int do_receiveServerUserList(void);
-         int do_receiveSpotMove(void);
-         int do_receiveSpotState(void);
-         int do_receiveTalk(void);
-         int do_receiveWhisper(void);
-         int do_receiveXTalk(void);
-         int do_receiveXWhisper(void);
+         auto do_receiveAltLogon(void) -> int;
+         auto do_receiveAltRoomDescription(void) -> int;
+         auto do_receiveAssetIncoming(void) -> int;
+         auto do_receiveAssetQuery(void) -> int;
+         auto do_receiveAuthenticate(void) -> int;
+         auto do_receiveBlowthru(void) -> int;
+         auto do_receiveConnectionError(void) -> int;
+         auto do_receiveDoorLock(void) -> int;
+         auto do_receiveDoorUnlock(void) -> int;
+         auto do_receiveDraw(void) -> int;
+         auto do_receiveHttpServerLocation(void) -> int;
+         auto do_receiveMovement(void) -> int;
+         auto do_receiveNavigationError(void) -> int;
+         auto do_receivePictureMove(void) -> int;
+         auto do_receivePing(void) -> int;
+         auto do_receivePong(void) -> int;
+         auto do_receivePropDelete(void) -> int;
+         auto do_receivePropMove(void) -> int;
+         auto do_receivePropNew(void) -> int;
+         auto do_receiveRoomDescend(void) -> int;
+         auto do_receiveRoomDescription(void) -> int;
+         auto do_receiveRoomUserList(void) -> int;
+         auto do_receiveServerVersion(void) -> int;
+         auto do_receiveServerInfo(void) -> int;
+         auto do_receiveUserNew(void) -> int;
+         auto do_receiveUserColor(void) -> int;
+         auto do_receiveUserExitRoom(void) -> int;
+         auto do_receiveUserFace(void) -> int;
+         auto do_receiveUserProp(void) -> int;
+         auto do_receiveUserDescription(void) -> int;
+         auto do_receiveUserRename(void) -> int;
+         auto do_receiveUserLeaving(void) -> int;
+         auto do_receiveUserLoggedOnAndMax(void) -> int;
+         auto do_receiveUserStatus(void) -> int;
+         auto do_receiveServerRoomList(void) -> int;
+         auto do_receiveServerUserList(void) -> int;
+         auto do_receiveSpotMove(void) -> int;
+         auto do_receiveSpotState(void) -> int;
+         auto do_receiveTalk(void) -> int;
+         auto do_receiveWhisper(void) -> int;
+         auto do_receiveXTalk(void) -> int;
+         auto do_receiveXWhisper(void) -> int;
 
-         int do_sendLogon(void);
-         int do_sendAuthenticate(
-               const QString &username, const QString &password);
-         int do_sendTalk(const QString& text);
-         int do_sendXTalk(const QString& text);
-         int do_sendPing(void);
-         int do_sendPong(void);
-         int do_sendGotoRoom(i16 roomId);
-         int do_sendMove(i16 x, i16 y);
+         auto do_sendLogon(void) -> int;
+         auto do_sendAuthenticate(
+               const QString &username, const QString &password) -> int;
+         auto do_sendTalk(const QString& text) -> int;
+         auto do_sendXTalk(const QString& text) -> int;
+         auto do_sendPing(void) -> int;
+         auto do_sendPong(void) -> int;
+         auto do_sendGotoRoom(i16 roomId) -> int;
+         auto do_sendMove(i16 x, i16 y) -> int;
 
-         int do_routeReceivedNetMsg(void);
+         auto do_routeReceivedNetMsg(void) -> int;
 
-         void do_deinit(void);
-         void do_init(void);
+         auto do_deinit(void) -> void;
+         auto do_init(void) -> void;
       };
    }
 }
