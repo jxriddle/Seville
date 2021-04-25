@@ -36,6 +36,7 @@ namespace seville
       {
          my_palaceClientPtr = new seville::palace::Client(this);
 
+         do_init();
          do_setupView();
          do_setupEvents();
          do_setupSizing();
@@ -53,6 +54,15 @@ namespace seville
 //         //doResizeBackgroundImage(event->size());
 //         QWidget::resizeEvent(event);
 //      }
+
+      auto PalaceClientWidget::do_init(void) -> void
+      {
+         auto spritesheetPath =
+               QString(":/seville/assets/images/defaultsmileys.png");
+         auto rect = QRect(0, 0, 10, 10);
+         my_spritesheet = QImage(spritesheetPath);
+         my_sprite = my_spritesheet.copy(rect);
+      }
 
       void PalaceClientWidget::do_setupView(void)
       {
@@ -168,7 +178,7 @@ namespace seville
       {
          //auto backgroundImageLabelSize0 = my_backgroundImageLabelPtr->size();
 
-         my_backgroundImagePixmap = pixmap;
+         my_backgroundImage = pixmap;
 
          //my_backgroundImageLabelPtr->setStyleSheet("border: 1px solid red");
          my_backgroundImageLabelPtr->setBackgroundRole(QPalette::Base);

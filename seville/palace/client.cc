@@ -359,20 +359,39 @@ namespace seville
          //while (do_readNetMsgHeaderFromSocket())
          //auto netMsg =
 
-         while (0 < my_socket.bytesAvailable() && do_receiveNetMsgFromSocket()) // && netMsgPtr != nullptr)
+         while (0 < my_socket.bytesAvailable())
          {
-//            if (my_netMsgBody.size() < NetMsg::kHeaderSize)
-//            {
-//               my_transferTimerId = startTimer(kIntervalTimeoutForTransferInMs);
-//               continue;
-//            }
-            //my_netMsgSize = my_netMsgBody.size();
+            if (my_netMsg.size() < NetMsg::kHeaderSize) {
+               if (my_socket.bytesAvailable() < NetMsg::kHeaderSize) {
+                  break;
+               }
+
+               if (!do_readNetMsgHeaderFromSocket()) {
+                  break;
+               }
+            }
+
+            if (my_netMsg.size() < NetMsg::kHeaderSize)
+               break;
+
+            auto netMsgLen = my_netMsg.len();
+            if (my_socket.bytesAvailable() < netMsgLen)
+               break;
+
+            if (!do_readNetMsgContentFromSocket())
+               break;
+
+            // set a timer to timeout netmsg receive
+            // if (my_netMsgBody.size() < NetMsg::kHeaderSize)
+            // {
+            //   my_transferTimerId =
+            //       startTimer(kIntervalTimeoutForTransferInMs);
+            //   continue;
+            // }
+            // my_netMsgSize = my_netMsgBody.size();
 
             auto netMsgId = my_netMsg.id();
-            auto netMsgLen = my_netMsg.len();
-            (void)netMsgLen;
             auto netMsgRef = my_netMsg.ref();
-
             if (my_connectionState == ConnectionState::kHandshakingState)
             {
 //               if (my_transferTimerId)
@@ -405,6 +424,7 @@ namespace seville
                do_setConnectionState(ConnectionState::kConnectedState);
                my_logger.appendInfoMessage(
                         QString("Connected to %1").arg(my_server.hostname()));
+
                my_netMsg.clear();
             }
             else if (my_connectionState == ConnectionState::kConnectedState &&
@@ -413,13 +433,16 @@ namespace seville
             {
                do_setConnectionState(ConnectionState::kDisconnectedState);
                my_logger.appendErrorMessage("Disconnected by server");
-               //my_netMsg.clear();
+
+               my_netMsg.clear();
                clear();
             }
             else if (my_connectionState == ConnectionState::kConnectedState)
             {
-               auto shouldClearNetMsg =
-                     my_netMsg.isValid() && do_routeReceivedNetMsg();
+               //auto netMsgIsValid = my_netMsg.isValid();
+               auto netMsgIsRouted = do_routeReceivedNetMsg();
+
+               auto shouldClearNetMsg = netMsgIsRouted;
                if (shouldClearNetMsg)
                   my_netMsg.clear();
                //auto lengthActual = my_netMsg.length();

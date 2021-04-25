@@ -30,7 +30,7 @@ namespace seville
          }
 
          inline auto backgroundImagePixmapPtr(void) -> QPixmap* {
-            return &my_backgroundImagePixmap;
+            return &my_backgroundImage;
          }
 
       protected:
@@ -60,13 +60,17 @@ namespace seville
          QLabel* my_backgroundImageLabelPtr;
          QScrollArea* my_scrollAreaPtr;
          QVBoxLayout* my_mainLayoutPtr;
-         QPixmap my_backgroundImagePixmap;
-         double my_scaleFactor;
          QLineEdit* my_lineEditAddressPtr;
          QLineEdit* my_chatLineEditPtr;
 
+         double my_scaleFactor;
+         QPixmap my_backgroundImage;
+         QImage my_sprite;
+         QImage my_spritesheet;
+
          view::MainWindow* do_mainWindowPtr(void);
 
+         auto do_init(void) -> void;
          auto do_setupView(void) -> void;
          auto do_setupEvents(void) -> void;
          auto do_setupSizing(void) -> void;

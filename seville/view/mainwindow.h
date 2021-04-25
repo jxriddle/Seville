@@ -21,6 +21,11 @@
 #include <QStatusBar>
 #include <QTabBar>
 #include <QTabWidget>
+#include <QToolBar>
+#include <QToolButton>
+#include <QComboBox>
+#include <QMessageBox>
+#include <QWidgetAction>
 
 #include "seville/palace/client.h"
 #include "seville/view/aboutdialog.h"
@@ -55,8 +60,8 @@ namespace seville
 
       public slots:
          void on_topLevelDidChange(bool shouldBeVisibleFlag);
-         void on_openHostConnectionDidTrigger(void);
-         void on_closeHostConnectionDidTrigger(void);
+         void on_clientConnectionDidOpen(void);
+         void on_clientConnectionDidClose(void);
          void on_quitAppDidTrigger(void);
          void on_aboutAppDidTrigger(void);
          void on_logWindowWasToggled(void);
@@ -91,10 +96,13 @@ namespace seville
          QAction* my_aboutAppActionPtr;
          QAction* my_toggleLogActionPtr;
          QStatusBar* my_statusBarPtr;
+         QToolBar* my_toolBarPtr;
 
+         auto do_setupWindow(void) -> void;
          auto do_setupView(void) -> void;
          auto do_setupActions(void) -> void;
          auto do_setupMenus(void) -> void;
+         auto do_setupToolbars(void) -> void;
          auto do_setupDocks(void) -> void;
          auto do_setupEvents(void) -> void;
          auto do_setupSizing(void) -> void;
