@@ -59,7 +59,7 @@ namespace seville
       {
          auto spritesheetPath =
                QString(":/seville/assets/images/defaultsmileys.png");
-         auto rect = QRect(0, 0, 10, 10);
+         auto rect = QRect(0, 0, 45, 45);
          my_spritesheet = QImage(spritesheetPath);
          my_sprite = my_spritesheet.copy(rect);
       }

@@ -18,9 +18,11 @@ namespace seville
          static const i32 kNumPropCells = 9;
 
          User(QObject* parentPtr = nullptr);
-         User(const User& user, QObject* parentPtr = nullptr);
+         User(const User& user, QObject* parentObjectPtr = nullptr);
 
          virtual ~User(void);
+
+         User& operator=(const User& value);
 
          inline auto color(void) const -> int {
             return my_color;
@@ -76,6 +78,14 @@ namespace seville
 
          inline auto setId(u32 value) -> void {
             my_id = value;
+         }
+
+         inline auto flags(void) -> i16 {
+            return my_flags;
+         }
+
+         inline auto setFlags(u16 value) -> void {
+            my_flags = value;
          }
 
          inline auto idCrc(void) const -> u32 {
@@ -144,6 +154,7 @@ namespace seville
 
       private:
          u32 my_id;
+         u16 my_flags;
          QString my_username;
          QString my_wizardPassword;
          int my_face;

@@ -34,9 +34,12 @@ namespace seville
             return instance_ptr;
          }
 
-         explicit Room(QObject* parentObjectPtr = nullptr);
-         //Room(const Room& room, QObject* object_parent_ptr = nullptr);
-         //virtual ~Room(void);
+         Room(QObject* parentObjectPtr = nullptr);
+         Room(const Room& room, QObject* parentObjectPtr = nullptr);
+
+         virtual ~Room(void);
+
+         Room& operator=(const Room& value);
 
          inline auto userWithId(u32 userId) -> User {
             for (auto& user: my_userList) {
@@ -217,50 +220,13 @@ namespace seville
          std::vector<Hotspot> my_hotspotList;
          std::vector<User> my_userList;
 
-         auto do_setupEvents(void) -> void
-         {
-         }
-
-         void do_clear(void)
-         {
-            my_roomId = 0;
-            my_flags = 0;
-            my_face = 0;
-            my_imageCount = 0;
-            my_drawCommandsCount = 0;
-            my_userCount = 0;
-            my_loosePropCount = 0;
-            my_reserved = 0;
-            my_backgroundImageName = "";
-            my_hotspotList.clear();
-            my_userList.clear();
-
-            my_backgroundImageByteArray.truncate(0);
-         }
-
-         void do_setBackgroundImageByteArray(
-               const QByteArray& backgroundImageByteArray)
-         {
-            my_backgroundImageByteArray.clear();
-            my_backgroundImageByteArray.resize(0);
-            my_backgroundImageByteArray.append(backgroundImageByteArray);
-
-            emit backgroundDidChangeEvent();
-         }
-
-         void do_assign(const Room& room)
-         {
-            my_roomId = room.my_roomId;
-            my_backgroundImageByteArray =
-                  room.my_backgroundImageByteArray;
-            //my_backgroundImage = room.my_backgroundImage;
-         }
-
-         void do_init() //const Room& room)
-         {
-            //do_assign(room);
-            do_setupEvents();
-         }
+         auto do_setupEvents(void) -> void;
+         auto do_clear(void) -> void;
+         auto do_setBackgroundImageByteArray(
+               const QByteArray& backgroundImageByteArray) -> void;
+         auto do_assign(const Room& room) -> void;
+         auto do_init(void) -> void; //const Room& room)
+         auto do_deinit(void) -> void;
       };
    }
 }

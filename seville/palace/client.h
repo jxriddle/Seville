@@ -417,8 +417,8 @@ namespace seville
          auto do_receiveUserLeaving(void) -> int;
          auto do_receiveUserLoggedOnAndMax(void) -> int;
          auto do_receiveUserStatus(void) -> int;
-         auto do_receiveServerRoomList(void) -> int;
-         auto do_receiveServerUserList(void) -> int;
+         auto do_receiveRoomList(void) -> int;
+         auto do_receiveUserList(void) -> int;
          auto do_receiveSpotMove(void) -> int;
          auto do_receiveSpotState(void) -> int;
          auto do_receiveTalk(void) -> int;
@@ -435,6 +435,9 @@ namespace seville
          auto do_sendPong(void) -> int;
          auto do_sendGotoRoom(i16 roomId) -> int;
          auto do_sendMove(i16 x, i16 y) -> int;
+         auto do_sendRequestRoomList(void) -> int;
+         auto do_sendRequestUserList(void) -> int;
+         auto do_sendRequestRoomAndUserLists(void) -> int;
 
          auto do_routeReceivedNetMsg(void) -> int;
 

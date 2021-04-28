@@ -43,7 +43,6 @@ namespace seville
          if (NetMsg::kHeaderSize <= my_netMsg.size())
             readContentOk = do_readNetMsgContentFromSocket(); //my_netMsg.len());
          //return readHeaderOk && readContentOk;
-         my_netMsg.setIsValid(readHeaderOk && readContentOk);
          return readHeaderOk && readContentOk;
          //return my_netMsg;
       }
@@ -426,6 +425,8 @@ namespace seville
                         QString("Connected to %1").arg(my_server.hostname()));
 
                my_netMsg.clear();
+
+               do_sendRequestRoomAndUserLists();
             }
             else if (my_connectionState == ConnectionState::kConnectedState &&
                      NetMsg::kHeaderSize <= my_netMsg.size() &&
@@ -439,10 +440,10 @@ namespace seville
             }
             else if (my_connectionState == ConnectionState::kConnectedState)
             {
-               //auto netMsgIsValid = my_netMsg.isValid();
+               auto netMsgIsValid = my_netMsg.isValid();
                auto netMsgIsRouted = do_routeReceivedNetMsg();
 
-               auto shouldClearNetMsg = netMsgIsRouted;
+               auto shouldClearNetMsg = netMsgIsValid && netMsgIsRouted;
                if (shouldClearNetMsg)
                   my_netMsg.clear();
                //auto lengthActual = my_netMsg.length();
@@ -472,9 +473,7 @@ namespace seville
          if (text.length() <= 0)
             return;
 
-         auto isLocalCommand = false;
          if (text.toStdString() == "'who") {
-            isLocalCommand = true;
             auto userListPtr = my_room.userListPtr();
             for (auto i = u32{0}; i < userListPtr->size(); i++) {
                auto user = my_room.userListPtr()->at(i);
@@ -484,9 +483,45 @@ namespace seville
                         .arg(user.id()));
             }
          }
-
-         if (!isLocalCommand)
+         else if (text.left(QString("'gotoroom").length()) ==
+                  QString("'gotoroom")) {
+            auto split = text.split(' ');
+            if (1 < split.length()) {
+               auto ok = true;
+               auto roomId = split.at(1).toUInt(&ok);
+               if (ok) {
+                  do_sendGotoRoom(roomId);
+               }
+            }
+         }
+         else if (text.left(QString("'rooms").length()) ==
+                  QString("'rooms")) {
+            my_logger.appendInfoMessage("Listing all rooms...");
+            for (auto& room: *my_server.roomListPtr()) {
+               auto roomName = room.roomName();
+               auto roomUserCount = room.userCount();
+               auto roomId = room.roomId();
+               my_logger.appendInfoMessage(QString("%1 (%2, users: %3).")
+                                           .arg(roomName)
+                                           .arg(roomId)
+                                           .arg(roomUserCount));
+            }
+         }
+         else if (text.left(QString("'users").length()) ==
+                  QString("'users")) {
+            my_logger.appendInfoMessage("Listing all users...");
+            for (auto& user: *my_server.userListPtr()) {
+               auto username = user.username();
+               auto userId = user.id();
+               my_logger.appendInfoMessage(
+                        QString("%1 (%2) is here.")
+                        .arg(username)
+                        .arg(userId));
+            }
+         }
+         else {
             do_sendXTalk(text);
+         }
       }
 
       auto Client::do_connectToHost(
@@ -857,7 +892,6 @@ namespace seville
       {
          my_logger.appendDebugMessage("> RoomDescend");
 
-         // stub
          return 1;
       }
 
@@ -994,14 +1028,17 @@ namespace seville
          (void)unknown2;
 
          user.setPropNum(my_netMsg.streamReadU16());
-         if (user.propNum() < User::kNumPropCells) {
-            auto propPtr = &user.propListPtr()->at(user.propNum());
-            propPtr->setId(0);
-            propPtr->setCrc(0);
-            // TODO ...
-         }
+         //if (user.propNum() < User::kNumPropCells) {
+         //   auto propPtr = &user.propListPtr()->at(user.propNum());
+         //   propPtr->setId(0);
+         //   propPtr->setCrc(0);
+         //   // TODO ...
+         //}
 
-         user.setUsername(my_netMsg.streamReadPascalQString());
+         auto usernameLen = my_netMsg.streamReadU8();
+         //auto username = my_netMsg.streamReadPascalQString();
+         auto username = my_netMsg.streamReadFixedQString(usernameLen);
+         user.setUsername(username);
 
          my_room.userListPtr()->push_back(user);
          my_room.setUserCount(my_room.userCount() + 1);
@@ -1080,19 +1117,56 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveServerRoomList(void) -> int
+      auto Client::do_receiveRoomList(void) -> int
       {
-         my_logger.appendDebugMessage("> ServerRoomList");
+         my_logger.appendDebugMessage("> RoomList");
 
-         // stub
+         auto roomListPtr = my_server.roomListPtr();
+         roomListPtr->clear();
+
+         auto roomCount = my_netMsg.ref();
+         //if()
+
+         for (auto i = u32{0}; i < roomCount; i++) {
+            auto room = Room();
+            room.setId(my_netMsg.streamReadU32());
+            room.setFlags(my_netMsg.streamReadU16());
+            room.setUserCount(my_netMsg.streamReadU16());
+            auto roomNameLen = my_netMsg.streamReadU8();
+            room.setRoomName(
+                     my_netMsg.streamReadFixedQString(roomNameLen));
+            auto roomNamePaddedLen = (4 - (roomNameLen & 3)) - 1; // + roomNameLen;
+            my_netMsg.streamSkip(roomNamePaddedLen);
+
+            roomListPtr->append(room);
+         }
+
          return 1;
       }
 
-      auto Client::do_receiveServerUserList(void) -> int
+      auto Client::do_receiveUserList(void) -> int
       {
-         my_logger.appendDebugMessage("> ServerUserList");
+         my_logger.appendDebugMessage("> UserList");
 
-         // stub
+         auto userListPtr = my_server.userListPtr();
+         userListPtr->clear();
+
+         auto userCount = my_netMsg.ref();
+         //if()
+
+         for (auto i = u32{0}; i < userCount; i++) {
+            auto user = User();
+            user.setId(my_netMsg.streamReadU32());
+            user.setFlags(my_netMsg.streamReadU16());
+            user.setRoomId(my_netMsg.streamReadU16());
+            auto usernameLen = my_netMsg.streamReadU8();
+            user.setUsername(my_netMsg.streamReadFixedQString(usernameLen));
+            auto usernamePaddedLen = (4 - (usernameLen & 3)) - 1; // + usernameLen;
+            my_netMsg.streamSkip(usernamePaddedLen);
+
+            userListPtr->append(user);
+         }
+
          return 1;
       }
 
@@ -1245,10 +1319,10 @@ namespace seville
             result += do_receiveRoomUserList();
             break;
          case NetMsg::kServerUserListKind:
-            result += do_receiveServerUserList();
+            result += do_receiveUserList();
             break;
          case NetMsg::kServerRoomListKind:
-            result += do_receiveServerRoomList();
+            result += do_receiveRoomList();
             break;
          case NetMsg::kRoomDescendKind:
             result += do_receiveRoomDescend();
@@ -1638,6 +1712,53 @@ namespace seville
          // emit userMove signal to invalidate view
          return my_socket.write(moveMsg);
          //return my_socket.flush();
+      }
+
+      auto Client::do_sendRequestRoomList(void) -> int
+      {
+         if (my_connectionState != ConnectionState::kConnectedState)
+            return -1;
+
+         auto msg = palace::NetMsg();
+         msg.setId(NetMsg::kServerRoomListKind);
+         msg.setLen(NetMsg::kNoLen);
+         msg.setRef(NetMsg::kNoRef);
+
+         return my_socket.write(msg);
+      }
+
+      auto Client::do_sendRequestUserList(void) -> int
+      {
+         if (my_connectionState != ConnectionState::kConnectedState)
+            return -1;
+
+         auto msg = palace::NetMsg();
+         msg.setId(NetMsg::kServerUserListKind);
+         msg.setLen(NetMsg::kNoLen);
+         msg.setRef(NetMsg::kNoRef);
+
+         return my_socket.write(msg);
+      }
+
+      auto Client::do_sendRequestRoomAndUserLists(void) -> int
+      {
+         if (my_connectionState != ConnectionState::kConnectedState)
+            return -1;
+
+         auto serverRoomListMsg = palace::NetMsg();
+         serverRoomListMsg.setId(NetMsg::kServerRoomListKind);
+         serverRoomListMsg.setLen(NetMsg::kNoLen);
+         serverRoomListMsg.setRef(NetMsg::kNoRef);
+
+         auto serverUserListMsg = palace::NetMsg();
+         serverUserListMsg.setId(NetMsg::kServerUserListKind);
+         serverUserListMsg.setLen(NetMsg::kNoLen);
+         serverUserListMsg.setRef(NetMsg::kNoRef);
+
+         auto res = my_socket.write(serverRoomListMsg);
+         res &= my_socket.write(serverUserListMsg);
+
+         return res;
       }
 
       auto Client::do_deinit(void) -> void

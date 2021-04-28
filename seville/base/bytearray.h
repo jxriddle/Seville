@@ -362,6 +362,10 @@ namespace seville
          my_streamCursorPosition = 0;
       }
 
+      inline auto streamSkip(int len) -> void {
+         my_streamCursorPosition += len;
+      }
+
       inline auto streamReadByteArray(i32 len) {
          auto value = do_byteArrayAt(my_streamCursorPosition, len);
          my_streamCursorPosition += len;
@@ -456,6 +460,9 @@ namespace seville
          my_streamCursorPosition += value.size(); // TODO stride
          return value;
       }
+
+//      inline auto streamReadUtf16QString(int len) -> QString {
+//      }
 
       inline auto streamWriteI64(i64 value) -> void {
          do_setI64At(my_streamCursorPosition, value);

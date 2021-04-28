@@ -155,6 +155,7 @@ namespace seville
          };
 
          enum NetMsgLen: i32 {
+            kNoLen = 0,
             kGotoRoomLen = 2,
             kMovementLen = 4,
          };
@@ -262,12 +263,13 @@ namespace seville
          //virtual ~NetMsg(void);
 
          inline auto isValid(void) -> int {
-            return my_isValidFlag;
+            //return my_isValidFlag;
+            return size() == NetMsg::kHeaderSize + static_cast<int>(do_len());
          }
 
-         inline auto setIsValid(int value) -> void {
-            my_isValidFlag = value;
-         }
+         //inline auto setIsValid(int value) -> void {
+         //   my_isValidFlag = value;
+         //}
 
          inline auto id(void) -> u32 {
             return do_id();

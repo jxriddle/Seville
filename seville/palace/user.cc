@@ -4,9 +4,16 @@ namespace seville
 {
    namespace palace
    {
+      User& User::operator=(const User& value)
+      {
+         do_assign(value);
+         return *this;
+      }
+
       void User::do_clear(void)
       {
          my_id = 0;
+         my_flags = 0;
          my_color = 1;
          my_face = 1;
          my_x = 0;
@@ -26,6 +33,7 @@ namespace seville
       void User::do_assign(const User& user)
       {
          my_id = user.my_id;
+         my_flags = user.my_flags;
          my_color = user.my_color;
          my_face = user.my_face;
          my_x = user.my_x;
@@ -54,14 +62,14 @@ namespace seville
          do_deinit();
       }
 
-      User::User(QObject* pParent)
-         : QObject(pParent)
+      User::User(QObject* parentPtr)
+         : QObject(parentPtr)
       {
          do_init();
       }
 
-      User::User(const User& user, QObject* pParent)
-         : QObject(pParent)
+      User::User(const User& user, QObject* parentPtr)
+         : QObject(parentPtr)
       {
          do_init(user);
       }
