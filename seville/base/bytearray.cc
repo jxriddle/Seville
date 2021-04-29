@@ -5,7 +5,10 @@
 
 namespace seville
 {
-   ByteArray::ByteArray(void) {}
+   ByteArray::ByteArray(void)
+   {
+      do_clear();
+   }
 
    auto ByteArray::New(void) -> std::unique_ptr<ByteArray>
    {

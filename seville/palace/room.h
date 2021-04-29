@@ -84,6 +84,7 @@ namespace seville
          }
 
          inline auto userCount(void) const -> u16 {
+            //return my_userList.size();
             return my_userCount;
          }
 

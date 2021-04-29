@@ -461,6 +461,16 @@ namespace seville
          return value;
       }
 
+      inline auto streamReadAndDecodeQString(int len) -> QString {
+         auto byteArray = do_byteArrayAt(my_streamCursorPosition, len);
+         auto value = QString::fromUtf8(byteArray);
+         if (value.toUtf8() != byteArray) {
+           value = QString::fromLatin1(byteArray);
+         }
+         my_streamCursorPosition += len;
+         return value;
+      }
+
 //      inline auto streamReadUtf16QString(int len) -> QString {
 //      }
 

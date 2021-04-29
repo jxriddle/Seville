@@ -407,6 +407,7 @@ namespace seville
          auto do_receiveRoomUserList(void) -> int;
          auto do_receiveServerVersion(void) -> int;
          auto do_receiveServerInfo(void) -> int;
+         auto do_processUserNew(void) -> User;
          auto do_receiveUserNew(void) -> int;
          auto do_receiveUserColor(void) -> int;
          auto do_receiveUserExitRoom(void) -> int;

@@ -152,6 +152,10 @@ namespace seville
             do_clear();
          }
 
+//         inline auto propsPtr(void) -> u32* {
+//            return &my_props;
+//         }
+
       private:
          u32 my_id;
          u16 my_flags;
@@ -169,6 +173,8 @@ namespace seville
          i16 my_roomId;
          std::vector<Prop> my_propList;
          i16 my_propNum;
+
+         //u32 my_props[kNumPropCells];
 
          auto do_clear(void) -> void;
          auto do_assign(const User& user) -> void;
