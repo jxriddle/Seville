@@ -51,6 +51,27 @@ namespace seville
             return User();
          }
 
+         inline auto userPtrWithId(u32 userId) -> User* {
+            for (auto& user: my_userList) {
+               if (user.id() == userId) {
+                  return &user;
+               }
+            }
+
+            return nullptr;
+         }
+
+         inline auto removeUserWithId(u32 userId) -> void {
+            auto i = u32{0};
+            auto z = my_userList.size();
+            while (i < z) {
+               if (my_userList[i].id() == userId) {
+                  my_userList.erase(my_userList.begin() + i);
+               }
+               i++;
+            }
+         }
+
          inline auto roomId(void) const -> u16 {
             return my_roomId;
          }

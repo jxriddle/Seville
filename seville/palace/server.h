@@ -45,23 +45,23 @@ namespace seville
          }
 
          inline auto roomListPtr(void) -> QList<Room>* {
-            return my_roomListUniquePtr.get();
+            return &my_roomList; // .get();
          }
 
-         inline auto setRoomListUniquePtr(
-               std::unique_ptr<QList<Room>> roomListUnquePtr) -> void {
-            my_roomListUniquePtr = std::move(roomListUnquePtr);
-         }
+//         inline auto setRoomListUniquePtr(
+//               std::unique_ptr<QList<Room>> roomListUnquePtr) -> void {
+//            my_roomList = std::move(roomListUnquePtr);
+//         }
 
          inline auto userListPtr(void) -> QList<User>* {
-            return my_userListUniquePtr.get();
+            return &my_userList; // .get();
          }
 
-         inline auto setUserListUniquePtr(
-               std::unique_ptr<QList<User>> userListUniquePtr)
-               -> void {
-            my_userListUniquePtr = std::move(userListUniquePtr);
-         }
+//         inline auto setUserListUniquePtr(
+//               std::unique_ptr<QList<User>> userListUniquePtr)
+//               -> void {
+//            my_userList = std::move(userListUniquePtr);
+//         }
 
          inline auto hostname(void) const -> QString {
             return my_host;
@@ -92,30 +92,30 @@ namespace seville
          }
 
          inline auto setHttpServerLocation(
-               const QString& http_server_location) -> void {
-            my_httpServerLocation = http_server_location;
+               const QString& httpServerLocation) -> void {
+            my_httpServerLocation = httpServerLocation;
          }
 
       private:
          HostByteOrder my_byteOrder;
-         std::unique_ptr<QList<Room>> my_roomListUniquePtr;
-         std::unique_ptr<QList<User>> my_userListUniquePtr;
+         QList<Room> my_roomList;
+         QList<User> my_userList;
          QString my_host;
          u16 my_port;
          u32 my_version;
          QString my_httpServerLocation;
 
          inline auto do_clear(void) -> void {
-            my_roomListUniquePtr->clear();
-            my_userListUniquePtr->clear();
+            my_roomList.clear();
+            my_userList.clear();
          }
 
          inline auto do_deinit(void) -> void {
          }
 
          inline auto do_init(void) -> void {
-            my_roomListUniquePtr = std::make_unique<QList<Room>>();
-            my_userListUniquePtr = std::make_unique<QList<User>>();
+            // my_roomList = std::make_unique<QList<Room>>();
+            // my_userList = std::make_unique<QList<User>>();
 
             do_clear();
          }

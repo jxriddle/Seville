@@ -6,7 +6,6 @@
 #include <QApplication>
 #include <QLoggingCategory>
 
-
 #include "seville/base/types.h"
 //#include "seville/view/mainwindow.h"
 

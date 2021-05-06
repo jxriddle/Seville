@@ -23,7 +23,7 @@ namespace seville
          my_idCrc = 0xc144c580;
          my_regCounter = 0xcf07309c;
          my_regCrc = 0x5905f923;
-         my_username = "Seville User";
+         my_username = "";
          my_wizardPassword = "";
          my_roomId = 0;
 

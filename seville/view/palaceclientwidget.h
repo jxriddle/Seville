@@ -5,9 +5,10 @@
 #include <QScrollArea>
 #include <QLineEdit>
 #include <QVBoxLayout>
+#include <QGraphicsView>
 
 #include "seville/palace/client.h"
-#include "seville/view/mainwindow.h"
+//#include "seville/view/mainwindow.h"
 
 namespace seville
 {
@@ -18,6 +19,11 @@ namespace seville
       Q_OBJECT
 
       public:
+         static const u32 kSmileyHeight = 45;
+         static const u32 kSmileyWidth = 45;
+         static const u32 kMaxPropWidth = 132;
+         static const u32 kMaxPropHeight = 132;
+
          explicit PalaceClientWidget(QWidget* parentWidgetPtr = nullptr);
          //virtual ~ClientWidget(void);
 
@@ -29,12 +35,17 @@ namespace seville
             do_promptOpenConnection(this);
          }
 
-         inline auto backgroundImagePixmapPtr(void) -> QPixmap* {
-            return &my_backgroundImage;
+//         inline auto backgroundImagePixmapPtr(void) -> QPixmap* {
+//            return &my_backgroundImage;
+//         }
+
+         inline auto drawUsersInRoom(void) -> void {
+            do_redrawRoom();
          }
 
       protected:
-         auto mousePressEvent(QMouseEvent* mouseEventPtr) -> void;
+         auto paintEvent(QPaintEvent* eventPtr) -> void;
+         auto mousePressEvent(QMouseEvent* eventPtr) -> void;
          //void resizeEvent(QResizeEvent* resize_event_ptr) override;
          auto currentChanged(int index) -> void;
 
@@ -54,19 +65,23 @@ namespace seville
                palace::ConnectionState connectionState);
          void on_chatLineEditDidPressReturn(void);
          //void on_currentTabDidChange(int index);
+         void on_viewNeedsUpdating(void);
 
       private:
          palace::Client* my_palaceClientPtr;
-         QLabel* my_backgroundImageLabelPtr;
+         // QLabel* my_backgroundImageLabelPtr;
+         QWidget* my_roomWidgetPtr;
          QScrollArea* my_scrollAreaPtr;
          QVBoxLayout* my_mainLayoutPtr;
          QLineEdit* my_lineEditAddressPtr;
          QLineEdit* my_chatLineEditPtr;
 
          double my_scaleFactor;
-         QPixmap my_backgroundImage;
+         // QPixmap my_backgroundImage;
+         QImage my_backgroundImage;
          QImage my_sprite;
          QImage my_spritesheet;
+         // QGraphicsView *my_view;
 
          view::MainWindow* do_mainWindowPtr(void);
 
@@ -75,12 +90,14 @@ namespace seville
          auto do_setupEvents(void) -> void;
          auto do_setupSizing(void) -> void;
 
-         auto do_setBackgroundImage(const QPixmap& pixmap) -> void;
+         // auto do_setBackgroundImage(const QPixmap& pixmap) -> void;
+         auto do_setBackgroundImage(const QImage& image) -> void;
          auto do_setBackgroundImageFromFile(const QString& imagePath) -> void;
          //auto do_resizeBackgroundImage(QSize size) -> void;
          auto do_promptOpenConnection(QWidget* parentPtr) -> void;
          auto do_fetchBackgroundImage(const QString& fileUrl) -> void;
          //auto do_clearBackgroundImage(void) -> void;
+         auto do_redrawRoom(void) -> void;
       };
    }
 }

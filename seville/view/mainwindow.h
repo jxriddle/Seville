@@ -28,9 +28,9 @@
 #include <QWidgetAction>
 
 #include "seville/palace/client.h"
+#include "seville/view/palaceclientwidget.h"
 #include "seville/view/aboutdialog.h"
 #include "seville/view/connectdialog.h"
-#include "seville/view/palaceclientwidget.h"
 #include "seville/view/logwidget.h"
 #include "seville/view/tabwidget.h"
 
@@ -60,18 +60,26 @@ namespace seville
 
       public slots:
          void on_topLevelDidChange(bool shouldBeVisibleFlag);
-         void on_clientConnectionDidOpen(void);
-         void on_clientConnectionDidClose(void);
-         void on_quitAppDidTrigger(void);
-         void on_aboutAppDidTrigger(void);
+         void on_currentTabDidChange(int index);
+         void on_openConnectionWasRequested(void);
+         void on_closeConnectionWasRequested(void);
+         void on_quitAppWasRequested(void);
+         void on_aboutAppWasRequested(void);
          void on_logWindowWasToggled(void);
-         //void on_client_widget_background_did_change(void);
-         //void on_clientWidgetDidResize(int width, int height);
-         void on_clientConnectionStateDidChange(
+         void on_newTabRequested(void);
+         void on_closeTabRequested(void);
+         // void on_client_widget_background_did_change(void);
+         // void on_clientWidgetDidResize(int width, int height);
+         void on_connectionStateDidChange(
                palace::ConnectionState connectionState);
+         void on_tabWasAddedWithClientWidgetPtr(
+               seville::view::PalaceClientWidget* palaceClientWidgetPtr);
+         void on_tabWasRemovedWithClientWidgetPtr(
+               seville::view::PalaceClientWidget* palaceClientWidgetPtr);
+         // void on_viewNeedsUpdating(void);
 
       protected:
-         //void resizeEvent(QResizeEvent* resizeEventPtr) override;
+         // void resizeEvent(QResizeEvent* resizeEventPtr) override;
          void closeEvent(QCloseEvent* closeEventPtr) override;
 
       private:
@@ -87,6 +95,8 @@ namespace seville
          QMenu* my_helpMenuPtr;
          QAction* my_openHostConnectionActionPtr;
          QAction* my_closeHostConnectionActionPtr;
+         QAction* my_newTabActionPtr;
+         QAction* my_closeTabActionPtr;
          QAction* my_undoContentActionPtr;
          QAction* my_redoContentActionPtr;
          QAction* my_cutContentActionPtr;
@@ -97,6 +107,7 @@ namespace seville
          QAction* my_toggleLogActionPtr;
          QStatusBar* my_statusBarPtr;
          QToolBar* my_toolBarPtr;
+         seville::view::PalaceClientWidget* my_currentPalaceClientWidgetPtr;
 
          auto do_setupWindow(void) -> void;
          auto do_setupView(void) -> void;
@@ -108,8 +119,15 @@ namespace seville
          auto do_setupSizing(void) -> void;
 
          auto do_updateMenus(void) -> void;
+         auto do_updateView(void) -> void;
+
+         auto do_teardownEvents(void) -> void;
+         auto do_setCurrentPalaceClientWidgetPtr(
+               seville::view::PalaceClientWidget* currentPalaceClientWidget)
+            -> void;
 
          auto do_init(void) -> void;
+         auto do_deinit(void) -> void;
       };
    }
 }

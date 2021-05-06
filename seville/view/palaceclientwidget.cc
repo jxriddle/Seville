@@ -11,6 +11,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QScrollBar>
+#include <QMouseEvent>
+#include <QPaintEvent>
 
 #include "seville/base/sevilleapp.h"
 #include "seville/palace/log.h"
@@ -34,8 +36,6 @@ namespace seville
       PalaceClientWidget::PalaceClientWidget(QWidget* parentWidgetPtr)
          : QWidget(parentWidgetPtr)
       {
-         my_palaceClientPtr = new seville::palace::Client(this);
-
          do_init();
          do_setupView();
          do_setupEvents();
@@ -57,11 +57,12 @@ namespace seville
 
       auto PalaceClientWidget::do_init(void) -> void
       {
+         my_palaceClientPtr = new seville::palace::Client(this);
          auto spritesheetPath =
                QString(":/seville/assets/images/defaultsmileys.png");
-         auto rect = QRect(0, 0, 45, 45);
+         //auto rect = QRect(0, 0, 45, 45);
          my_spritesheet = QImage(spritesheetPath);
-         my_sprite = my_spritesheet.copy(rect);
+         //my_sprite = my_spritesheet.copy(rect);
       }
 
       void PalaceClientWidget::do_setupView(void)
@@ -73,7 +74,8 @@ namespace seville
 
          my_scrollAreaPtr = new QScrollArea(this);
 
-         my_backgroundImageLabelPtr = new QLabel(this);
+         // my_backgroundImageLabelPtr = new QLabel(this);
+         my_roomWidgetPtr = new QWidget(this);
 
          my_scrollAreaPtr->setHorizontalScrollBarPolicy(
                   Qt::ScrollBarPolicy::ScrollBarAsNeeded);
@@ -91,9 +93,11 @@ namespace seville
          //         QSizePolicy::Maximum, QSizePolicy::Maximum);
 
          my_scrollAreaPtr->setWidgetResizable(false);
-         my_scrollAreaPtr->setWidget(my_backgroundImageLabelPtr);
+         // my_scrollAreaPtr->setWidget(my_backgroundImageLabelPtr);
+         my_scrollAreaPtr->setWidget(my_roomWidgetPtr);
 
-         my_scrollAreaPtr->setFixedSize(my_backgroundImageLabelPtr->size());
+         // my_scrollAreaPtr->setFixedSize(my_backgroundImageLabelPtr->size());
+         my_scrollAreaPtr->setFixedSize(my_roomWidgetPtr->size());
          //my_scrollAreaPtr->setFixedWidth(my_backgroundImageLabelPtr->width() + 10);
          //my_scrollAreaPtr->setFixedHeight(my_backgroundImageLabelPtr->height() + 10);
 
@@ -147,13 +151,18 @@ namespace seville
                  &seville::view::PalaceClientWidget::
                  on_connectionStateDidChange);
 
+         connect(my_palaceClientPtr,
+                 &seville::palace::Client::viewNeedsUpdatingEvent,
+                 this,
+                 &seville::view::PalaceClientWidget::on_viewNeedsUpdating);
+
          //auto mainWindowPtr =
          //static_cast<view::MainWindow*>(this->parent()->parent());
-         auto mainWindowPtr = do_mainWindowPtr(); //sevilleApp.mainWindowPtr();
-         connect(my_palaceClientPtr,
-                 &seville::palace::Client::connectionStateDidChangeEvent,
-                 mainWindowPtr,
-                 &seville::view::MainWindow::on_clientConnectionStateDidChange);
+         //auto mainWindowPtr = do_mainWindowPtr(); //sevilleApp.mainWindowPtr();
+         //connect(my_palaceClientPtr,
+         //        &seville::palace::Client::connectionStateDidChangeEvent,
+         //        mainWindowPtr,
+         //        &seville::view::MainWindow::on_clientConnectionStateDidChange);
 
          connect(my_chatLineEditPtr,
                  &QLineEdit::returnPressed,
@@ -174,18 +183,23 @@ namespace seville
          //my_scrollAreaPtr->layout()->setSizeConstraint(QLayout::SetFixedSize);
       }
 
-      void PalaceClientWidget::do_setBackgroundImage(const QPixmap& pixmap)
+      //void PalaceClientWidget::do_setBackgroundImage(const QPixmap& pixmap)
+      void PalaceClientWidget::do_setBackgroundImage(const QImage& image)
       {
-         //auto backgroundImageLabelSize0 = my_backgroundImageLabelPtr->size();
+         // QPainter painter;
 
-         my_backgroundImage = pixmap;
+         //auto backgroundImageLabelSize0 = my_backgroundImageLabelPtr->size();
+         my_backgroundImage = image;
+         //my_backgroundImage  = pixmap.toImage();
 
          //my_backgroundImageLabelPtr->setStyleSheet("border: 1px solid red");
-         my_backgroundImageLabelPtr->setBackgroundRole(QPalette::Base);
-         my_backgroundImageLabelPtr->setPixmap(pixmap);
-         my_backgroundImageLabelPtr->setMask(pixmap.mask());
+         // my_roomWidgetPtr->setBackgroundRole(QPalette::Base);
+         // painter.drawImage()
+         // my_backgroundImageLabelPtr->setBackgroundRole(QPalette::Base);
+         // my_backgroundImageLabelPtr->setPixmap(pixmap);
+         // my_backgroundImageLabelPtr->setMask(pixmap.mask());
          //my_backgroundImageLabelPtr->setFixedSize(pixmap.size());
-         my_backgroundImageLabelPtr->adjustSize();
+         // my_backgroundImageLabelPtr->adjustSize();
          //my_backgroundImageLabelPtr->resize(
          //       my_backgroundImageLabelPtr->minimumSizeHint());
 
@@ -201,12 +215,14 @@ namespace seville
          //my_scrollAreaPtr->setFixedWidth(
          //         my_backgroundImageLabelPtr->width() + 4);
          my_scrollAreaPtr->setFixedWidth(
-                  my_backgroundImageLabelPtr->width() + 4);
+                  my_backgroundImage.width() + 4);
+                  //my_backgroundImageLabelPtr->width() + 4);
          //auto frameWidth = my_backgroundImageLabelPtr->frameWidth();
          //(void)frameWidth;
                   //my_scrollAreaPtr->horizontalScrollBar()->size().width());
          my_scrollAreaPtr->setFixedHeight(
-                  my_backgroundImageLabelPtr->height() + 4);
+                  my_backgroundImage.height() + 4);
+                  //my_backgroundImageLabelPtr->height() + 4);
          //my_scrollAreaPtr->setStyleSheet("border: 1px solid red");
          //my_scrollAreaPtr->updateGeometry();
          my_scrollAreaPtr->adjustSize();
@@ -257,8 +273,9 @@ namespace seville
       void PalaceClientWidget::do_setBackgroundImageFromFile(
             const QString& imagePath)
       {
-         QPixmap pixmap = QPixmap(imagePath);
-         do_setBackgroundImage(pixmap);
+         // QPixmap pixmap = QPixmap(imagePath);
+         auto image = QImage(imagePath);
+         do_setBackgroundImage(image);
       }
 
       void PalaceClientWidget::do_promptOpenConnection(
@@ -268,6 +285,30 @@ namespace seville
          if (dialog.exec() == QDialog::Accepted) {
             my_palaceClientPtr->connectToHost(
                      dialog.host(), dialog.port(), dialog.username());
+         }
+      }
+
+      auto PalaceClientWidget::do_redrawRoom(void) -> void
+      {
+         if (my_palaceClientPtr == nullptr)
+            return;
+
+         my_palaceClientPtr->loggerPtr()->appendInfoMessage("Drawing users in room...");
+
+         QPainter painter;
+         painter.drawImage(0, 0, my_backgroundImage);
+
+         for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr()) {
+            auto rect =
+                  QRect(user.face() * kSmileyWidth,
+                        user.color() * kSmileyHeight,
+                        kSmileyWidth,
+                        kSmileyHeight);
+
+            QImage userImage = my_spritesheet.copy(rect);
+            painter.drawImage(user.x(), user.y(), userImage);
+
+            update();
          }
       }
 
@@ -298,10 +339,46 @@ namespace seville
 
       void PalaceClientWidget::mousePressEvent(QMouseEvent* mouseEventPtr)
       {
-         (void)mouseEventPtr;
+         if (my_palaceClientPtr == nullptr)
+            return;
+
          if (my_palaceClientPtr->connectionState() ==
              palace::ConnectionState::kDisconnectedState) {
             do_promptOpenConnection(this);
+         }
+         else if (my_palaceClientPtr->connectionState() ==
+                  palace::ConnectionState::kConnectedState) {
+            my_palaceClientPtr->move(mouseEventPtr->x(), mouseEventPtr->y());
+         }
+      }
+
+      void PalaceClientWidget::paintEvent(QPaintEvent *paintEventPtr)
+      {
+         (void)paintEventPtr;
+
+         if (my_palaceClientPtr == nullptr)
+            return;
+
+         // my_palaceClientPtr->loggerPtr()->appendInfoMessage("Drawing users in room...");
+
+         QPainter painter(this);
+         painter.drawImage(8, 8, my_backgroundImage);
+
+         for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr()) {
+            auto rect =
+                  QRect(user.face() * kSmileyWidth,
+                        user.color() * kSmileyHeight,
+                        kSmileyWidth,
+                        kSmileyHeight);
+
+            QImage userImage = my_spritesheet.copy(rect);
+            painter.drawImage(user.x(), user.y(), userImage);
+
+            // painter.setPen(Qt::);
+            painter.setFont(QFont("Sans-Serif", 10, 3));
+            painter.drawText(user.x(), user.y() + 55, user.username());
+
+            update();
          }
       }
 
@@ -322,8 +399,8 @@ namespace seville
          auto backgroundImage =
                my_palaceClientPtr->roomPtr()->backgroundImage();
 
-         auto pixmap = QPixmap::fromImage(backgroundImage);
-         do_setBackgroundImage(pixmap);
+         //auto pixmap = QPixmap::fromImage(backgroundImage);
+         do_setBackgroundImage(backgroundImage);
 
          adjustSize();
 
@@ -350,6 +427,11 @@ namespace seville
          auto text = my_chatLineEditPtr->text();
          my_palaceClientPtr->chat(text);
          my_chatLineEditPtr->clear();
+      }
+
+      auto PalaceClientWidget::on_viewNeedsUpdating(void) -> void
+      {
+         update();
       }
    }
 }

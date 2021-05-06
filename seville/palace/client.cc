@@ -250,6 +250,32 @@ namespace seville
 //         }
       }
 
+      auto Client::on_backgroundDidFinishLoading(
+            QNetworkReply* replyPtr) -> void
+      {
+            if (replyPtr->error()) {
+               my_logger.appendErrorMessage(
+                        //QString("Background failed to load."));
+                        QString("Background load error: %1")
+                        .arg(replyPtr->errorString()));
+            }
+            else {
+               auto imageByteArray = replyPtr->readAll();
+               auto const imageByteArrayPtr =
+                     reinterpret_cast<QByteArray*>(&imageByteArray);
+               my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
+
+               emit backgroundImageDidLoadEvent();
+            }
+
+            replyPtr->deleteLater();
+      }
+
+      auto Client::on_pingTimerDidTrigger(void) -> void
+      {
+         do_sendPing();
+      }
+
       auto Client::on_socketErrorDidOccur(
             QAbstractSocket::SocketError socketError) -> void
       {
@@ -838,7 +864,16 @@ namespace seville
       {
          my_logger.appendDebugMessage("> Movement");
 
-         // stub
+         auto userId = my_netMsg.ref();
+         auto y = my_netMsg.streamReadU16();
+         auto x = my_netMsg.streamReadU16();
+
+         auto userPtr = my_room.userPtrWithId(userId);
+         userPtr->setX(x);
+         userPtr->setY(y);
+
+         emit viewNeedsUpdatingEvent();
+
          return 1;
       }
 
@@ -853,6 +888,8 @@ namespace seville
       auto Client::do_receivePictureMove(void) -> int
       {
          my_logger.appendDebugMessage("> PictMove");
+
+         emit viewNeedsUpdatingEvent();
 
          // stub
          return 1;
@@ -883,6 +920,8 @@ namespace seville
       {
          my_logger.appendDebugMessage("> PropDelete");
 
+         emit viewNeedsUpdatingEvent();
+
          // stub
          return 1;
       }
@@ -890,6 +929,8 @@ namespace seville
       auto Client::do_receivePropMove(void) -> int
       {
          my_logger.appendDebugMessage("> PropMove");
+
+         emit viewNeedsUpdatingEvent();
 
          // stub
          return 1;
@@ -899,6 +940,8 @@ namespace seville
       {
          my_logger.appendDebugMessage("> PropNew");
 
+         emit viewNeedsUpdatingEvent();
+
          // stub
          return 1;
       }
@@ -906,6 +949,8 @@ namespace seville
       auto Client::do_receiveRoomDescend(void) -> int
       {
          my_logger.appendDebugMessage("> RoomDescend");
+
+         emit viewNeedsUpdatingEvent();
 
          return 1;
       }
@@ -978,6 +1023,8 @@ namespace seville
 
          if (0 < backgroundImageUri.length())
             do_fetchBackgroundAsync(backgroundImageUri);
+
+         emit viewNeedsUpdatingEvent();
 
          return 1;
       }
@@ -1075,6 +1122,8 @@ namespace seville
          my_logger.appendInfoMessage(
                   QString("%1 has entered the room").arg(user.username()));
 
+         emit viewNeedsUpdatingEvent();
+
          return 1;
       }
 
@@ -1083,6 +1132,9 @@ namespace seville
          my_logger.appendDebugMessage("> UserColor");
 
          // stub
+
+         emit viewNeedsUpdatingEvent();
+
          return 1;
       }
 
@@ -1090,7 +1142,14 @@ namespace seville
       {
          my_logger.appendDebugMessage("> UserExitRoom");
 
-         // stub
+         auto userId = my_netMsg.ref();
+         auto user = my_room.userWithId(userId);
+         my_room.removeUserWithId(userId);
+         my_logger.appendInfoMessage(
+                  QString("%1 has left the room.").arg(user.username()));
+
+         emit viewNeedsUpdatingEvent();
+
          return 1;
       }
 
@@ -1099,12 +1158,16 @@ namespace seville
          my_logger.appendDebugMessage("> UserFace");
 
          // stub
+         emit viewNeedsUpdatingEvent();
+
          return 1;
       }
 
       auto Client::do_receiveUserProp(void) -> int
       {
          my_logger.appendDebugMessage("> UserProp");
+
+         emit viewNeedsUpdatingEvent();
 
          return 1;
       }
@@ -1121,7 +1184,20 @@ namespace seville
       {
          my_logger.appendDebugMessage("> UserRename");
 
-         // stub
+         auto userId = my_netMsg.streamReadI32();
+         auto userPtr = my_room.userPtrWithId(userId);
+         auto oldUsername = userPtr->username();
+
+         auto usernameLen = my_netMsg.streamReadU8();
+         auto username = my_netMsg.streamReadFixedQString(usernameLen);
+         userPtr->setUsername(username);
+
+         my_logger.appendInfoMessage(QString("%1 has changed name to %2")
+                                     .arg(oldUsername)
+                                     .arg(username));
+
+         emit viewNeedsUpdatingEvent();
+
          return 1;
       }
 
@@ -1129,13 +1205,25 @@ namespace seville
       {
          my_logger.appendDebugMessage("> UserLeaving");
 
-         // stub
+         auto userCount = my_netMsg.streamReadU32();
+         my_room.setUserCount(userCount);
+
+         auto userId = my_netMsg.ref();
+         auto user = my_room.userWithId(userId);
+         my_room.removeUserWithId(userId);
+         my_logger.appendInfoMessage(
+                  QString("%1 has signed off.").arg(user.username()));
+
+         emit viewNeedsUpdatingEvent();
+
          return 1;
       }
 
       auto Client::do_receiveUserLoggedOnAndMax(void) -> int
       {
          my_logger.appendDebugMessage("> UserLoggedOnAndMax");
+
+         emit viewNeedsUpdatingEvent();
 
          // stub
          return 1;
@@ -1798,22 +1886,57 @@ namespace seville
          return res;
       }
 
+      auto Client::do_deinitEvents(void) -> void
+      {
+         disconnect(&my_socket, &QTcpSocket::readyRead,
+                    this, &seville::palace::Client::on_readyReadDidOccur);
+
+         disconnect(&my_socket, QOverload<QAbstractSocket::SocketError>::of(
+                    &QAbstractSocket::errorOccurred),
+                    this, &Client::on_socketErrorDidOccur);
+
+         disconnect(&my_networkAccessManager, &QNetworkAccessManager::finished,
+                    this, &Client::on_backgroundDidFinishLoading);
+
+         disconnect(&my_pingTimer, &QTimer::timeout,
+                    this, &Client::on_pingTimerDidTrigger);
+      }
+
       auto Client::do_deinit(void) -> void
       {
+         do_deinitEvents();
+
          disconnectFromHost();
+      }
+
+      auto Client::do_initEvents(void) -> void
+      {
+         connect(&my_socket, &QTcpSocket::readyRead,
+                 this, &seville::palace::Client::on_readyReadDidOccur);
+
+         connect(&my_socket, QOverload<QAbstractSocket::SocketError>::of(
+                    &QAbstractSocket::errorOccurred),
+                 this, &Client::on_socketErrorDidOccur);
+
+         connect(&my_networkAccessManager, &QNetworkAccessManager::finished,
+                 this, &Client::on_backgroundDidFinishLoading);
+
+         connect(&my_pingTimer, &QTimer::timeout,
+                 this, &Client::on_pingTimerDidTrigger);
       }
 
       auto Client::do_init(void) -> void
       {
-         do_setupEvents();
+         do_initEvents();
 
          do_clear();
+
          //my_logger.setMode(LogMode::kDebugMode);
          //my_logger_.setIsDebugMode(true);
 
          // TODO use a linked list or deque to communicate between threads
          // or just use a big buffer, as below.
-         my_socket.setReadBufferSize(1e7);
+         //my_socket.setReadBufferSize(1e7);
       }
    }
 }

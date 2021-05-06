@@ -6,6 +6,7 @@
 
 //#include "uiapptabbar.h"
 #include "tabwidget.h"
+#include "logwidget.h"
 #include "palaceclientwidget.h"
 
 namespace seville
@@ -37,9 +38,22 @@ namespace seville
          }
       }
 
+      auto TabWidget::closeCurrentTab(void) -> void
+      {
+
+      }
+
       auto TabWidget::currentPalaceClientPtr(void) -> palace::Client*
       {
-         return my_currentPalaceClientPtr;
+         auto currentPalaceClientWidgetPtr =
+               static_cast<seville::view::PalaceClientWidget*>(currentWidget());
+
+         seville::palace::Client* currentPalaceClientPtr = nullptr;
+         if (currentPalaceClientWidgetPtr != nullptr)
+            currentPalaceClientPtr =
+                  currentPalaceClientWidgetPtr->palaceClientPtr();
+
+         return currentPalaceClientPtr;
       }
 
       auto TabWidget::clear(void) -> void
@@ -52,13 +66,13 @@ namespace seville
          //my_currentPalaceClientPtr = nullptr;
       }
 
-      auto do_mainWindowPtr(void) -> view::MainWindow*
-      {
-         foreach (auto w, qApp->topLevelWidgets())
-            if (auto mainWindowPtr = qobject_cast<view::MainWindow*>(w))
-               return mainWindowPtr;
-         return nullptr;
-      }
+//      auto do_mainWindowPtr(void) -> view::MainWindow*
+//      {
+//         foreach (auto w, qApp->topLevelWidgets())
+//            if (auto mainWindowPtr = qobject_cast<view::MainWindow*>(w))
+//               return mainWindowPtr;
+//         return nullptr;
+//      }
 
       auto do_logWidgetPtr(void) -> view::LogWidget*
       {
@@ -79,32 +93,58 @@ namespace seville
          my_mainLayoutPtr = new QVBoxLayout(this);
          //auto layout_ptr = new QGridLayout(this);
 
-         //my_mainLayoutPtr->setSizeConstraint(QLayout::SetFixedSize);
-         //layout_ptr->addStretch(1);
-         //setContentsMargins(0, 0, 0, 0);
+         // my_mainLayoutPtr->setSizeConstraint(QLayout::SetFixedSize);
+         // layout_ptr->addStretch(1);
+         // setContentsMargins(0, 0, 0, 0);
          setLayout(my_mainLayoutPtr);
-         //tabWidget_->setSizePolicy();
-         //resize(minimumSizeHint());
+         // tabWidget_->setSizePolicy();
+         // resize(minimumSizeHint());
          adjustSize();
 
          // setStyleSheet("border: 1px solid blue");
       }
 
+      auto TabWidget::do_teardownEvents(void) -> void
+      {
+         // connect(tb, SIGNAL(clicked()), this, SLOT(on_addTab_triggered()));
+         // this->connect(this, SIGNAL(tabCloseRequested(int)),
+         // this, SLOT(on_tab_closed_triggered(int)));
+         disconnect(this, &seville::view::TabWidget::tabCloseRequested,
+                    this, &seville::view::TabWidget::on_tabDidClose);
+         //// connect(appTabBar.PlusButton(), SIGNAL(clicked()), this, SLOT(on_plusButton_clicked()));
+         //// connect(&appTabBar, SIGNAL(tabMoved(int, int)), this, SLOT(on_tabMoved_triggered()));
+         // connect(this, SIGNAL(removeTab(int)),
+         //         this, SLOT(on_tabClosed_triggered(int)));
+
+         // auto widget = this->widget(0); //currentWidget();
+         // this->widget(0);
+
+         // disconnect(this, &seville::view::TabWidget::currentChanged,
+         //            this, &seville::view::TabWidget::on_currentTabDidChange);
+
+         // disconnect(this, &seville::view::TabWidget::tabBarDoubleClicked,
+         //            this, &seville::view::TabWidget::on_tabBarDoubleClicked);
+      }
+
       auto TabWidget::do_setupEvents(void) -> void
       {
-         //connect(tb, SIGNAL(clicked()), this, SLOT(on_addTab_triggered()));
-         //this->connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(on_tab_closed_triggered(int)));
+         // connect(tb, SIGNAL(clicked()), this, SLOT(on_addTab_triggered()));
+         // this->connect(this, SIGNAL(tabCloseRequested(int)),
+         // this, SLOT(on_tab_closed_triggered(int)));
          connect(this, &seville::view::TabWidget::tabCloseRequested,
                  this, &seville::view::TabWidget::on_tabDidClose);
-         ////connect(appTabBar.PlusButton(), SIGNAL(clicked()), this, SLOT(on_plusButton_clicked()));
-         ////connect(&appTabBar, SIGNAL(tabMoved(int, int)), this, SLOT(on_tabMoved_triggered()));
-         //connect(this, SIGNAL(removeTab(int)), this, SLOT(on_tabClosed_triggered(int)));
+         //// connect(appTabBar.PlusButton(), SIGNAL(clicked()), this, SLOT(on_plusButton_clicked()));
+         //// connect(&appTabBar, SIGNAL(tabMoved(int, int)), this, SLOT(on_tabMoved_triggered()));
+         // connect(this, SIGNAL(removeTab(int)), this, SLOT(on_tabClosed_triggered(int)));
 
-         //auto widget = this->widget(0); //currentWidget();
-         //this->widget(0);
+         // auto widget = this->widget(0); //currentWidget();
+         // this->widget(0);
 
-         connect(this, &seville::view::TabWidget::currentChanged,
-                 this, &seville::view::TabWidget::on_currentTabDidChange);
+         // connect(this, &seville::view::TabWidget::currentChanged,
+         //         this, &seville::view::TabWidget::on_currentTabDidChange);
+
+         // connect(this, &seville::view::TabWidget::tabBarDoubleClicked,
+         //         this, &seville::view::TabWidget::on_tabBarDoubleClicked);
       }
 
       auto TabWidget::do_addNewTab(QWidget* contentWidgetPtr) -> void
@@ -118,19 +158,35 @@ namespace seville
          if (palaceClientWidgetPtr == nullptr)
             palaceClientWidgetPtr = new PalaceClientWidget(this);
 
-         //auto clientWidgetPtr = new PalaceClientWidget(this);
+         // auto clientWidgetPtr = new PalaceClientWidget(this);
 
          addTab(palaceClientWidgetPtr, tr("New Connection"));
-                      //.arg(QString::number(this->count())));
+                      // .arg(QString::number(this->count())));
          setCurrentWidget(palaceClientWidgetPtr);
-         my_currentPalaceClientPtr = palaceClientWidgetPtr->palaceClientPtr();
+         // my_currentPalaceClientPtr = palaceClientWidgetPtr->palaceClientPtr();
+      }
 
-         auto mainWindowPtr = do_mainWindowPtr();
-         if (mainWindowPtr != nullptr) {
-            connect(
-               palaceClientWidgetPtr,
-               &PalaceClientWidget::widgetBackgroundDidChangeEvent,
-               this, &TabWidget::on_widgetBackgroundDidChange);
+      void TabWidget::do_closeCurrentTab(void)
+      {
+         auto index = this->currentIndex();
+         do_closeTab(index);
+      }
+
+      void TabWidget::do_closeTab(int index)
+      {
+         auto clientWidgetPtr =
+               static_cast<PalaceClientWidget*>(widget(index));
+
+         // disconnect(
+         //     clientWidgetPtr, &PalaceClientWidget::widgetDidResizeEvent,
+         //     this, &TabWidget::on_clientTabWidgetDidResize);
+
+         removeTab(index);
+         delete clientWidgetPtr;
+
+         if (count() <= 0) {
+            // QApplication::quit();
+            do_addNewTab(new view::PalaceClientWidget(this));
          }
       }
 
@@ -149,23 +205,28 @@ namespace seville
          //my_currentPalaceClientPtr = this->
       }
 
-      void TabWidget::on_widgetBackgroundDidChange(void)
+      void TabWidget::on_tabBarDoubleClicked(void)
       {
-         tabBar()->adjustSize();
-
-         updateGeometry();
-         adjustSize();
-         window()->adjustSize();
-
-         auto mainWindowPtr = static_cast<QMainWindow*>(parent());
-         if (mainWindowPtr != nullptr) {
-            mainWindowPtr->updateGeometry();
-            mainWindowPtr->adjustSize();
-
-            mainWindowPtr->window()->layout()->update();
-            mainWindowPtr->window()->adjustSize();
-         }
+         addNewTab();
       }
+
+//      void TabWidget::on_widgetBackgroundDidChange(void)
+//      {
+//         tabBar()->adjustSize();
+
+//         updateGeometry();
+//         adjustSize();
+//         window()->adjustSize();
+
+//         auto mainWindowPtr = static_cast<QMainWindow*>(parent());
+//         if (mainWindowPtr != nullptr) {
+//            mainWindowPtr->updateGeometry();
+//            mainWindowPtr->adjustSize();
+
+//            mainWindowPtr->window()->layout()->update();
+//            mainWindowPtr->window()->adjustSize();
+//         }
+//      }
 
       void TabWidget::on_tabDidMove(void)
       {
@@ -173,20 +234,7 @@ namespace seville
 
       void TabWidget::on_tabDidClose(int index)
       {
-         auto clientWidgetPtr =
-               static_cast<PalaceClientWidget*>(widget(index));
-
-//         disconnect(
-//            clientWidgetPtr, &PalaceClientWidget::widgetDidResizeEvent,
-//            this, &TabWidget::on_clientTabWidgetDidResize);
-
-         removeTab(index);
-         delete clientWidgetPtr;
-
-         if (count() <= 0) {
-            //QApplication::quit();
-            do_addNewTab(new view::PalaceClientWidget(this));
-         }
+         do_closeTab(index);
       }
 
 //      void TabWidget::on_clientTabWidgetDidResize(int width, int height)
@@ -204,32 +252,45 @@ namespace seville
 //         }
 //      }
 
-      void TabWidget::on_currentTabDidChange(int index)
+//      void TabWidget::on_currentTabDidChange(int index)
+//      {
+//         auto mainWindowPtr = do_mainWindowPtr();
+//         if (mainWindowPtr == nullptr)
+//            return;
+
+//         auto logWidgetPtr = mainWindowPtr->logWidgetPtr();
+//         if (logWidgetPtr == nullptr)
+//            return;
+
+//         // the following assignment is intentional
+//         if (auto palaceClientWidgetPtr =
+//             qobject_cast<PalaceClientWidget*>(widget(index))) {
+
+//            if (palaceClientWidgetPtr == nullptr)
+//               return;
+
+//            auto palaceClientPtr = palaceClientWidgetPtr->palaceClientPtr();
+//            if (palaceClientPtr == nullptr)
+//               return;
+
+////            my_currentPalaceClientPtr =
+////                  palaceClientWidgetPtr->palaceClientPtr();
+
+//            if (palaceClientPtr == nullptr)
+//               return;
+
+//            logWidgetPtr->setPalaceClientPtr(palaceClientPtr);
+//         }
+//      }
+
+      void TabWidget::on_addNewTabRequested(void)
       {
-         auto mainWindowPtr = do_mainWindowPtr();
-         if (mainWindowPtr == nullptr)
-            return;
+         do_addNewTab();
+      }
 
-         auto logWidgetPtr = mainWindowPtr->logWidgetPtr();
-         if (logWidgetPtr == nullptr)
-            return;
-
-         // the following assignment is intentional
-         if (auto palaceClientWidgetPtr =
-             qobject_cast<PalaceClientWidget*>(widget(index))) {
-
-            if (palaceClientWidgetPtr == nullptr)
-               return;
-
-            auto palaceClientPtr = palaceClientWidgetPtr->palaceClientPtr();
-            if (palaceClientPtr == nullptr)
-               return;
-
-            my_currentPalaceClientPtr =
-                  palaceClientWidgetPtr->palaceClientPtr();
-
-            logWidgetPtr->setPalaceClientPtr(palaceClientPtr);
-         }
+      void TabWidget::on_closeCurrentTabRequested(void)
+      {
+         do_closeCurrentTab();
       }
 
       //void AppTabWidget::on_plusButton_clicked()

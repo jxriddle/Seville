@@ -289,11 +289,30 @@ namespace seville
             do_roomChat(text);
          }
 
+         inline auto move(i16 x, i16 y) -> void {
+            my_logger.appendDebugMessage(
+                     QString("Movement to (%1, %2)").arg(x).arg(y));
+
+            my_user.setX(x);
+            my_user.setY(y);
+
+            auto userPtr = my_room.userPtrWithId(my_user.id());
+            userPtr->setX(x);
+            userPtr->setY(y);
+
+            do_sendMove(x, y);
+
+            emit viewNeedsUpdatingEvent();
+         }
+
       signals:
          void backgroundImageDidLoadEvent(void);
          void connectionStateDidChangeEvent(ConnectionState);
+         void viewNeedsUpdatingEvent(void);
 
       public slots:
+         void on_backgroundDidFinishLoading(QNetworkReply* replyPtr);
+         void on_pingTimerDidTrigger(void);
          void on_readyReadDidOccur(void);
          void on_socketErrorDidOccur(QAbstractSocket::SocketError);
 
@@ -383,6 +402,8 @@ namespace seville
          auto do_determineIsConnected(void) const -> bool;
          auto do_determineShouldSwapEndianness(void) const -> NetMsgOptions;
 
+         auto do_processUserNew(void) -> User;
+
          auto do_receiveAltLogon(void) -> int;
          auto do_receiveAltRoomDescription(void) -> int;
          auto do_receiveAssetIncoming(void) -> int;
@@ -407,7 +428,6 @@ namespace seville
          auto do_receiveRoomUserList(void) -> int;
          auto do_receiveServerVersion(void) -> int;
          auto do_receiveServerInfo(void) -> int;
-         auto do_processUserNew(void) -> User;
          auto do_receiveUserNew(void) -> int;
          auto do_receiveUserColor(void) -> int;
          auto do_receiveUserExitRoom(void) -> int;
@@ -442,6 +462,8 @@ namespace seville
 
          auto do_routeReceivedNetMsg(void) -> int;
 
+         auto do_deinitEvents(void) -> void;
+         auto do_initEvents(void) -> void;
          auto do_deinit(void) -> void;
          auto do_init(void) -> void;
       };
