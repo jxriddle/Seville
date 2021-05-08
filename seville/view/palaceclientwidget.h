@@ -39,8 +39,8 @@ namespace seville
 //            return &my_backgroundImage;
 //         }
 
-         inline auto drawUsersInRoom(void) -> void {
-            do_redrawRoom();
+         inline auto drawRoom(void) -> void {
+            do_drawRoom();
          }
 
       protected:
@@ -97,7 +97,7 @@ namespace seville
          auto do_promptOpenConnection(QWidget* parentPtr) -> void;
          auto do_fetchBackgroundImage(const QString& fileUrl) -> void;
          //auto do_clearBackgroundImage(void) -> void;
-         auto do_redrawRoom(void) -> void;
+         auto do_drawRoom(void) -> void;
       };
    }
 }

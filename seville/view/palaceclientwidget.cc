@@ -288,7 +288,7 @@ namespace seville
          }
       }
 
-      auto PalaceClientWidget::do_redrawRoom(void) -> void
+      auto PalaceClientWidget::do_drawRoom(void) -> void
       {
          if (my_palaceClientPtr == nullptr)
             return;
@@ -348,7 +348,8 @@ namespace seville
          }
          else if (my_palaceClientPtr->connectionState() ==
                   palace::ConnectionState::kConnectedState) {
-            my_palaceClientPtr->move(mouseEventPtr->x(), mouseEventPtr->y());
+            my_palaceClientPtr->move(mouseEventPtr->x() - kSmileyWidth/2,
+                                     mouseEventPtr->y() - kSmileyHeight/2);
          }
       }
 
