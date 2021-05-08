@@ -60,32 +60,33 @@ namespace seville
          inline auto appendLogEntry(
                LogEntryKind kind,
                const QString& message,
-               const QString& fromUsername,
-               const QString& toUsername
+               const QString& usernameFrom,
+               const QString& usernameTo
                ) -> void {
-            do_appendLogEntry(LogEntry(kind, message, fromUsername, toUsername));
+            do_appendLogEntry(
+                     LogEntry(kind, message, usernameFrom, usernameTo));
          }
 
          inline auto appendWhisperMessage(
-               const QString& fromUsername,
-               const QString& toUsername,
+               const QString& usernameFrom,
+               // const QString& usernameTo,
                const QString& message) -> void {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kWhisperKind,
                         message,
-                        fromUsername,
-                        toUsername));
+                        usernameFrom));
+                        // usernameTo));
          }
 
          inline auto appendChatMessage(
-               const QString& username_from,
+               const QString& usernameFrom,
                const QString& message) -> void {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kChatKind,
                         message,
-                        username_from,
+                        usernameFrom,
                         ""));
          }
 

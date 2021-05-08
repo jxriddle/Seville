@@ -4,12 +4,12 @@ namespace seville
 {
    namespace palace
    {
-      Server::~Server()
+      Server::~Server(void)
       {
          do_deinit();
       }
 
-      Server::Server()
+      Server::Server(void)
          : QObject()
       {
          do_init();

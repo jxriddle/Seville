@@ -509,6 +509,22 @@ namespace seville
                         .arg(user.id()));
             }
          }
+         else if (text.left(QString("'w ").length()) ==
+                  QString("'w ")) {
+            auto split = text.split(' ');
+            if (2 < split.length()) {
+               auto ok = true;
+               auto userId = split.at(1).toUInt(&ok);
+               auto message = split.at(2);
+               for (auto i = 3; i < split.length(); i++) {
+                  message.append(QString(" %1").arg(split.at(i)));
+               }
+
+               if (ok) {
+                  do_sendXWhisper(userId, message);
+               }
+            }
+         }
          else if (text.left(QString("'gotoroom").length()) ==
                   QString("'gotoroom")) {
             auto split = text.split(' ');
@@ -1185,7 +1201,10 @@ namespace seville
          my_logger.appendDebugMessage("> UserRename");
 
          auto userId = my_netMsg.streamReadI32();
-         auto userPtr = my_room.userPtrWithId(userId);
+         auto userPtr = my_server.userPtrWithId(userId);
+         if (userPtr == nullptr)
+            return 0;
+
          auto oldUsername = userPtr->username();
 
          auto usernameLen = my_netMsg.streamReadU8();
@@ -1260,7 +1279,7 @@ namespace seville
             auto roomNamePaddedLen = (4 - (roomNameLen & 3)) - 1; // + roomNameLen;
             my_netMsg.streamSkip(roomNamePaddedLen);
 
-            roomListPtr->append(room);
+            roomListPtr->push_back(room);
          }
 
          return 1;
@@ -1287,7 +1306,7 @@ namespace seville
             auto usernamePaddedLen = (4 - (usernameLen & 3)) - 1; // + usernameLen;
             my_netMsg.streamSkip(usernamePaddedLen);
 
-            userListPtr->append(user);
+            userListPtr->push_back(user);
          }
 
          return 1;
@@ -1327,7 +1346,28 @@ namespace seville
       {
          my_logger.appendDebugMessage("> Whisper");
 
-         // stub
+         auto userId = my_netMsg.ref();
+         auto user = my_server.userWithId(userId);
+
+         auto userIdTo = my_netMsg.streamReadU32();
+         (void)userIdTo;
+         // auto messageLen = my_netMsg.streamReadU16();
+         // auto cipherLen = messageLen - 3;
+         // auto ciphertext = my_netMsg.streamReadByteArray(cipherLen);
+         //auto ciphertext = my_netMsg.streamReadAndDecodeQString(cipherLen);
+         // auto message = my_cipher.decipher(ciphertext);
+         auto message = my_netMsg.streamReadAndDecodeQString(
+                  my_netMsg.len());
+
+         auto usernameFrom = user.username();
+         //auto id = user.id();
+         my_logger.appendWhisperMessage(
+//                  QString("%1 (%2)")
+//                  .arg(username)
+//                  .arg(id),
+         usernameFrom,
+         message);
+
          return 1;
       }
 
@@ -1344,13 +1384,13 @@ namespace seville
          //auto ciphertext = my_netMsg.streamReadAndDecodeQString(cipherLen);
          auto message = my_cipher.decipher(ciphertext);
 
-         auto username = user.username();
+         auto usernameFrom = user.username();
          //auto id = user.id();
          my_logger.appendChatMessage(
 //                  QString("%1 (%2)")
 //                  .arg(username)
 //                  .arg(id),
-         username,
+         usernameFrom,
          message);
 
          return 1;
@@ -1360,7 +1400,26 @@ namespace seville
       {
          my_logger.appendDebugMessage("> XWhisper");
 
-         // stub
+         auto userId = my_netMsg.ref();
+         auto user = my_server.userWithId(userId);
+
+         // auto userIdTo = my_netMsg.streamReadU32();
+         // (void)userIdTo;
+         auto messageLen = my_netMsg.streamReadU16();
+         auto cipherLen = messageLen - 3;
+         auto ciphertext = my_netMsg.streamReadByteArray(cipherLen);
+         //auto ciphertext = my_netMsg.streamReadAndDecodeQString(cipherLen);
+         auto message = my_cipher.decipher(ciphertext);
+
+         auto usernameFrom = user.username();
+         //auto id = user.id();
+         my_logger.appendWhisperMessage(
+//                  QString("%1 (%2)")
+//                  .arg(username)
+//                  .arg(id),
+         usernameFrom,
+         message);
+
          return 1;
       }
 
@@ -1773,6 +1832,26 @@ namespace seville
          xTalkMsg.append('\0');
 
          return my_socket.write(xTalkMsg);
+         //return my_socket.flush();
+      }
+
+      auto Client::do_sendXWhisper(const u32 userId, const QString& text) -> int
+      {
+         auto msg = NetMsg(do_determineShouldSwapEndianness());
+
+         msg.setId(NetMsg::kXWhisperKind);
+         auto len = NetMsg::kXWhisperBodySize + text.length() + 3;
+         msg.setLen(len);
+         msg.setRef(my_user.id());
+
+         auto plaintext = text.toUtf8();
+         auto ciphertext = my_cipher.encipher(plaintext);
+         msg.appendU32(userId);
+         msg.appendU16(text.length() + 3);
+         msg.append(ciphertext);
+         msg.append('\0');
+
+         return my_socket.write(msg);
          //return my_socket.flush();
       }
 

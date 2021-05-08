@@ -44,7 +44,7 @@ namespace seville
             my_byteOrder = byteOrder;
          }
 
-         inline auto roomListPtr(void) -> QList<Room>* {
+         inline auto roomListPtr(void) -> std::vector<Room>* {
             return &my_roomList; // .get();
          }
 
@@ -53,7 +53,7 @@ namespace seville
 //            my_roomList = std::move(roomListUnquePtr);
 //         }
 
-         inline auto userListPtr(void) -> QList<User>* {
+         inline auto userListPtr(void) -> std::vector<User>* {
             return &my_userList; // .get();
          }
 
@@ -62,6 +62,37 @@ namespace seville
 //               -> void {
 //            my_userList = std::move(userListUniquePtr);
 //         }
+
+         inline auto userWithId(u32 userId) -> User {
+            for (auto& user: my_userList) {
+               if (user.id() == userId) {
+                  return user;
+               }
+            }
+
+            return User();
+         }
+
+         inline auto userPtrWithId(u32 userId) -> User* {
+            for (auto& user: my_userList) {
+               if (user.id() == userId) {
+                  return &user;
+               }
+            }
+
+            return nullptr;
+         }
+
+         inline auto removeUserWithId(u32 userId) -> void {
+            auto i = u32{0};
+            auto z = my_userList.size();
+            while (i < z) {
+               if (my_userList[i].id() == userId) {
+                  my_userList.erase(my_userList.begin() + i);
+               }
+               i++;
+            }
+         }
 
          inline auto hostname(void) const -> QString {
             return my_host;
@@ -98,8 +129,8 @@ namespace seville
 
       private:
          HostByteOrder my_byteOrder;
-         QList<Room> my_roomList;
-         QList<User> my_userList;
+         std::vector<Room> my_roomList;
+         std::vector<User> my_userList;
          QString my_host;
          u16 my_port;
          u32 my_version;

@@ -452,6 +452,7 @@ namespace seville
                const QString &username, const QString &password) -> int;
          auto do_sendTalk(const QString& text) -> int;
          auto do_sendXTalk(const QString& text) -> int;
+         auto do_sendXWhisper(const u32 userId, const QString& text) -> int;
          auto do_sendPing(void) -> int;
          auto do_sendPong(void) -> int;
          auto do_sendGotoRoom(i16 roomId) -> int;

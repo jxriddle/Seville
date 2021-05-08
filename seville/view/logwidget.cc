@@ -25,16 +25,21 @@ namespace seville
       void LogWidget::on_messageLoggedEvent(
             const seville::palace::LogEntry& logEntry)
       {
-         if (logEntry.kind() == seville::palace::LogEntryKind::kChatKind ||
-             logEntry.kind() == seville::palace::LogEntryKind::kWhisperKind) {
+         if (logEntry.kind() == seville::palace::LogEntryKind::kChatKind) {
             my_logTextEditPtr->append(
                      QString("%1: %2")
                      .arg(logEntry.fromUsername())
                      .arg(logEntry.message()));
          //} else if (logMessage.kind() ==
          //           seville::palace::LogMessageKind::kInfoKind) {
+         } else if (logEntry.kind() == seville::palace::LogEntryKind::kWhisperKind) {
+            my_logTextEditPtr->append(
+                     QString("Whisper from %1: %2")
+                     .arg(logEntry.fromUsername())
+                     .arg(logEntry.message()));
          } else {
             my_logTextEditPtr->append(logEntry.message());
+                     //QString("(whisper) %1").arg(logEntry.message()));
          }
       }
 
