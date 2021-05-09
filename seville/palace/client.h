@@ -153,6 +153,9 @@ namespace seville
          static const int kDefaultSizeOfChunkReadSize = 100; /* netmsg::kHeaderSize; */
          static const int kMinSizeOfShortestChunkReadSize = 1;
 
+         static const int kNumFaces = 12;
+         static const int kNumFaceColors = 16;
+
 //            static const int kDemoElapsed = 0x00011940;
 //            static const int kTotalElapsed = 0x00011940;
 //            static const int kDemoLimit = 0x00011940;
@@ -226,8 +229,8 @@ namespace seville
             return &my_user;
          }
 
-         inline auto roomPtr(void) -> Room* {
-            return &my_room;
+         inline auto currentRoomPtr(void) -> Room* {
+            return &my_currentRoom;
          }
 
          auto inline isBigEndian(void) -> bool {
@@ -296,7 +299,7 @@ namespace seville
             my_user.setX(x);
             my_user.setY(y);
 
-            auto userPtr = my_room.userPtrWithId(my_user.id());
+            auto userPtr = my_currentRoom.userPtrWithId(my_user.id());
             userPtr->setX(x);
             userPtr->setY(y);
 
@@ -340,7 +343,7 @@ namespace seville
          quint16 my_port;
          Server my_server;
          User my_user;
-         Room my_room;
+         Room my_currentRoom;
          Cipher my_cipher;
          QTimer my_timer;
          //int my_transfer_timer_id;
@@ -460,6 +463,8 @@ namespace seville
          auto do_sendRequestRoomList(void) -> int;
          auto do_sendRequestUserList(void) -> int;
          auto do_sendRequestRoomAndUserLists(void) -> int;
+         auto do_sendFaceColor(u16 colorId) -> int;
+         auto do_sendFace(u16 face) -> int;
 
          auto do_routeReceivedNetMsg(void) -> int;
 

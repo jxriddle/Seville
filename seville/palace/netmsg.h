@@ -101,50 +101,50 @@ namespace seville
 
          // Record Sizes (excludes header size)
          //static const u32 kAuthResponseSize =
-         enum NetMsgBodySize: i32 {
-            kDefaultBodySize = 0,
-            kAltLogonBodySize = kDefaultBodySize,
-            kConnectionErrorBodySize = kDefaultBodySize,
-            kServerVersionBodySize = kDefaultBodySize,
-            kServerInfoBodySize = kDefaultBodySize,
-            kUserStatusBodySize = kDefaultBodySize,
-            kUserLoggedOnAndMaxBodySize = kDefaultBodySize,
-            kHttpServerLocationBodySize = kDefaultBodySize,
-            kRoomUserListBodySize = kDefaultBodySize,
-            kServerUserListBodySize = kDefaultBodySize,
-            kServerRoomListBodySize = kDefaultBodySize,
-            kRoomDescendedBodySize = kDefaultBodySize,
-            kUserNewBodySize = kDefaultBodySize,
-            kPingBodySize = kDefaultBodySize,
-            kPongBodySize = kDefaultBodySize,
-            kXTalkBodySize = kDefaultBodySize,
-            kXWhisperBodySize = 4,
-            kTalkBodyBodySize = kDefaultBodySize,
-            kWhisperBodySize = kDefaultBodySize,
-            kAssetIncomingBodySize = kDefaultBodySize,
-            kAssetQueryBodySize = kDefaultBodySize,
-            kMovementBodySize = kDefaultBodySize,
-            kUserColorBodySize = kDefaultBodySize,
-            kUserFaceBodySize = kDefaultBodySize,
-            kUserPropBodySize = kDefaultBodySize,
-            kUserDescriptionBodySize = kDefaultBodySize,
-            kUserRenameBodySize = kDefaultBodySize,
-            kUserLeavingBodySize = kDefaultBodySize,
-            kUserExitRoomBodySize = kDefaultBodySize,
-            kPropMoveBodySize = kDefaultBodySize,
-            kPropDeleteBodySize = kDefaultBodySize,
-            kPropNewBodySize = kDefaultBodySize,
-            kDoorLockBodySize = kDefaultBodySize,
-            kDoorUnlockBodySize = kDefaultBodySize,
-            kPictMoveBodySize = kDefaultBodySize,
-            kSpotStateBodySize = kDefaultBodySize,
-            kSpotMoveBodySize = kDefaultBodySize,
-            kDrawBodySize = kDefaultBodySize,
-            kNavErrorBodySize = kDefaultBodySize,
-            kBlowThruBodySize = kDefaultBodySize,
-            kAuthenticateBodySize = kDefaultBodySize,
-            kAltRoomDescriptionBodySize = kDefaultBodySize,
-            kRoomDescriptionBodySize = 40,
+         enum NetMsgBodyLen: i32 {
+            kDefaultBodyLen = 0,
+            kAltLogonBodyLen = kDefaultBodyLen,
+            kConnectionErrorBodyLen = kDefaultBodyLen,
+            kServerVersionBodyLen = kDefaultBodyLen,
+            kServerInfoBodyLen = kDefaultBodyLen,
+            kUserStatusBodyLen = kDefaultBodyLen,
+            kUserLoggedOnAndMaxBodyLen = kDefaultBodyLen,
+            kHttpServerLocationBodyLen = kDefaultBodyLen,
+            kRoomUserListBodyLen = kDefaultBodyLen,
+            kServerUserListBodyLen = kDefaultBodyLen,
+            kServerRoomListBodyLen = kDefaultBodyLen,
+            kRoomDescendedBodyLen = kDefaultBodyLen,
+            kUserNewBodyLen = kDefaultBodyLen,
+            kPingBodyLen = kDefaultBodyLen,
+            kPongBodyLen = kDefaultBodyLen,
+            kXTalkBodyLen = kDefaultBodyLen,
+            kXWhisperBodyLen = 4,
+            kTalkBodyBodyLen = kDefaultBodyLen,
+            kWhisperBodyLen = kDefaultBodyLen,
+            kAssetIncomingBodyLen = kDefaultBodyLen,
+            kAssetQueryBodyLen = kDefaultBodyLen,
+            kMovementBodyLen = kDefaultBodyLen,
+            kUserColorBodyLen = 2,
+            kUserFaceBodyLen = 2,
+            kUserPropBodyLen = kDefaultBodyLen,
+            kUserDescriptionBodyLen = kDefaultBodyLen,
+            kUserRenameBodyLen = kDefaultBodyLen,
+            kUserLeavingBodyLen = kDefaultBodyLen,
+            kUserExitRoomBodyLen = kDefaultBodyLen,
+            kPropMoveBodyLen = kDefaultBodyLen,
+            kPropDeleteBodyLen = kDefaultBodyLen,
+            kPropNewBodyLen = kDefaultBodyLen,
+            kDoorLockBodyLen = kDefaultBodyLen,
+            kDoorUnlockBodyLen = kDefaultBodyLen,
+            kPictMoveBodyLen = kDefaultBodyLen,
+            kSpotStateBodyLen = kDefaultBodyLen,
+            kSpotMoveBodyLen = kDefaultBodyLen,
+            kDrawBodyLen = kDefaultBodyLen,
+            kNavErrorBodyLen = kDefaultBodyLen,
+            kBlowThruBodyLen = kDefaultBodyLen,
+            kAuthenticateBodyLen = kDefaultBodyLen,
+            kAltRoomDescriptionBodyLen = kDefaultBodyLen,
+            kRoomDescriptionBodyLen = 40,
          };
 
          enum NetMsgSize: i32 {
@@ -154,7 +154,7 @@ namespace seville
             //kHeaderSize = kMinimumSize,
             kGenericSize = kMinimumSize,
             kLogonSize = 128,
-            kRoomDescriptionSize = kMinimumSize + kRoomDescriptionBodySize,
+            // kRoomDescriptionSize = kMinimumSize + kRoomDescriptionBodySize,
          };
 
          enum NetMsgLen: i32 {
@@ -267,7 +267,7 @@ namespace seville
 
          inline auto isValid(void) -> int {
             //return my_isValidFlag;
-            return size() == NetMsg::kHeaderSize + static_cast<int>(do_len());
+            return size() == NetMsg::kHeaderSize + static_cast<int>(do_bodyLen());
          }
 
          //inline auto setIsValid(int value) -> void {
@@ -282,12 +282,12 @@ namespace seville
             do_setId(value);
          }
 
-         inline auto len(void) -> u32 {
-            return do_len();
+         inline auto bodyLen(void) -> u32 {
+            return do_bodyLen();
          }
 
-         inline auto setLen(u32 value) -> void {
-            do_setLen(value);
+         inline auto setBodyLen(u32 value) -> void {
+            do_setBodyLen(value);
          }
 
          inline auto ref(void) -> u32 {
@@ -401,8 +401,8 @@ namespace seville
 
          auto do_id(void) -> u32;
          auto do_setId(u32 value) -> void;
-         auto do_len(void) -> u32;
-         auto do_setLen(u32 value) -> void;
+         auto do_bodyLen(void) -> u32;
+         auto do_setBodyLen(u32 value) -> void;
          auto do_ref(void) -> u32;
          auto do_setRef(u32 value) -> void;
 

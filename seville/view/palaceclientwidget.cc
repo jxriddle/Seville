@@ -13,6 +13,9 @@
 #include <QScrollBar>
 #include <QMouseEvent>
 #include <QPaintEvent>
+#include <QFontMetrics>
+#include <QGraphicsPathItem>
+#include <QGraphicsDropShadowEffect>
 
 #include "seville/base/sevilleapp.h"
 #include "seville/palace/log.h"
@@ -57,6 +60,22 @@ namespace seville
 
       auto PalaceClientWidget::do_init(void) -> void
       {
+         kNameColors[0] = QColor::fromRgb(240, 152, 152); // red
+         kNameColors[1] = QColor::fromRgb(238, 171, 135); // orange red
+         kNameColors[2] = QColor::fromRgb(237, 200, 126); // orange
+         kNameColors[3] = QColor::fromRgb(238, 225, 135); // yellow
+         kNameColors[4] = QColor::fromRgb(181, 237, 126); // light green
+         kNameColors[5] = QColor::fromRgb(135, 238, 135); // green
+         kNameColors[6] = QColor::fromRgb(135, 238, 186); // blue green
+         kNameColors[7] = QColor::fromRgb(135, 238, 215); // green blue
+         kNameColors[9] = QColor::fromRgb(126, 237, 237); // light blue
+         kNameColors[10] = QColor::fromRgb(143, 193, 239); // blue
+         kNameColors[11] = QColor::fromRgb(126, 254, 237); // purple
+         kNameColors[12] = QColor::fromRgb(138, 126, 237); // violet
+         kNameColors[13] = QColor::fromRgb(210, 100, 233); // light violet?
+         kNameColors[14] = QColor::fromRgb(235, 117, 204); // pink
+         kNameColors[15] = QColor::fromRgb(235, 117, 163); // light red
+
          my_palaceClientPtr = new seville::palace::Client(this);
          auto spritesheetPath =
                QString(":/seville/assets/images/defaultsmileys.png");
@@ -288,29 +307,29 @@ namespace seville
          }
       }
 
-      auto PalaceClientWidget::do_drawRoom(void) -> void
-      {
-         if (my_palaceClientPtr == nullptr)
-            return;
+//      auto PalaceClientWidget::do_drawRoom(void) -> void
+//      {
+//         if (my_palaceClientPtr == nullptr)
+//            return;
 
-         my_palaceClientPtr->loggerPtr()->appendInfoMessage("Drawing users in room...");
+//         // my_palaceClientPtr->loggerPtr()->appendInfoMessage("Drawing users in room...");
 
-         QPainter painter;
-         painter.drawImage(0, 0, my_backgroundImage);
+//         QPainter painter;
+//         painter.drawImage(0, 0, my_backgroundImage);
 
-         for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr()) {
-            auto rect =
-                  QRect(user.face() * kSmileyWidth,
-                        user.color() * kSmileyHeight,
-                        kSmileyWidth,
-                        kSmileyHeight);
+//         for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr()) {
+//            auto rect =
+//                  QRect(user.face() * kSmileyWidth,
+//                        user.color() * kSmileyHeight,
+//                        kSmileyWidth,
+//                        kSmileyHeight);
 
-            QImage userImage = my_spritesheet.copy(rect);
-            painter.drawImage(user.x(), user.y(), userImage);
+//            QImage userImage = my_spritesheet.copy(rect);
+//            painter.drawImage(user.x(), user.y(), userImage);
 
-            update();
-         }
-      }
+//            update();
+//         }
+//      }
 
 //      void PalaceClientWidget::do_clearBackgroundImage(void)
 //      {
@@ -353,7 +372,7 @@ namespace seville
          }
       }
 
-      void PalaceClientWidget::paintEvent(QPaintEvent *paintEventPtr)
+      void PalaceClientWidget::paintEvent(QPaintEvent* paintEventPtr)
       {
          (void)paintEventPtr;
 
@@ -365,7 +384,8 @@ namespace seville
          QPainter painter(this);
          painter.drawImage(8, 8, my_backgroundImage);
 
-         for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr()) {
+         for (auto& user: *my_palaceClientPtr->currentRoomPtr()->userListPtr())
+         {
             auto rect =
                   QRect(user.face() * kSmileyWidth,
                         user.color() * kSmileyHeight,
@@ -375,12 +395,61 @@ namespace seville
             QImage userImage = my_spritesheet.copy(rect);
             painter.drawImage(user.x(), user.y(), userImage);
 
-            // painter.setPen(Qt::);
-            painter.setFont(QFont("Sans-Serif", 10, 3));
-            painter.drawText(user.x(), user.y() + 55, user.username());
+            // QBrush blackBrush(Qt::black);
+            // QPen pen(Qt::gray);
 
-            update();
+            auto font = QFont("Sans-Serif", 10, QFont::Bold);
+            // font.setWeight(3);
+
+            auto fontMetrics = QFontMetrics(font);
+
+            auto width = fontMetrics.boundingRect(
+                     user.username()).width() + kDropShadowWidth;
+
+            // auto nameTextRect = QRect();
+            auto nameTextPoint =
+                  QPoint(user.x() + (kSmileyWidth / 2) - (width / 2.0),
+                         user.y() + 56);
+
+            // nameTextRect.setX(user.x());
+            // nameTextRect.setY(user.y());
+            // nameTextRect.setWidth((kSmileyWidth / 2) - (width / 2));
+            // nameTextRect.setHeight(user.y() + 58);
+
+
+            // draw name drop shadow
+            // painter.drawText(
+            //    nameTextRect.adjusted(0, 2, 2, 0), user.username());
+
+            // auto nameTextGraphic = QGraphicsTextItem();
+            // auto dropShadowEffect = QGraphicsDropShadowEffect();
+            // auto painterPath = QPainterPath();
+            // painterPath.addText(
+            //          nameTextPoint + QPoint(0, 1), font, user.username());
+
+            // nameTextGraphic.set
+            painter.setFont(font);
+            painter.setPen(Qt::black);
+            // painter.drawPath(painterPath);
+            painter.drawText(nameTextPoint + QPoint(0, -1), user.username());
+            painter.drawText(nameTextPoint + QPoint(-1, 0), user.username());
+            painter.drawText(nameTextPoint + QPoint(1, 0), user.username());
+
+            painter.setFont(font);
+            painter.setPen(Qt::black);
+            // painter.drawPath(painterPath);
+            painter.drawText(nameTextPoint + QPoint(0, 2), user.username());
+
+            // draw name
+            // painter.setPen(Qt::Pen
+            painter.setFont(font);
+            if (0 <= user.face() && user.face() < kNumNameColors)
+              painter.setPen(kNameColors[user.face()]);
+
+            painter.drawText(nameTextPoint, user.username());
          }
+
+         // update();
       }
 
       //auto ClientWidget::on_background_image_did_change(
@@ -398,7 +467,7 @@ namespace seville
       auto PalaceClientWidget::on_backgroundImageDidLoad(void) -> void
       {
          auto backgroundImage =
-               my_palaceClientPtr->roomPtr()->backgroundImage();
+               my_palaceClientPtr->currentRoomPtr()->backgroundImage();
 
          //auto pixmap = QPixmap::fromImage(backgroundImage);
          do_setBackgroundImage(backgroundImage);

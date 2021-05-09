@@ -475,7 +475,8 @@ namespace seville
       {
          do_updateMenus();
 
-         my_currentPalaceClientWidgetPtr->drawRoom();
+         my_currentPalaceClientWidgetPtr->update();
+         // my_currentPalaceClientWidgetPtr->drawRoom();
       }
 
       auto MainWindow::do_init(void) -> void

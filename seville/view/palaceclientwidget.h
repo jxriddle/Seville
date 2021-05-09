@@ -24,6 +24,11 @@ namespace seville
          static const u32 kMaxPropWidth = 132;
          static const u32 kMaxPropHeight = 132;
 
+         static const int kNumNameColors = 16;
+         QColor kNameColors[kNumNameColors];
+
+         static const int kDropShadowWidth = 0;
+
          explicit PalaceClientWidget(QWidget* parentWidgetPtr = nullptr);
          //virtual ~ClientWidget(void);
 
@@ -39,9 +44,9 @@ namespace seville
 //            return &my_backgroundImage;
 //         }
 
-         inline auto drawRoom(void) -> void {
-            do_drawRoom();
-         }
+         // inline auto drawRoom(void) -> void {
+         //    do_drawRoom();
+         // }
 
       protected:
          auto paintEvent(QPaintEvent* eventPtr) -> void;
@@ -93,11 +98,11 @@ namespace seville
          // auto do_setBackgroundImage(const QPixmap& pixmap) -> void;
          auto do_setBackgroundImage(const QImage& image) -> void;
          auto do_setBackgroundImageFromFile(const QString& imagePath) -> void;
-         //auto do_resizeBackgroundImage(QSize size) -> void;
+         // auto do_resizeBackgroundImage(QSize size) -> void;
          auto do_promptOpenConnection(QWidget* parentPtr) -> void;
          auto do_fetchBackgroundImage(const QString& fileUrl) -> void;
-         //auto do_clearBackgroundImage(void) -> void;
-         auto do_drawRoom(void) -> void;
+         // auto do_clearBackgroundImage(void) -> void;
+         // auto do_drawRoom(void) -> void;
       };
    }
 }

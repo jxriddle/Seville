@@ -78,12 +78,12 @@ namespace seville
          setU32At(NetMsg::kIdOffset, value);
       }
 
-      auto NetMsg::do_len(void) -> u32
+      auto NetMsg::do_bodyLen(void) -> u32
       {
          return u32At(NetMsg::kLenOffset);
       }
 
-      auto NetMsg::do_setLen(u32 value) -> void
+      auto NetMsg::do_setBodyLen(u32 value) -> void
       {
          //my_headerFlags &= 0b010;
          setU32At(NetMsg::kLenOffset, value);
