@@ -1257,7 +1257,7 @@ namespace seville
       {
          my_logger.appendDebugMessage("> UserRename");
 
-         auto userId = my_netMsg.streamReadI32();
+         auto userId = my_netMsg.ref();
          auto userPtr = my_server.userPtrWithId(userId);
          if (userPtr == nullptr)
             return 0;

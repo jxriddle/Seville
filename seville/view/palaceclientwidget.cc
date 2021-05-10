@@ -69,13 +69,13 @@ namespace seville
          kNameColors[6]  = QColor::fromRgb(0x28, 0xe0, 0x83); // pale green
          kNameColors[7]  = QColor::fromRgb(0x2f, 0xe1, 0xba); // blue green
          kNameColors[9]  = QColor::fromRgb(0x38, 0xe3, 0xe3); // green blue
-         kNameColors[10] = QColor::fromRgb(0x25, 0x86, 0xe0); // light blue
+         kNameColors[10] = QColor::fromRgb(0x25, 0x86, 0xe1); // light blue
          kNameColors[11] = QColor::fromRgb(0x26, 0x55, 0xe0); // blue
          kNameColors[12] = QColor::fromRgb(0x4b, 0x38, 0xe3); // violet
          kNameColors[13] = QColor::fromRgb(0x87, 0x2f, 0xe1); // purple
          kNameColors[14] = QColor::fromRgb(0xbc, 0x20, 0xdd); // mauve
          kNameColors[15] = QColor::fromRgb(0xe0, 0x26, 0xae); // pink
-         kNameColors[16] = QColor::fromRgb(0xe0, 0x25, 0x6e); // red purple
+         // kNameColors[16] = QColor::fromRgb(0xe0, 0x25, 0x6e); // red purple
 
          my_palaceClientPtr = new seville::palace::Client(this);
          auto spritesheetPath =
