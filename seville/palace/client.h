@@ -468,6 +468,7 @@ namespace seville
          auto do_sendRequestRoomAndUserLists(void) -> int;
          auto do_sendFaceColor(u16 colorId) -> int;
          auto do_sendFace(u16 face) -> int;
+         auto do_sendPropRequest(void) -> int;
 
          auto do_routeReceivedNetMsg(void) -> int;
 

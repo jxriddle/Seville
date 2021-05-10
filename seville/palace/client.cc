@@ -138,10 +138,17 @@ namespace seville
                //do_readSocket();
             //});
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+         connect(
+            &my_socket,QOverload<QAbstractSocket::SocketError>
+                  ::of(&QAbstractSocket::error),
+            this, &Client::on_socketErrorDidOccur);
+#else
          connect(
             &my_socket, QOverload<QAbstractSocket::SocketError>::of(
                      &QAbstractSocket::errorOccurred),
                   this, &Client::on_socketErrorDidOccur);
+
                   //this, [this](QAbstractSocket::SocketError error) {
                   //&Client::on_socketError
                //QAbstractSocket::SocketError::
@@ -154,6 +161,7 @@ namespace seville
 //               my_logger_.error("Socket error");
 //               qCDebug(log_seville) << "ERROR: Socket Error";
 //            });
+#endif
 
          connect(
             &my_networkAccessManager, &QNetworkAccessManager::finished,
@@ -1387,7 +1395,8 @@ namespace seville
          auto userId = my_netMsg.ref();
          auto user = my_room.userWithId(userId);
          //auto message = my_netMsg.streamReadByteArray(my_netMsg.len());
-         auto message = my_netMsg.streamReadAndDecodeQString(my_netMsg.bodyLen());
+         auto message =
+               my_netMsg.streamReadAndDecodeQString(my_netMsg.bodyLen());
 
          my_logger.appendChatMessage(user.username(), message);
 
@@ -1401,8 +1410,8 @@ namespace seville
          auto userId = my_netMsg.ref();
          auto user = my_server.userWithId(userId);
 
-         auto userIdTo = my_netMsg.streamReadU32();
-         (void)userIdTo;
+         // auto userIdTo = my_netMsg.streamReadU32();
+         // (void)userIdTo;
          // auto messageLen = my_netMsg.streamReadU16();
          // auto cipherLen = messageLen - 3;
          // auto ciphertext = my_netMsg.streamReadByteArray(cipherLen);
@@ -2057,6 +2066,11 @@ namespace seville
          emit viewNeedsUpdatingEvent();
 
          return my_socket.write(msg);
+      }
+
+      auto Client::do_sendPropRequest(void) -> int
+      {
+         return 0;
       }
 
       auto Client::do_deinitEvents(void) -> void

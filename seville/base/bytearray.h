@@ -463,9 +463,9 @@ namespace seville
 
       inline auto streamReadAndDecodeQString(int len) -> QString {
          auto byteArray = do_byteArrayAt(my_streamCursorPosition, len);
-         auto value = QString::fromUtf8(byteArray);
-         if (value.toUtf8() != byteArray) {
-           value = QString::fromLatin1(byteArray);
+         auto value = QString::fromLatin1(byteArray);
+         if (value.toLatin1() != byteArray) {
+           value = QString::fromUtf8(byteArray);
          }
          my_streamCursorPosition += len;
          return value;
