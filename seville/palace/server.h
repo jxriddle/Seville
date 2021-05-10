@@ -127,6 +127,12 @@ namespace seville
             my_httpServerLocation = httpServerLocation;
          }
 
+         inline auto httpPropLocation(void) -> QString {
+            return QString("%1%2")
+                  .arg(my_httpServerLocation)
+                  .arg("webservice/props/get/");
+         }
+
       private:
          HostByteOrder my_byteOrder;
          std::vector<Room> my_roomList;

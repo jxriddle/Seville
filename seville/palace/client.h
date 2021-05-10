@@ -153,8 +153,8 @@ namespace seville
          static const int kDefaultSizeOfChunkReadSize = 100; /* netmsg::kHeaderSize; */
          static const int kMinSizeOfShortestChunkReadSize = 1;
 
-         static const int kNumFaces = 12;
-         static const int kNumFaceColors = 16;
+         static const int kNumFaces = 13;
+         static const int kNumFaceColors = 17;
 
 //            static const int kDemoElapsed = 0x00011940;
 //            static const int kTotalElapsed = 0x00011940;
@@ -225,12 +225,12 @@ namespace seville
             return &my_server;
          }
 
-         inline auto userPtr(void) -> User* {
-            return &my_user;
-         }
+         // inline auto userPtr(void) -> User* {
+         //    return &my_user;
+         // }
 
-         inline auto currentRoomPtr(void) -> Room* {
-            return &my_currentRoom;
+         inline auto roomPtr(void) -> Room* {
+            return &my_room;
          }
 
          auto inline isBigEndian(void) -> bool {
@@ -296,10 +296,7 @@ namespace seville
             my_logger.appendDebugMessage(
                      QString("Movement to (%1, %2)").arg(x).arg(y));
 
-            my_user.setX(x);
-            my_user.setY(y);
-
-            auto userPtr = my_currentRoom.userPtrWithId(my_user.id());
+            auto userPtr = my_room.userPtrWithId(my_userId);
             userPtr->setX(x);
             userPtr->setY(y);
 
@@ -339,11 +336,12 @@ namespace seville
          ConnectionState my_connectionState;
          QTcpSocket my_socket;
          QString my_username;
+         QString my_wizpass;
          QString my_host;
          quint16 my_port;
          Server my_server;
-         User my_user;
-         Room my_currentRoom;
+         u32 my_userId;
+         Room my_room;
          Cipher my_cipher;
          QTimer my_timer;
          //int my_transfer_timer_id;
@@ -354,6 +352,11 @@ namespace seville
          //ByteArray my_netMsgBody;
          NetMsg my_netMsg;
          //i32 my_netMsgSize;
+         u32 my_idCrc;
+         u32 my_idCounter;
+         bool my_isUserIdChanged;
+         u32 my_regCrc;
+         u32 my_regCounter;
 
 //         bool my_puidChangedFlag; //    = false;
 //         u32 my_puidCounter; // = 0xf5dc385e;

@@ -60,21 +60,22 @@ namespace seville
 
       auto PalaceClientWidget::do_init(void) -> void
       {
-         kNameColors[0] = QColor::fromRgb(240, 152, 152); // red
-         kNameColors[1] = QColor::fromRgb(238, 171, 135); // orange red
-         kNameColors[2] = QColor::fromRgb(237, 200, 126); // orange
-         kNameColors[3] = QColor::fromRgb(238, 225, 135); // yellow
-         kNameColors[4] = QColor::fromRgb(181, 237, 126); // light green
-         kNameColors[5] = QColor::fromRgb(135, 238, 135); // green
-         kNameColors[6] = QColor::fromRgb(135, 238, 186); // blue green
-         kNameColors[7] = QColor::fromRgb(135, 238, 215); // green blue
-         kNameColors[9] = QColor::fromRgb(126, 237, 237); // light blue
-         kNameColors[10] = QColor::fromRgb(143, 193, 239); // blue
-         kNameColors[11] = QColor::fromRgb(126, 254, 237); // purple
-         kNameColors[12] = QColor::fromRgb(138, 126, 237); // violet
-         kNameColors[13] = QColor::fromRgb(210, 100, 233); // light violet?
-         kNameColors[14] = QColor::fromRgb(235, 117, 204); // pink
-         kNameColors[15] = QColor::fromRgb(235, 117, 163); // light red
+         kNameColors[0]  = QColor::fromRgb(0xe1, 0x2f, 0x2f); // red
+         kNameColors[1]  = QColor::fromRgb(0xe0, 0x66, 0x26); // orange red
+         kNameColors[2]  = QColor::fromRgb(0xdd, 0x9e, 0x20); // orange
+         kNameColors[3]  = QColor::fromRgb(0xe3, 0xce, 0x38); // yellow
+         kNameColors[4]  = QColor::fromRgb(0x82, 0xe0, 0x26); // light green
+         kNameColors[5]  = QColor::fromRgb(0x28, 0xe0, 0x28); // green
+         kNameColors[6]  = QColor::fromRgb(0x28, 0xe0, 0x83); // pale green
+         kNameColors[7]  = QColor::fromRgb(0x2f, 0xe1, 0xba); // blue green
+         kNameColors[9]  = QColor::fromRgb(0x38, 0xe3, 0xe3); // green blue
+         kNameColors[10] = QColor::fromRgb(0x25, 0x86, 0xe0); // light blue
+         kNameColors[11] = QColor::fromRgb(0x26, 0x55, 0xe0); // blue
+         kNameColors[12] = QColor::fromRgb(0x4b, 0x38, 0xe3); // violet
+         kNameColors[13] = QColor::fromRgb(0x87, 0x2f, 0xe1); // purple
+         kNameColors[14] = QColor::fromRgb(0xbc, 0x20, 0xdd); // mauve
+         kNameColors[15] = QColor::fromRgb(0xe0, 0x26, 0xae); // pink
+         kNameColors[16] = QColor::fromRgb(0xe0, 0x25, 0x6e); // red purple
 
          my_palaceClientPtr = new seville::palace::Client(this);
          auto spritesheetPath =
@@ -367,8 +368,8 @@ namespace seville
          }
          else if (my_palaceClientPtr->connectionState() ==
                   palace::ConnectionState::kConnectedState) {
-            my_palaceClientPtr->move(mouseEventPtr->x() - kSmileyWidth/2,
-                                     mouseEventPtr->y() - kSmileyHeight/2);
+            my_palaceClientPtr->move(mouseEventPtr->x() - kSmileyWidth / 2,
+                                     mouseEventPtr->y() - kSmileyHeight / 2);
          }
       }
 
@@ -384,16 +385,19 @@ namespace seville
          QPainter painter(this);
          painter.drawImage(8, 8, my_backgroundImage);
 
-         for (auto& user: *my_palaceClientPtr->currentRoomPtr()->userListPtr())
+         for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr())
          {
-            auto rect =
-                  QRect(user.face() * kSmileyWidth,
-                        user.color() * kSmileyHeight,
-                        kSmileyWidth,
-                        kSmileyHeight);
+            auto face = user.face();
+            auto color = user.color();
+            auto rect = QRect(face * kSmileyWidth,
+                              color * kSmileyHeight,
+                              kSmileyWidth,
+                              kSmileyHeight);
 
             QImage userImage = my_spritesheet.copy(rect);
-            painter.drawImage(user.x(), user.y(), userImage);
+            painter.drawImage(user.x(), //  - kSmileyWidth / 2,
+                              user.y(), // - kSmileyHeight / 2,
+                              userImage);
 
             // QBrush blackBrush(Qt::black);
             // QPen pen(Qt::gray);
@@ -409,7 +413,7 @@ namespace seville
             // auto nameTextRect = QRect();
             auto nameTextPoint =
                   QPoint(user.x() + (kSmileyWidth / 2) - (width / 2.0),
-                         user.y() + 56);
+                         user.y() + 58);
 
             // nameTextRect.setX(user.x());
             // nameTextRect.setY(user.y());
@@ -443,8 +447,8 @@ namespace seville
             // draw name
             // painter.setPen(Qt::Pen
             painter.setFont(font);
-            if (0 <= user.face() && user.face() < kNumNameColors)
-              painter.setPen(kNameColors[user.face()]);
+            if (0 <= user.color() && user.color() < kNumNameColors)
+              painter.setPen(kNameColors[user.color()]);
 
             painter.drawText(nameTextPoint, user.username());
          }
@@ -467,7 +471,7 @@ namespace seville
       auto PalaceClientWidget::on_backgroundImageDidLoad(void) -> void
       {
          auto backgroundImage =
-               my_palaceClientPtr->currentRoomPtr()->backgroundImage();
+               my_palaceClientPtr->roomPtr()->backgroundImage();
 
          //auto pixmap = QPixmap::fromImage(backgroundImage);
          do_setBackgroundImage(backgroundImage);

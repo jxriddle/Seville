@@ -168,7 +168,7 @@ namespace seville
                   auto imageByteArray = replyPtr->readAll();
                   auto const imageByteArrayPtr =
                         reinterpret_cast<QByteArray*>(&imageByteArray);
-                  my_currentRoom.setBackgroundImageByteArray(*imageByteArrayPtr);
+                  my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
 
                   emit backgroundImageDidLoadEvent();
                }
@@ -237,8 +237,15 @@ namespace seville
 //         my_regCrc = 0x5905f923;
          my_netMsg.clear();
          my_server.clear();
-         my_user.clear();
-         my_currentRoom.clear();
+         // my_user.clear();
+         my_room.clear();
+         my_cipher.clear();
+
+         my_isUserIdChanged = false;
+         my_idCounter = 0xf5dc385e;
+         my_idCrc = 0xc144c580;
+         my_regCounter = 0xcf07309c;
+         my_regCrc = 0x5905f923;
       }
 
       auto Client::do_resetReceiveTimer(void) -> void
@@ -263,7 +270,7 @@ namespace seville
                auto imageByteArray = replyPtr->readAll();
                auto const imageByteArrayPtr =
                      reinterpret_cast<QByteArray*>(&imageByteArray);
-               my_currentRoom.setBackgroundImageByteArray(*imageByteArrayPtr);
+               my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
 
                emit backgroundImageDidLoadEvent();
             }
@@ -438,7 +445,8 @@ namespace seville
                //in >> user_id;
                //my_user.setId(user_id);
                //auto userId = my_netMsgBody.ref();
-               my_user.setId(netMsgRef);
+               // my_user.setId(netMsgRef);
+               my_userId = netMsgRef;
 
                if (do_sendLogon() < 0)
                {
@@ -500,9 +508,9 @@ namespace seville
             return;
 
          if (text.toStdString() == "'who") {
-            auto userListPtr = my_currentRoom.userListPtr();
+            auto userListPtr = my_room.userListPtr();
             for (auto i = u32{0}; i < userListPtr->size(); i++) {
-               auto user = my_currentRoom.userListPtr()->at(i);
+               auto user = my_room.userListPtr()->at(i);
                my_logger.appendInfoMessage(
                         QString("%1 (%2) is here")
                         .arg(user.username())
@@ -548,7 +556,7 @@ namespace seville
             }
          }
          else if (text.left(QString("'gotoroom ").length()) ==
-                  QString("'gotoroom")) {
+                  QString("'gotoroom ")) {
             auto split = text.split(' ');
             if (1 < split.length()) {
                auto ok = true;
@@ -566,7 +574,7 @@ namespace seville
                auto roomUserCount = room.userCount();
                auto roomId = room.roomId();
                if (0 < roomUserCount) {
-                  my_logger.appendInfoMessage(QString("%1 (%2, users: %3).")
+                  my_logger.appendInfoMessage(QString("%1 (%2), users: %3")
                                               .arg(roomName)
                                               .arg(roomId)
                                               .arg(roomUserCount));
@@ -580,7 +588,7 @@ namespace seville
                auto roomName = room.roomName();
                auto roomUserCount = room.userCount();
                auto roomId = room.roomId();
-               my_logger.appendInfoMessage(QString("%1 (%2, users: %3).")
+               my_logger.appendInfoMessage(QString("%1 (%2), users: %3")
                                            .arg(roomName)
                                            .arg(roomId)
                                            .arg(roomUserCount));
@@ -592,10 +600,12 @@ namespace seville
             for (auto& user: *my_server.userListPtr()) {
                auto username = user.username();
                auto userId = user.id();
+               auto roomId = user.roomId();
                my_logger.appendInfoMessage(
-                        QString("%1 (%2) is here.")
+                        QString("%1 (%2) is in room %3.")
                         .arg(username)
-                        .arg(userId));
+                        .arg(userId)
+                        .arg(roomId));
             }
          }
          else {
@@ -622,10 +632,11 @@ namespace seville
 
          my_logger.appendInfoMessage(logMsg);
 
-         my_user.setUsername(username);
+         // my_user.setUsername(username);
+         my_username = username;
          my_server.setHost(host);
          my_server.setPort(actualHostTcpPort);
-         my_currentRoom.setId(actualInitialRoom);
+         my_room.setId(actualInitialRoom);
 
          my_logger.appendDebugMessage("Handshaking");
          do_setConnectionState(ConnectionState::kHandshakingState);
@@ -795,12 +806,15 @@ namespace seville
                   //NetMsg::kLogonPuidCrcOffset);
          //in >> puid_crc;
 
-         if (my_user.idCounter() != puidCounter ||
-             my_user.idCrc() != puidCrc)
+         if (my_idCounter != puidCounter ||
+             my_idCrc != puidCrc)
          {
-            my_user.setIdCrc(puidCrc);
-            my_user.setIdCounter(puidCounter);
-            my_user.setIdChanged(true);
+            // my_user.setIdCrc(puidCrc);
+            my_idCrc = puidCrc;
+            // my_user.setIdCounter(puidCounter);
+            my_idCounter = puidCounter;
+            // my_user.setIdChanged(true);
+            my_isUserIdChanged = true;
             my_logger.appendDebugMessage("My user id changed by server");
          }
          else {
@@ -906,7 +920,7 @@ namespace seville
          auto y = my_netMsg.streamReadU16();
          auto x = my_netMsg.streamReadU16();
 
-         auto userPtr = my_currentRoom.userPtrWithId(userId);
+         auto userPtr = my_room.userPtrWithId(userId);
          userPtr->setX(x);
          userPtr->setY(y);
 
@@ -997,31 +1011,31 @@ namespace seville
       {
          my_logger.appendDebugMessage("> RoomDescription");
 
-         my_currentRoom.setFlags(my_netMsg.streamReadU32());
-         my_currentRoom.setFace(my_netMsg.streamReadU32());
-         my_currentRoom.setId(my_netMsg.streamReadU16());
+         my_room.setFlags(my_netMsg.streamReadU32());
+         my_room.setFace(my_netMsg.streamReadU32());
+         my_room.setId(my_netMsg.streamReadU16());
 
          auto roomNameOffset = my_netMsg.streamReadU16();
          auto backgroundImageNameOffset = my_netMsg.streamReadU16();
          auto artistNameOffset = my_netMsg.streamReadU16();
          auto passwordOffset = my_netMsg.streamReadU16();
 
-         my_currentRoom.setHotspotCount(my_netMsg.streamReadU16());
+         my_room.setHotspotCount(my_netMsg.streamReadU16());
 
          auto hotspotOffset = my_netMsg.streamReadU16();
 
-         my_currentRoom.setImageCount(my_netMsg.streamReadU16());
+         my_room.setImageCount(my_netMsg.streamReadU16());
          //auto backgroundImageOffset =
                my_netMsg.streamReadU16();
 
-         my_currentRoom.setDrawCommandsCount(my_netMsg.streamReadU16());
+         my_room.setDrawCommandsCount(my_netMsg.streamReadU16());
          //auto firstDrawCommand =
                my_netMsg.streamReadU16();
 
-         my_currentRoom.setUserCount(my_netMsg.streamReadU16());
+         my_room.setUserCount(my_netMsg.streamReadU16());
          //my_netMsg.streamSkip(sizeof(u16));
 
-         my_currentRoom.setLoosePropCount(my_netMsg.streamReadU16());
+         my_room.setLoosePropCount(my_netMsg.streamReadU16());
          //auto firstLooseProp =
                my_netMsg.streamReadU16();
          //auto unknown =
@@ -1032,29 +1046,29 @@ namespace seville
          auto dataOffset = my_netMsg.streamCursorPosition();
 
          auto roomName = my_netMsg.pascalQStringAt(dataOffset + roomNameOffset);
-         my_currentRoom.setRoomName(roomName);
+         my_room.setRoomName(roomName);
 
          auto backgroundImageName =
                my_netMsg.pascalQStringAt(
                   dataOffset + backgroundImageNameOffset);
-         my_currentRoom.setBackgroundImageName(backgroundImageName);
+         my_room.setBackgroundImageName(backgroundImageName);
 
-         my_currentRoom.setArtistName(my_netMsg.pascalQStringAt(
+         my_room.setArtistName(my_netMsg.pascalQStringAt(
                   dataOffset + artistNameOffset));
 
-         my_currentRoom.setPassword(
+         my_room.setPassword(
                   my_netMsg.pascalQStringAt(dataOffset + passwordOffset));
 
          my_netMsg.setStreamCursorPosition(dataOffset + hotspotOffset);
-         auto hotspotCount = my_currentRoom.hotspotCount();
+         auto hotspotCount = my_room.hotspotCount();
          for (auto i = 0; i < hotspotCount; i++) {
             auto hotspot = Hotspot();
             // TODO fill out hotspot
-            my_currentRoom.hotspotListPtr()->push_back(hotspot);
+            my_room.hotspotListPtr()->push_back(hotspot);
          }
 
          auto backgroundImageUri =
-               my_server.httpServerLocation() + my_currentRoom.backgroundImageName();
+               my_server.httpServerLocation() + my_room.backgroundImageName();
 
          my_logger.appendDebugMessage(QString("Fetching background from %1")
                           .arg(backgroundImageUri));
@@ -1071,7 +1085,7 @@ namespace seville
       {
          my_logger.appendDebugMessage("> RoomUserList");
 
-         my_currentRoom.userListPtr()->clear();
+         my_room.userListPtr()->clear();
 
          auto roomUserCount = i32(my_netMsg.ref());
          for (auto i = 0; i < roomUserCount; i++) {
@@ -1147,8 +1161,8 @@ namespace seville
          //auto usernamePaddedLen = (4 - (usernameLen & 3)) - 1; // + usernameLen;
          //my_netMsg.streamSkip(usernamePaddedLen);
 
-         my_currentRoom.userListPtr()->push_back(user);
-         my_currentRoom.setUserCount(my_currentRoom.userCount() + 1);
+         my_room.userListPtr()->push_back(user);
+         my_room.setUserCount(my_room.userCount() + 1);
 
          return user;
       }
@@ -1186,8 +1200,8 @@ namespace seville
          my_logger.appendDebugMessage("> UserExitRoom");
 
          auto userId = my_netMsg.ref();
-         auto user = my_currentRoom.userWithId(userId);
-         my_currentRoom.removeUserWithId(userId);
+         auto user = my_room.userWithId(userId);
+         my_room.removeUserWithId(userId);
          my_logger.appendInfoMessage(
                   QString("%1 has left the room.").arg(user.username()));
 
@@ -1260,12 +1274,15 @@ namespace seville
          my_logger.appendDebugMessage("> UserLeaving");
 
          auto userCount = my_netMsg.streamReadU32();
-         my_currentRoom.setUserCount(userCount);
+         my_room.setUserCount(userCount);
 
          auto userId = my_netMsg.ref();
-         auto user = my_server.userWithId(userId);
+         auto user = my_room.userWithId(userId);
          my_logger.appendInfoMessage(
                   QString("%1 has signed off.").arg(user.username()));
+         my_room.removeUserWithId(userId);
+
+         user = my_server.userWithId(userId);
          my_server.removeUserWithId(userId);
 
          emit viewNeedsUpdatingEvent();
@@ -1305,8 +1322,8 @@ namespace seville
             auto room = Room();
             room.setId(my_netMsg.streamReadU32());
             room.setFlags(my_netMsg.streamReadU16());
-            //room.setUserCount(my_netMsg.streamReadU16());
-            my_netMsg.streamSkip(sizeof(u16));
+            room.setUserCount(my_netMsg.streamReadU16());
+            // my_netMsg.streamSkip(sizeof(u16));
             auto roomNameLen = my_netMsg.streamReadU8();
             room.setRoomName(
                      my_netMsg.streamReadAndDecodeQString(roomNameLen));
@@ -1368,7 +1385,7 @@ namespace seville
          my_logger.appendDebugMessage("> Talk");
 
          auto userId = my_netMsg.ref();
-         auto user = my_currentRoom.userWithId(userId);
+         auto user = my_room.userWithId(userId);
          //auto message = my_netMsg.streamReadByteArray(my_netMsg.len());
          auto message = my_netMsg.streamReadAndDecodeQString(my_netMsg.bodyLen());
 
@@ -1411,7 +1428,7 @@ namespace seville
          my_logger.appendDebugMessage("> XTalk");
 
          auto userId = my_netMsg.ref();
-         auto user = my_currentRoom.userWithId(userId);
+         auto user = my_room.userWithId(userId);
 
          auto messageLen = my_netMsg.streamReadU16();
          auto cipherLen = messageLen - 3;
@@ -1674,20 +1691,20 @@ namespace seville
          logonMsg.setBodyLen(NetMsg::kLogonSize);
          logonMsg.setRef(NetMsg::kNoRef);
 
-         logonMsg.appendU32(my_user.regCrc());
-         logonMsg.appendU32(my_user.regCounter());
+         logonMsg.appendU32(my_regCrc);
+         logonMsg.appendU32(my_regCounter);
          logonMsg.appendFixedPascalQString(
-                  my_user.username(), NetMsg::kLogonMaximumUsernameSize);
+                  my_username, NetMsg::kLogonMaximumUsernameSize);
          logonMsg.appendFixedPascalQString(
-                  my_user.wizPass(), NetMsg::kLogonWizardPasswordSize);
+                  my_wizpass, NetMsg::kLogonWizardPasswordSize);
          logonMsg.appendU32(
                   FlagAuxOptions::kAuthenticate | FlagAuxOptions::kWin32);
-         logonMsg.appendU32(my_user.idCounter());
-         logonMsg.appendU32(my_user.idCrc());
+         logonMsg.appendU32(my_idCounter);
+         logonMsg.appendU32(my_idCrc);
          logonMsg.appendU32(kMagicFromPChat);
          logonMsg.appendU32(kMagicFromPChat);
          logonMsg.appendU32(kMagicFromPChat);
-         logonMsg.appendU16(my_currentRoom.roomId());
+         logonMsg.appendU16(my_room.roomId());
          logonMsg.appendFixedQString(kIdent, kIdentLen);
          logonMsg.appendU32(0);
          logonMsg.appendU32(
@@ -1842,7 +1859,7 @@ namespace seville
 
          talkMsg.setId(NetMsg::kTalkKind);
          talkMsg.setBodyLen(text.length());
-         talkMsg.setRef(my_user.id());
+         talkMsg.setRef(my_userId);
 
          talkMsg.append(text.toUtf8());
          talkMsg.append('\0');
@@ -1858,7 +1875,7 @@ namespace seville
          xTalkMsg.setId(NetMsg::kXTalkKind);
          auto len = text.length() + 3;
          xTalkMsg.setBodyLen(len);
-         xTalkMsg.setRef(my_user.id());
+         xTalkMsg.setRef(my_userId);
 
          auto plaintext = text.toUtf8();
          auto ciphertext = my_cipher.encipher(plaintext);
@@ -1877,7 +1894,7 @@ namespace seville
          msg.setId(NetMsg::kXWhisperKind);
          auto len = NetMsg::kXWhisperBodyLen + text.length() + 3;
          msg.setBodyLen(len);
-         msg.setRef(my_user.id());
+         msg.setRef(my_userId);
 
          auto plaintext = text.toUtf8();
          auto ciphertext = my_cipher.encipher(plaintext);
@@ -1921,8 +1938,8 @@ namespace seville
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
 
-         my_currentRoom.userListPtr()->clear();
-         my_currentRoom.setId(roomId);
+         my_room.userListPtr()->clear();
+         my_room.setId(roomId);
 
          auto gotoroomMsg = palace::NetMsg(do_determineShouldSwapEndianness());
          gotoroomMsg.setId(NetMsg::kGotoRoomKind);
@@ -2005,12 +2022,18 @@ namespace seville
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
 
+         auto userPtr = my_room.userPtrWithId(my_userId);
+         if (userPtr != nullptr)
+            userPtr->setFace(faceId);
+
          auto msg = palace::NetMsg();
          msg.setId(NetMsg::kUserFaceKind);
          msg.setBodyLen(NetMsg::kUserFaceBodyLen);
-         msg.setRef(my_user.id()); // 0?
+         msg.setRef(my_userId); // 0?
 
          msg.appendU16(faceId);
+
+         emit viewNeedsUpdatingEvent();
 
          return my_socket.write(msg);
       }
@@ -2020,12 +2043,18 @@ namespace seville
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
 
+         auto userPtr = my_room.userPtrWithId(my_userId);
+         if (userPtr != nullptr)
+            userPtr->setColor(faceColorId);
+
          auto msg = palace::NetMsg();
          msg.setId(NetMsg::kUserColorKind);
          msg.setBodyLen(NetMsg::kUserColorBodyLen);
-         msg.setRef(my_user.id()); // 0?
+         msg.setRef(my_userId); // 0?
 
          msg.appendU16(faceColorId);
+
+         emit viewNeedsUpdatingEvent();
 
          return my_socket.write(msg);
       }
