@@ -148,6 +148,7 @@ namespace seville
             &my_socket, QOverload<QAbstractSocket::SocketError>::of(
                      &QAbstractSocket::errorOccurred),
                   this, &Client::on_socketErrorDidOccur);
+#endif
 
                   //this, [this](QAbstractSocket::SocketError error) {
                   //&Client::on_socketError
@@ -161,7 +162,6 @@ namespace seville
 //               my_logger_.error("Socket error");
 //               qCDebug(log_seville) << "ERROR: Socket Error";
 //            });
-#endif
 
          connect(
             &my_networkAccessManager, &QNetworkAccessManager::finished,
@@ -2078,9 +2078,16 @@ namespace seville
          disconnect(&my_socket, &QTcpSocket::readyRead,
                     this, &seville::palace::Client::on_readyReadDidOccur);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+         disconnect(
+            &my_socket,QOverload<QAbstractSocket::SocketError>
+                  ::of(&QAbstractSocket::error),
+            this, &Client::on_socketErrorDidOccur);
+#else
          disconnect(&my_socket, QOverload<QAbstractSocket::SocketError>::of(
                     &QAbstractSocket::errorOccurred),
                     this, &Client::on_socketErrorDidOccur);
+#endif
 
          disconnect(&my_networkAccessManager, &QNetworkAccessManager::finished,
                     this, &Client::on_backgroundDidFinishLoading);
@@ -2101,9 +2108,16 @@ namespace seville
          connect(&my_socket, &QTcpSocket::readyRead,
                  this, &seville::palace::Client::on_readyReadDidOccur);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+         connect(
+            &my_socket,QOverload<QAbstractSocket::SocketError>
+                  ::of(&QAbstractSocket::error),
+            this, &Client::on_socketErrorDidOccur);
+#else
          connect(&my_socket, QOverload<QAbstractSocket::SocketError>::of(
                     &QAbstractSocket::errorOccurred),
                  this, &Client::on_socketErrorDidOccur);
+#endif
 
          connect(&my_networkAccessManager, &QNetworkAccessManager::finished,
                  this, &Client::on_backgroundDidFinishLoading);
