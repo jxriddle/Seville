@@ -156,8 +156,10 @@ namespace seville
                qobject_cast<seville::view::PalaceClientWidget*>(
                   my_tabWidgetPtr->currentWidget());
 
+         if (currentPalaceClientWidgetPtr != nullptr)
+            do_setCurrentPalaceClientWidgetPtr(currentPalaceClientWidgetPtr);
+
          //auto palaceClientPtr = palaceClientWidgetPtr.palaceClientPtr();
-         do_setCurrentPalaceClientWidgetPtr(currentPalaceClientWidgetPtr);
       }
 
 //      void MainWindow::on_viewNeedsUpdating(void)
@@ -381,11 +383,22 @@ namespace seville
                  &seville::view::TabWidget::tabWasRemovedWithWidgetPtrEvent,
                  this,
                  &seville::view::MainWindow::on_tabWasRemovedWithClientWidgetPtr);
+
+         auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
+         connect(palaceClientPtr,
+                 &seville::palace::Client::connectionStateDidChangeEvent,
+                 this, &seville::view::MainWindow::on_connectionStateDidChange);
       }
 
       auto MainWindow::do_teardownEvents(void) -> void
       {
          // Disconnect Action Signals from Slots
+
+         auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
+         disconnect(palaceClientPtr,
+                 &seville::palace::Client::connectionStateDidChangeEvent,
+                 this, &seville::view::MainWindow::on_connectionStateDidChange);
+
          disconnect(my_logDockWidgetPtr, &QDockWidget::topLevelChanged,
                  this, &seville::view::MainWindow::on_topLevelDidChange);
 
@@ -423,7 +436,6 @@ namespace seville
 
          disconnect(my_toggleLogActionPtr, &QAction::triggered,
                     this, &seville::view::MainWindow::on_logWindowWasToggled);
-
       }
 
       auto MainWindow::do_setupSizing(void) -> void

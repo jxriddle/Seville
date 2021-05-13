@@ -164,7 +164,7 @@ namespace seville
 //            });
 
          connect(
-            &my_networkAccessManager, &QNetworkAccessManager::finished,
+            &my_roomBackgroundNetworkAccessManager, &QNetworkAccessManager::finished,
             this, [this](QNetworkReply* replyPtr) {
                if (replyPtr->error()) {
                   my_logger.appendErrorMessage(
@@ -226,7 +226,16 @@ namespace seville
 //               }
 //            }
 
-         my_networkAccessManager.get(request);
+         my_roomBackgroundNetworkAccessManager.get(request);
+      }
+
+      auto Client::do_fetchPropAsync(const QString& url) -> void
+      {
+         QNetworkRequest request;
+         request.setUrl(url);
+         request.setRawHeader("User-Agent", "Seville 1.0");
+
+         my_roomBackgroundNetworkAccessManager.get(request);
       }
 
       auto Client::do_clear(void) -> void
@@ -265,7 +274,7 @@ namespace seville
 //         }
       }
 
-      auto Client::on_backgroundDidFinishLoading(
+      auto Client::on_backgroundDidFetchAsync(
             QNetworkReply* replyPtr) -> void
       {
             if (replyPtr->error()) {
@@ -284,6 +293,28 @@ namespace seville
             }
 
             replyPtr->deleteLater();
+      }
+
+      auto Client::on_propDidFetchAsync(QNetworkReply* replyPtr) -> void
+      {
+         if (replyPtr->error()) {
+            my_logger.appendErrorMessage(
+                     //QString("Background failed to load."));
+                     QString("Prop load error: %1")
+                     .arg(replyPtr->errorString()));
+         }
+         else {
+            auto imageByteArray = replyPtr->readAll();
+            auto const imageByteArrayPtr =
+                  reinterpret_cast<QByteArray*>(&imageByteArray);
+
+            // my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
+
+            // emit backgroundImageDidLoadEvent();
+            emit viewNeedsUpdatingEvent();
+         }
+
+         replyPtr->deleteLater();
       }
 
       auto Client::on_pingTimerDidTrigger(void) -> void
@@ -504,7 +535,7 @@ namespace seville
 
          my_connectionState = connectionState;
 
-         emit connectionStateDidChangeEvent(connectionState);
+         // emit connectionStateDidChangeEvent(connectionState);
       }
 
       auto Client::do_roomChat(const QString& text) -> void
@@ -648,6 +679,8 @@ namespace seville
 
          my_logger.appendDebugMessage("Handshaking");
          do_setConnectionState(ConnectionState::kHandshakingState);
+         emit connectionStateDidChangeEvent(ConnectionState::kHandshakingState);
+
          my_socket.connectToHost(host, actualHostTcpPort);
          my_pingTimer.setInterval(60000);
          my_pingTimer.start();
@@ -2089,8 +2122,13 @@ namespace seville
                     this, &Client::on_socketErrorDidOccur);
 #endif
 
-         disconnect(&my_networkAccessManager, &QNetworkAccessManager::finished,
-                    this, &Client::on_backgroundDidFinishLoading);
+         disconnect(&my_roomBackgroundNetworkAccessManager,
+                    &QNetworkAccessManager::finished,
+                    this, &Client::on_backgroundDidFetchAsync);
+
+         disconnect(&my_propNetworkAccessManager,
+                    &QNetworkAccessManager::finished,
+                    this, &Client::on_propDidFetchAsync);
 
          disconnect(&my_pingTimer, &QTimer::timeout,
                     this, &Client::on_pingTimerDidTrigger);
@@ -2100,7 +2138,7 @@ namespace seville
       {
          do_deinitEvents();
 
-         disconnectFromHost();
+         do_disconnectFromHost();
       }
 
       auto Client::do_initEvents(void) -> void
@@ -2119,8 +2157,8 @@ namespace seville
                  this, &Client::on_socketErrorDidOccur);
 #endif
 
-         connect(&my_networkAccessManager, &QNetworkAccessManager::finished,
-                 this, &Client::on_backgroundDidFinishLoading);
+         connect(&my_roomBackgroundNetworkAccessManager, &QNetworkAccessManager::finished,
+                 this, &Client::on_backgroundDidFetchAsync);
 
          connect(&my_pingTimer, &QTimer::timeout,
                  this, &Client::on_pingTimerDidTrigger);

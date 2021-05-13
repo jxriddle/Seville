@@ -75,8 +75,8 @@ namespace seville
       private:
          palace::Client* my_palaceClientPtr;
          // QLabel* my_backgroundImageLabelPtr;
-         QWidget* my_roomWidgetPtr;
-         QScrollArea* my_scrollAreaPtr;
+         QLabel* my_roomWidgetPtr;
+         // QScrollArea* my_scrollAreaPtr;
          QVBoxLayout* my_mainLayoutPtr;
          QLineEdit* my_lineEditAddressPtr;
          QLineEdit* my_chatLineEditPtr;

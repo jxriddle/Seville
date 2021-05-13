@@ -73,9 +73,9 @@ namespace seville
          kNameColors[11] = QColor::fromRgb(0x26, 0x55, 0xe0); // blue
          kNameColors[12] = QColor::fromRgb(0x4b, 0x38, 0xe3); // violet
          kNameColors[13] = QColor::fromRgb(0x87, 0x2f, 0xe1); // purple
-         kNameColors[14] = QColor::fromRgb(0xbc, 0x20, 0xdd); // mauve
-         kNameColors[15] = QColor::fromRgb(0xe0, 0x26, 0xae); // pink
-         // kNameColors[16] = QColor::fromRgb(0xe0, 0x25, 0x6e); // red purple
+         kNameColors[14] = QColor::fromRgb(0xbc, 0x20, 0xdd); // pink
+         kNameColors[15] = QColor::fromRgb(0xe0, 0x26, 0xae); // red purple
+         // kNameColors[16] = QColor::fromRgb(0xe0, 0x25, 0x6e);
 
          my_palaceClientPtr = new seville::palace::Client(this);
          auto spritesheetPath =
@@ -88,36 +88,38 @@ namespace seville
       void PalaceClientWidget::do_setupView(void)
       {
          my_mainLayoutPtr = new QVBoxLayout(this);
+         // my_mainLayoutPtr = new QVBoxLayout(this);
 
          //my_address_line_edit_ptr_ = new QLineEdit(this);
          //my_layout_ptr_->addWidget(my_address_line_edit_ptr_);
 
-         my_scrollAreaPtr = new QScrollArea(this);
+         // my_scrollAreaPtr = new QScrollArea(this);
 
          // my_backgroundImageLabelPtr = new QLabel(this);
-         my_roomWidgetPtr = new QWidget(this);
+         // my_roomWidgetPtr = new QLabel(my_scrollAreaPtr);
+         my_roomWidgetPtr = new QLabel(this);
 
-         my_scrollAreaPtr->setHorizontalScrollBarPolicy(
-                  Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+         // my_scrollAreaPtr->setHorizontalScrollBarPolicy(
+         //          Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 
-         my_scrollAreaPtr->setVerticalScrollBarPolicy(
-                  Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+         // my_scrollAreaPtr->setVerticalScrollBarPolicy(
+         //          Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 
-         my_scrollAreaPtr->setSizePolicy(
-                  QSizePolicy::Preferred, QSizePolicy::Preferred);
+         // my_scrollAreaPtr->setSizePolicy(
+         //          QSizePolicy::Preferred, QSizePolicy::Preferred);
          //my_scrollAreaPtr->setSizePolicy(
          //         QSizePolicy::Preferred, QSizePolicy::Preferred);
-         auto scrollAreaLayoutPtr = new QVBoxLayout(my_scrollAreaPtr);
-         my_scrollAreaPtr->setLayout(scrollAreaLayoutPtr);
+         // auto scrollAreaLayoutPtr = new QVBoxLayout(my_scrollAreaPtr);
+         // my_scrollAreaPtr->setLayout(scrollAreaLayoutPtr);
          //my_scrollAreaPtr->setSizePolicy(
          //         QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-         my_scrollAreaPtr->setWidgetResizable(false);
+         // my_scrollAreaPtr->setWidgetResizable(false);
          // my_scrollAreaPtr->setWidget(my_backgroundImageLabelPtr);
-         my_scrollAreaPtr->setWidget(my_roomWidgetPtr);
+         // my_scrollAreaPtr->setWidget(my_roomWidgetPtr);
 
          // my_scrollAreaPtr->setFixedSize(my_backgroundImageLabelPtr->size());
-         my_scrollAreaPtr->setFixedSize(my_roomWidgetPtr->size());
+         // my_scrollAreaPtr->setFixedSize(my_roomWidgetPtr->size());
          //my_scrollAreaPtr->setFixedWidth(my_backgroundImageLabelPtr->width() + 10);
          //my_scrollAreaPtr->setFixedHeight(my_backgroundImageLabelPtr->height() + 10);
 
@@ -132,7 +134,8 @@ namespace seville
 //            layout_scroll_area_ptr->setSpacing(0);
 //            my_scrollarea_ptr_->setLayout(layout_scroll_area_ptr);
 
-         my_mainLayoutPtr->addWidget(my_scrollAreaPtr);
+         // layout()->addWidget(my_scrollAreaPtr);
+         layout()->addWidget(my_roomWidgetPtr);
 
          //PalRoom& room = myPalClient->currentRoom();
                //.arg("test-pattern.png");
@@ -140,9 +143,7 @@ namespace seville
          //qCDebug(log_seville) << image_filename;
 
          my_chatLineEditPtr = new QLineEdit(this);
-         my_mainLayoutPtr->addWidget(my_chatLineEditPtr);
-
-         setLayout(my_mainLayoutPtr);
+         layout()->addWidget(my_chatLineEditPtr);
 
          //do_clearBackgroundImage();
          auto filename = QString(":/seville/assets/images/test-pattern.png");
@@ -234,18 +235,24 @@ namespace seville
          //my_scrollAreaPtr->setFixedSize(my_backgroundImageLabelPtr->size());
          //my_scrollAreaPtr->setFixedWidth(
          //         my_backgroundImageLabelPtr->width() + 4);
-         my_scrollAreaPtr->setFixedWidth(
-                  my_backgroundImage.width() + 4);
+         // my_scrollAreaPtr->resize(
+         //          my_backgroundImage.width() + 4,
+         //          my_backgroundImage.height() + 4);
+         // my_scrollAreaPtr->setFixedWidth(
+         //          );
                   //my_backgroundImageLabelPtr->width() + 4);
          //auto frameWidth = my_backgroundImageLabelPtr->frameWidth();
          //(void)frameWidth;
                   //my_scrollAreaPtr->horizontalScrollBar()->size().width());
-         my_scrollAreaPtr->setFixedHeight(
-                  my_backgroundImage.height() + 4);
+         // my_scrollAreaPtr->setFixedHeight(
+
                   //my_backgroundImageLabelPtr->height() + 4);
          //my_scrollAreaPtr->setStyleSheet("border: 1px solid red");
          //my_scrollAreaPtr->updateGeometry();
-         my_scrollAreaPtr->adjustSize();
+         // my_scrollAreaPtr->adjustSize();
+         my_roomWidgetPtr->setFixedWidth(my_backgroundImage.width() + 4);
+         my_roomWidgetPtr->setFixedHeight(my_backgroundImage.height() + 4);
+         my_roomWidgetPtr->adjustSize();
 
          //updateGeometry();
          //adjustSize();
@@ -413,7 +420,7 @@ namespace seville
             // auto nameTextRect = QRect();
             auto nameTextPoint =
                   QPoint(user.x() + (kSmileyWidth / 2) - (width / 2.0),
-                         user.y() + 58);
+                         user.y() + 56);
 
             // nameTextRect.setX(user.x());
             // nameTextRect.setY(user.y());
@@ -442,7 +449,7 @@ namespace seville
             painter.setFont(font);
             painter.setPen(Qt::black);
             // painter.drawPath(painterPath);
-            painter.drawText(nameTextPoint + QPoint(0, 2), user.username());
+            painter.drawText(nameTextPoint + QPoint(0, 1), user.username());
 
             // draw name
             // painter.setPen(Qt::Pen

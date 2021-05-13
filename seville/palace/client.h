@@ -280,12 +280,18 @@ namespace seville
             do_disconnectFromHost();
             do_connectToHost(
                      url.host(), url.port(), url.userName(), initialRoom);
+
+            emit connectionStateDidChangeEvent(
+                     ConnectionState::kDisconnectedState);
          }
 
          inline auto disconnectFromHost(void) -> void {
             //my_logger.appendInfoMessage("Disconnected.");
             do_disconnectFromHost();
             this->isBigEndian();
+
+            emit connectionStateDidChangeEvent(
+                     ConnectionState::kDisconnectedState);
          }
 
          inline auto chat(const QString& text) -> void {
@@ -311,7 +317,8 @@ namespace seville
          void viewNeedsUpdatingEvent(void);
 
       public slots:
-         void on_backgroundDidFinishLoading(QNetworkReply* replyPtr);
+         void on_backgroundDidFetchAsync(QNetworkReply* replyPtr);
+         void on_propDidFetchAsync(QNetworkReply* replyPtr);
          void on_pingTimerDidTrigger(void);
          void on_readyReadDidOccur(void);
          void on_socketErrorDidOccur(QAbstractSocket::SocketError);
@@ -320,7 +327,8 @@ namespace seville
          //NetMsgReadState netMsgReadState;
          Log my_logger;
          //QImage my_background_img;
-         QNetworkAccessManager my_networkAccessManager;
+         QNetworkAccessManager my_roomBackgroundNetworkAccessManager;
+         QNetworkAccessManager my_propNetworkAccessManager;
          //NetMsg my_netmsg_rx;
          //QDataStream *my_netmsg_rx_ds_ptr;
          //NetMsg my_netmsg_tx_ptr;
@@ -383,7 +391,8 @@ namespace seville
 
          //         }
          auto do_setupEvents(void) -> void;
-         auto do_fetchBackgroundAsync(const QString &url) -> void;
+         auto do_fetchBackgroundAsync(const QString& url) -> void;
+         auto do_fetchPropAsync(const QString& url) -> void;
          auto do_clear(void) -> void;
          auto do_resetReceiveTimer(void) -> void;
          auto do_readSocket(void) -> void;
