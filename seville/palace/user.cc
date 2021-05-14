@@ -53,9 +53,14 @@ namespace seville
          }
       }
 
-      void User::do_init(void)
+      auto User::do_init(void) -> void
       {
          do_clear();
+      }
+
+      auto User::do_fetchWebProp(void) -> void
+      {
+
       }
 
       User::~User(void)
