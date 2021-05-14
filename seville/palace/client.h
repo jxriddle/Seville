@@ -320,7 +320,6 @@ namespace seville
 
       public slots:
          void on_backgroundDidFetchAsync(QNetworkReply* replyPtr);
-         void on_propDidFetchAsync(QNetworkReply* replyPtr);
          void on_pingTimerDidTrigger(void);
          void on_readyReadDidOccur(void);
          void on_socketErrorDidOccur(QAbstractSocket::SocketError);

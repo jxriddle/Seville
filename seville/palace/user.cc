@@ -58,9 +58,37 @@ namespace seville
          do_clear();
       }
 
+      auto User::do_deinit(void) -> void
+      {
+
+      }
+
       auto User::do_fetchWebProp(void) -> void
       {
 
+      }
+
+      auto User::on_propDidFetchAsync(QNetworkReply* replyPtr) -> void
+      {
+         if (replyPtr->error()) {
+            // my_logger.appendErrorMessage(
+                     //QString("Background failed to load."));
+            //          QString("Prop load error: %1")
+            //          .arg(replyPtr->errorString()));
+         }
+         else {
+            auto imageByteArray = replyPtr->readAll();
+            auto const imageByteArrayPtr =
+                  reinterpret_cast<QByteArray*>(&imageByteArray);
+            (void)imageByteArrayPtr;
+
+            // my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
+
+            // emit backgroundImageDidLoadEvent();
+            // emit viewNeedsUpdatingEvent();
+         }
+
+         replyPtr->deleteLater();
       }
 
       User::~User(void)

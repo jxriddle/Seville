@@ -296,28 +296,6 @@ namespace seville
             replyPtr->deleteLater();
       }
 
-      auto Client::on_propDidFetchAsync(QNetworkReply* replyPtr) -> void
-      {
-         if (replyPtr->error()) {
-            my_logger.appendErrorMessage(
-                     //QString("Background failed to load."));
-                     QString("Prop load error: %1")
-                     .arg(replyPtr->errorString()));
-         }
-         else {
-            auto imageByteArray = replyPtr->readAll();
-            auto const imageByteArrayPtr =
-                  reinterpret_cast<QByteArray*>(&imageByteArray);
-
-            // my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
-
-            // emit backgroundImageDidLoadEvent();
-            emit viewNeedsUpdatingEvent();
-         }
-
-         replyPtr->deleteLater();
-      }
-
       auto Client::on_pingTimerDidTrigger(void) -> void
       {
          do_sendPing();
@@ -2185,9 +2163,9 @@ namespace seville
                     &QNetworkAccessManager::finished,
                     this, &Client::on_backgroundDidFetchAsync);
 
-         disconnect(&my_propNetworkAccessManager,
-                    &QNetworkAccessManager::finished,
-                    this, &Client::on_propDidFetchAsync);
+         // disconnect(&my_propNetworkAccessManager,
+         //            &QNetworkAccessManager::finished,
+         //            this, &Client::on_propDidFetchAsync);
 
          disconnect(&my_pingTimer, &QTimer::timeout,
                     this, &Client::on_pingTimerDidTrigger);

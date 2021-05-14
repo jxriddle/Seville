@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QObject>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 #include "seville/base/types.h"
 #include "seville/palace/prop.h"
@@ -162,6 +163,9 @@ namespace seville
 //            return &my_props;
 //         }
 
+      public slots:
+         void on_propDidFetchAsync(QNetworkReply* replyPtr);
+
       private:
          u32 my_id;
          u16 my_flags;
@@ -191,12 +195,10 @@ namespace seville
          auto do_clear(void) -> void;
          auto do_assign(const User& user) -> void;
 
-         inline auto do_deinit(void) -> void {
-         }
+         auto do_deinit(void) -> void;
+         auto do_init(void) -> void;
 
-         inline auto do_init(void) -> void;
-
-         inline auto do_init(const User& user) -> void {
+         auto do_init(const User& user) -> void {
             do_assign(user);
          }
       };

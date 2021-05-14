@@ -51,8 +51,8 @@ namespace seville
          //msgBox->exec();
       //}
 
-      void MainWindow::
-      on_connectionStateDidChange(palace::ConnectionState connectionState)
+      void MainWindow::on_connectionStateDidChange(
+            palace::ConnectionState connectionState)
       {
          (void)connectionState;
          if (my_tabWidgetPtr == nullptr)
