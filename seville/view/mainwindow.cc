@@ -470,6 +470,9 @@ namespace seville
       {
          //auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
          auto currentPalaceClientWidgetPtr = my_currentPalaceClientWidgetPtr;
+         if (currentPalaceClientWidgetPtr == nullptr)
+            return;
+
          auto currentPalaceClientPtr =
                currentPalaceClientWidgetPtr->palaceClientPtr();
 

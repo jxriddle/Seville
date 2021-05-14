@@ -83,7 +83,7 @@ namespace seville
             my_id = value;
          }
 
-         inline auto flags(void) -> i16 {
+         inline auto flags(void) -> u16 {
             return my_flags;
          }
 
@@ -164,7 +164,7 @@ namespace seville
 //         }
 
       public slots:
-         void on_propDidFetchAsync(QNetworkReply* replyPtr);
+         void on_webPropDidFetchAsync(QNetworkReply* replyPtr);
 
       private:
          u32 my_id;
@@ -184,13 +184,13 @@ namespace seville
          std::vector<Prop> my_propList;
          i16 my_propNum;
          u32 my_headPropFlag;
-         QImage my_webProp;
+         QImage my_webPropImage;
          QNetworkAccessManager my_webPropFetcher;
 
          //u32 my_props[kNumPropCells];
 
          auto do_hasHeadProp(void) -> u32;
-         auto do_fetchWebProp(void) -> void;
+         auto do_fetchWebPropAsync(void) -> void;
 
          auto do_clear(void) -> void;
          auto do_assign(const User& user) -> void;

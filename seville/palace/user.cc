@@ -63,12 +63,15 @@ namespace seville
 
       }
 
-      auto User::do_fetchWebProp(void) -> void
+      auto User::do_fetchWebPropAsync(QString propServerUri) -> void
       {
-
+         auto request = QNetworkRequest(propServerUri);
+         request.setRawHeader("Content-Type", "application/json");
+         auto data = "";
+         auto reply = my_webPropFetcher.post(request, data);
       }
 
-      auto User::on_propDidFetchAsync(QNetworkReply* replyPtr) -> void
+      auto User::on_webPropDidFetchAsync(QNetworkReply* replyPtr) -> void
       {
          if (replyPtr->error()) {
             // my_logger.appendErrorMessage(
