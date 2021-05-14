@@ -139,6 +139,8 @@ namespace seville
          static const char* kIdent;
          static const int kIdentLen = 6;
 
+         // static const u32 kNumPropCells = 9;
+         static const u32 kNetMsgTTLMax = 100;
          static const int kDefaultServerPort = 9998;
 
          static constexpr int kIntervalTimeoutForTransferInMs = 30 * 1000;
@@ -359,6 +361,7 @@ namespace seville
          //ByteArray my_netMsgHeader;
          //ByteArray my_netMsgBody;
          NetMsg my_netMsg;
+         u32 my_netMsgTTLCount;
          //i32 my_netMsgSize;
          u32 my_idCrc;
          u32 my_idCounter;

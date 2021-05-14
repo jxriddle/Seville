@@ -7,6 +7,15 @@ namespace seville
 {
    namespace palace
    {
+      enum PropFlags: u32 {
+         PROP_HEAD = 2,
+         PROP_GHOST = 4,
+         PROP_RARE = 8,
+         PROP_ANIMATED = 16,
+         PROP_BOUNCE = 32,
+         PROP_PNG = 1024,
+      };
+
       class Prop
       {
       public:

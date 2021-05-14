@@ -1,7 +1,9 @@
 #ifndef SEVILLE_PALACE_USER_H_
 #define SEVILLE_PALACE_USER_H_
 
+#include <QImage>
 #include <QObject>
+#include <QNetworkAccessManager>
 
 #include "seville/base/types.h"
 #include "seville/palace/prop.h"
@@ -152,6 +154,10 @@ namespace seville
             do_clear();
          }
 
+         inline auto hasHeadProp(void) -> u32 {
+            return do_hasHeadProp();
+         }
+
 //         inline auto propsPtr(void) -> u32* {
 //            return &my_props;
 //         }
@@ -173,8 +179,14 @@ namespace seville
          i16 my_roomId;
          std::vector<Prop> my_propList;
          i16 my_propNum;
+         u32 my_headPropFlag;
+         QImage my_webProp;
+         QNetworkAccessManager my_webPropFetcher;
 
          //u32 my_props[kNumPropCells];
+
+         auto do_hasHeadProp(void) -> u32;
+         auto do_fetchWebProp(void) -> void;
 
          auto do_clear(void) -> void;
          auto do_assign(const User& user) -> void;

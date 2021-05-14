@@ -55,6 +55,15 @@ namespace seville
       on_connectionStateDidChange(palace::ConnectionState connectionState)
       {
          (void)connectionState;
+         if (my_tabWidgetPtr == nullptr)
+            return;
+
+         if (my_tabWidgetPtr->currentPalaceClientPtr() == nullptr)
+            return;
+
+         if (my_tabWidgetPtr->currentPalaceClientPtr()->loggerPtr() == nullptr)
+            return;
+
          my_tabWidgetPtr->currentPalaceClientPtr()->loggerPtr()
                ->appendDebugMessage("***Client Connection State Did Change***");
 

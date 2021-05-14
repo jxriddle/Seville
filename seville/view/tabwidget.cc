@@ -84,8 +84,8 @@ namespace seville
 
       auto TabWidget::do_setupView(void) -> void
       {
-         setTabShape(QTabWidget::TabShape::Triangular);
-         ////setTabBar(&this->appTabBar);
+         // setTabShape(QTabWidget::TabShape::Triangular);
+         // setTabBar(&this->appTabBar);
          setTabsClosable(true);
          setMovable(true);
 

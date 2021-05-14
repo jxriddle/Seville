@@ -26,6 +26,7 @@ namespace seville
          my_username = "";
          my_wizardPassword = "";
          my_roomId = 0;
+         my_headPropFlag = 0;
 
          my_propList.clear();
       }

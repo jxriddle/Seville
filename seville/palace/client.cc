@@ -263,6 +263,7 @@ namespace seville
          my_idCrc = 0xc144c580;
          my_regCounter = 0xcf07309c;
          my_regCrc = 0x5905f923;
+         my_netMsgTTLCount = 0;
       }
 
       auto Client::do_resetReceiveTimer(void) -> void
@@ -515,10 +516,17 @@ namespace seville
             {
                auto netMsgIsValid = my_netMsg.isValid();
                auto netMsgIsRouted = do_routeReceivedNetMsg();
+               (void)netMsgIsRouted;
 
-               auto shouldClearNetMsg = netMsgIsValid && netMsgIsRouted;
-               if (shouldClearNetMsg)
+               auto netMsgTTLReached = my_netMsgTTLCount < kNetMsgTTLMax;
+               auto shouldClearNetMsg = netMsgIsValid; // && netMsgIsRouted;
+               if (shouldClearNetMsg) {
                   my_netMsg.clear();
+                  my_netMsgTTLCount = 0;
+               } else if (netMsgTTLReached) {
+                  disconnectFromHost();
+               }
+
                //auto lengthActual = my_netMsg.length();
                //auto lengthExpected = my_netMsg.len() + NetMsg::kHeaderSize;
                //if (NetMsg::kHeaderSize <= lengthActual &&
@@ -548,12 +556,60 @@ namespace seville
 
          if (text.toStdString() == "'who") {
             auto userListPtr = my_room.userListPtr();
+            my_logger.appendInfoMessage(QString("Listing %1/%2 (%3/%4) users in room...")
+                  .arg(my_room.userCount())
+                  .arg(my_server.userListPtr()->size())
+                  .arg(my_room.userListPtr()->size())
+                  .arg(my_server.userListPtr()->size()));
+
             for (auto i = u32{0}; i < userListPtr->size(); i++) {
                auto user = my_room.userListPtr()->at(i);
                my_logger.appendInfoMessage(
                         QString("%1 (%2) is here")
                         .arg(user.username())
                         .arg(user.id()));
+            }
+         }
+         else if (text.left(QString("'webserver").length()) ==
+                  QString("'webserver")) {
+            my_logger.appendInfoMessage(
+                     QString("My webserver location is: %1")
+                     .arg(my_server.httpServerLocation()));
+         }
+         else if (text.left(QString("'propserver").length()) ==
+                  QString("'propserver")) {
+            my_logger.appendInfoMessage(
+                     QString("My propserver location is: %1")
+                     .arg(my_server.httpPropLocation()));
+         }
+         else if (text.left(QString("'usercount").length()) ==
+                  QString("'usercount")) {
+            my_logger.appendInfoMessage(
+                     QString("Server user count: %1")
+                     .arg(my_server.userListPtr()->size()));
+         }
+         else if (text.left(QString("'roomusercount").length()) ==
+                  QString("'roomusercount")) {
+            my_logger.appendInfoMessage(
+                     QString("Room user count: %1")
+                     .arg(my_room.userListPtr()->size()));
+         }
+         else if (text.left(QString("'propids ").length()) ==
+                  QString("'propids ")) {
+            auto split = text.split(' ');
+            if (1 < split.length()) {
+               auto ok = true;
+               auto userId = split.at(1).toUShort(&ok);
+               auto user = my_room.userWithId(userId);
+               for (auto i = u32{0}; i < User::kNumPropCells; i++) {
+                  auto prop = user.propListPtr()->at(i);
+                  my_logger.appendInfoMessage(
+                           QString("User %1 propId[%2]: %3 (crc: %4)")
+                           .arg(userId)
+                           .arg(i)
+                           .arg(prop.id())
+                           .arg(prop.crc()));
+               }
             }
          }
          else if (text.left(QString("'w ").length()) ==
@@ -1291,7 +1347,7 @@ namespace seville
          my_logger.appendDebugMessage("> UserRename");
 
          auto userId = my_netMsg.ref();
-         auto userPtr = my_server.userPtrWithId(userId);
+         auto userPtr = my_room.userPtrWithId(userId);
          if (userPtr == nullptr)
             return 0;
 
@@ -1299,11 +1355,11 @@ namespace seville
 
          auto usernameLen = my_netMsg.streamReadU8();
          auto username = my_netMsg.streamReadFixedQString(usernameLen);
-         userPtr->setUsername(username);
-
          my_logger.appendInfoMessage(QString("%1 has changed name to %2")
                                      .arg(oldUsername)
                                      .arg(username));
+
+         userPtr->setUsername(username);
 
          emit viewNeedsUpdatingEvent();
 
@@ -1314,17 +1370,19 @@ namespace seville
       {
          my_logger.appendDebugMessage("> UserLeaving");
 
-         auto userCount = my_netMsg.streamReadU32();
-         my_room.setUserCount(userCount);
-
          auto userId = my_netMsg.ref();
-         auto user = my_room.userWithId(userId);
+         auto user = my_server.userWithId(userId);
+
          my_logger.appendInfoMessage(
                   QString("%1 has signed off.").arg(user.username()));
-         my_room.removeUserWithId(userId);
 
          user = my_server.userWithId(userId);
          my_server.removeUserWithId(userId);
+
+         auto userCount = my_netMsg.streamReadU32();
+         my_room.setUserCount(userCount);
+
+         my_room.removeUserWithId(userId);
 
          emit viewNeedsUpdatingEvent();
 
@@ -1453,7 +1511,8 @@ namespace seville
          auto message = my_netMsg.streamReadAndDecodeQString(
                   my_netMsg.bodyLen());
 
-         auto usernameFrom = user.username();
+         auto username = user.username();
+         QString usernameFrom = QString("%1 (%2)").arg(username).arg(userId);
          //auto id = user.id();
          my_logger.appendWhisperMessage(
 //                  QString("%1 (%2)")
