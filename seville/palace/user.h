@@ -190,7 +190,7 @@ namespace seville
          //u32 my_props[kNumPropCells];
 
          auto do_hasHeadProp(void) -> u32;
-         auto do_fetchWebPropAsync(void) -> void;
+         auto do_fetchWebPropAsync(QString propServerUri) -> void;
 
          auto do_clear(void) -> void;
          auto do_assign(const User& user) -> void;
