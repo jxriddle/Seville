@@ -45,10 +45,12 @@ namespace seville
          do_setupSizing();
       }
 
-      //ClientWidget::~ClientWidget(void)
-      //{
+      PalaceClientWidget::~PalaceClientWidget(void)
+      {
+         do_teardownEvents();
+         do_deinit();
          //delete myPalaceClient;
-      //}
+      }
 
 //      void PalRoomWidget::resizeEvent(QResizeEvent* resize_event_ptr)
 //      {
@@ -58,7 +60,7 @@ namespace seville
 //         QWidget::resizeEvent(event);
 //      }
 
-      auto PalaceClientWidget::do_init(void) -> void
+      void PalaceClientWidget::do_init(void)
       {
          kNameColors[0]  = QColor::fromRgb(0xe1, 0x2f, 0x2f); // red
          kNameColors[1]  = QColor::fromRgb(0xe0, 0x66, 0x26); // orange red
@@ -83,6 +85,11 @@ namespace seville
          //auto rect = QRect(0, 0, 45, 45);
          my_spritesheet = QImage(spritesheetPath);
          //my_sprite = my_spritesheet.copy(rect);
+      }
+
+      void PalaceClientWidget::do_deinit(void)
+      {
+
       }
 
       void PalaceClientWidget::do_setupView(void)
@@ -165,12 +172,12 @@ namespace seville
                  &seville::view::PalaceClientWidget::
                  on_backgroundImageDidLoad);
 
-         connect(my_palaceClientPtr,
-                 &seville::palace::Client::
-                 connectionStateDidChangeEvent,
-                 this,
-                 &seville::view::PalaceClientWidget::
-                 on_connectionStateDidChange);
+//         connect(my_palaceClientPtr,
+//                 &seville::palace::Client::
+//                 connectionStateDidChangeEvent,
+//                 this,
+//                 &seville::view::PalaceClientWidget::
+//                 on_connectionStateDidChange);
 
          connect(my_palaceClientPtr,
                  &seville::palace::Client::viewNeedsUpdatingEvent,
@@ -192,7 +199,47 @@ namespace seville
                  on_chatLineEditDidPressReturn);
       }
 
-      auto PalaceClientWidget::do_setupSizing(void) -> void
+      void PalaceClientWidget::do_teardownEvents(void)
+      {
+         //disconnect(
+            //this, &Seville::View::ClientWidget::mousePressEvent,
+            //this, &Seville::View::ClientWidget::onMousePressEvent);
+
+         disconnect(my_palaceClientPtr,
+                 &seville::palace::Client::
+                 backgroundImageDidLoadEvent,
+                 this,
+                 &seville::view::PalaceClientWidget::
+                 on_backgroundImageDidLoad);
+
+//         disconnect(my_palaceClientPtr,
+//                 &seville::palace::Client::
+//                 connectionStateDidChangeEvent,
+//                 this,
+//                 &seville::view::PalaceClientWidget::
+//                 on_connectionStateDidChange);
+
+         disconnect(my_palaceClientPtr,
+                 &seville::palace::Client::viewNeedsUpdatingEvent,
+                 this,
+                 &seville::view::PalaceClientWidget::on_viewNeedsUpdating);
+
+         //auto mainWindowPtr =
+         //static_cast<view::MainWindow*>(this->parent()->parent());
+         //auto mainWindowPtr = do_mainWindowPtr(); //sevilleApp.mainWindowPtr();
+         //disconnect(my_palaceClientPtr,
+         //        &seville::palace::Client::connectionStateDidChangeEvent,
+         //        mainWindowPtr,
+         //        &seville::view::MainWindow::on_clientConnectionStateDidChange);
+
+         disconnect(my_chatLineEditPtr,
+                 &QLineEdit::returnPressed,
+                 this,
+                 &seville::view::PalaceClientWidget::
+                 on_chatLineEditDidPressReturn);
+      }
+
+      void PalaceClientWidget::do_setupSizing(void)
       {
          //my_mainLayoutPtr->setSizeConstraint(QLayout::SetMinimumSize);
 
@@ -475,7 +522,7 @@ namespace seville
          //do_set_background_image_(pixmap);
       //}
 
-      auto PalaceClientWidget::on_backgroundImageDidLoad(void) -> void
+      void PalaceClientWidget::on_backgroundImageDidLoad(void)
       {
          auto backgroundImage =
                my_palaceClientPtr->roomPtr()->backgroundImage();
@@ -491,8 +538,8 @@ namespace seville
          }
       }
 
-      auto PalaceClientWidget::on_connectionStateDidChange(
-            palace::ConnectionState connectionState) -> void
+      void PalaceClientWidget::on_connectionStateDidChange(
+            palace::ConnectionState connectionState)
       {
          (void)connectionState;
          //if (palace::ConnectionState::kHandshakingState ==
@@ -503,14 +550,14 @@ namespace seville
          //   do_clearBackgroundImage();
       }
 
-      auto PalaceClientWidget::on_chatLineEditDidPressReturn(void) -> void
+      void PalaceClientWidget::on_chatLineEditDidPressReturn(void)
       {
          auto text = my_chatLineEditPtr->text();
          my_palaceClientPtr->chat(text);
          my_chatLineEditPtr->clear();
       }
 
-      auto PalaceClientWidget::on_viewNeedsUpdating(void) -> void
+      void PalaceClientWidget::on_viewNeedsUpdating(void)
       {
          update();
       }

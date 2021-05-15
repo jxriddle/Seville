@@ -109,25 +109,24 @@ namespace seville
          QToolBar* my_toolBarPtr;
          seville::view::PalaceClientWidget* my_currentPalaceClientWidgetPtr;
 
-         auto do_setupWindow(void) -> void;
-         auto do_setupView(void) -> void;
-         auto do_setupActions(void) -> void;
-         auto do_setupMenus(void) -> void;
-         auto do_setupToolbars(void) -> void;
-         auto do_setupDocks(void) -> void;
-         auto do_setupEvents(void) -> void;
-         auto do_setupSizing(void) -> void;
+         void do_setupWindow(void);
+         void do_setupView(void);
+         void do_setupActions(void);
+         void do_setupMenus(void);
+         void do_setupToolbars(void);
+         void do_setupDocks(void);
+         void do_setupEvents(void);
+         void do_setupSizing(void);
 
-         auto do_updateMenus(void) -> void;
-         auto do_updateView(void) -> void;
+         void do_updateMenus(void);
+         void do_updateView(void);
 
-         auto do_teardownEvents(void) -> void;
-         auto do_setCurrentPalaceClientWidgetPtr(
-               seville::view::PalaceClientWidget* currentPalaceClientWidget)
-            -> void;
+         void do_teardownEvents(void);
+         void do_setCurrentPalaceClientWidgetPtr(
+               seville::view::PalaceClientWidget* currentPalaceClientWidget);
 
-         auto do_init(void) -> void;
-         auto do_deinit(void) -> void;
+         void do_init(void);
+         void do_deinit(void);
       };
    }
 }

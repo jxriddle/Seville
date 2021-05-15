@@ -53,25 +53,30 @@ namespace seville
          }
       }
 
-      auto User::do_init(void) -> void
+      void User::do_init(void)
       {
          do_clear();
       }
 
-      auto User::do_deinit(void) -> void
+      void User::do_deinit(void)
       {
 
       }
 
-      auto User::do_fetchWebPropAsync(QString propServerUri) -> void
+      void User::do_fetchWebPropAsync(const QString& propServerUri)
       {
          auto request = QNetworkRequest(propServerUri);
          request.setRawHeader("Content-Type", "application/json");
-         auto data = "";
-         auto reply = my_webPropFetcher.post(request, data);
+         auto data = QString("{\"props\"[");
+
+         data.append(QString("{\"id\": %1}").arg(my_id));
+
+         data.append("]}");
+         // auto postReply = my_webPropFetcher.post(request, data);
+         // auto json = postReply;
       }
 
-      auto User::on_webPropDidFetchAsync(QNetworkReply* replyPtr) -> void
+      void User::on_webPropDidFetchAsync(QNetworkReply* replyPtr)
       {
          if (replyPtr->error()) {
             // my_logger.appendErrorMessage(

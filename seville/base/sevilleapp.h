@@ -27,7 +27,7 @@ namespace seville
 
       SevilleApp(void) noexcept;
 
-      auto main(int argc, char* argv[]) -> int;
+      int main(int argc, char* argv[]);
 
    //   view::MainWindow* mainWindowPtr(void);
 
@@ -35,7 +35,7 @@ namespace seville
    //   view::MainWindow* my_mainWindowPtr;
    };
 
-   extern SevilleApp sevilleApp;
+   extern SevilleApp app;
 }
 
 #endif   // SEVILLE_APP_H_

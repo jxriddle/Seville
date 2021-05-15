@@ -34,17 +34,17 @@ namespace seville
 
          //virtual ~Logger(void);
 
-         static auto New(void) -> Log*;
+         static Log* New(void);
 
-         inline auto mode(void) const -> LogMode {
+         inline LogMode mode(void) const {
             return my_mode;
          }
 
-         inline auto setMode(LogMode value) -> void {
+         inline void setMode(LogMode value) {
             my_mode = value;
          }
 
-         inline auto logEntriesPtr(void) -> std::vector<LogEntry>* {
+         inline std::vector<LogEntry>* logEntriesPtr(void) {
             return my_logEntriesUniquePtr.get();
          }
 
@@ -53,24 +53,24 @@ namespace seville
 //            return std::move(my_logEntriesUniquePtr);
 //         }
 
-         inline auto appendLogEntry(const LogEntry& message) -> void {
+         inline void appendLogEntry(const LogEntry& message) {
             do_appendLogEntry(message);
          }
 
-         inline auto appendLogEntry(
+         inline void appendLogEntry(
                LogEntryKind kind,
                const QString& message,
                const QString& usernameFrom,
                const QString& usernameTo
-               ) -> void {
+               ) {
             do_appendLogEntry(
                      LogEntry(kind, message, usernameFrom, usernameTo));
          }
 
-         inline auto appendWhisperMessage(
+         inline void appendWhisperMessage(
                const QString& usernameFrom,
                // const QString& usernameTo,
-               const QString& message) -> void {
+               const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kWhisperKind,
@@ -79,9 +79,9 @@ namespace seville
                         // usernameTo));
          }
 
-         inline auto appendChatMessage(
+         inline void appendChatMessage(
                const QString& usernameFrom,
-               const QString& message) -> void {
+               const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kChatKind,
@@ -90,7 +90,7 @@ namespace seville
                         ""));
          }
 
-         inline auto appendGlobalMessage(const QString& message) -> void {
+         inline void appendGlobalMessage(const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kGlobalKind,
@@ -99,7 +99,7 @@ namespace seville
                         ""));
          }
 
-         inline auto appendInfoMessage(const QString& message) -> void {
+         inline void appendInfoMessage(const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kInfoKind,
@@ -108,7 +108,7 @@ namespace seville
                         ""));
          }
 
-         inline auto appendWarningMessage(const QString& message) -> void {
+         inline void appendWarningMessage(const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kWarningKind,
@@ -117,7 +117,7 @@ namespace seville
                         ""));
          }
 
-         inline auto appendErrorMessage(const QString& message) -> void {
+         inline void appendErrorMessage(const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kErrorKind,
@@ -126,7 +126,7 @@ namespace seville
                         ""));
          }
 
-         inline auto appendDebugMessage(const QString& message) -> void {
+         inline void appendDebugMessage(const QString& message) {
             qCDebug(seville_log) << message;
             if (LogMode::kDebugMode == my_mode)
                do_appendLogEntry(
@@ -145,10 +145,10 @@ namespace seville
          LogMode my_mode;
          std::unique_ptr<std::vector<LogEntry>> my_logEntriesUniquePtr;
 
-         auto do_appendLogEntry(const LogEntry& message) -> void;
+         void do_appendLogEntry(const LogEntry& message);
          // auto do_log_message_unique_ptr_(
                 //std::unique_ptr<LogMessage> message_unique_ptr) -> void;
-         auto do_init(LogMode mode = LogMode::kDefaultMode) -> void;
+         void do_init(LogMode mode = LogMode::kDefaultMode);
       };
    }
 }

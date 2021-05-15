@@ -21,12 +21,12 @@ namespace seville
       class LogEntry
       {
       public:
-         static auto New(
+         static std::unique_ptr<LogEntry> New(
                LogEntryKind logEntryKind = LogEntryKind::kChatKind,
                const QString& message = "",
                const QString& fromUsername = "",
                const QString& toUsername = ""
-            ) -> std::unique_ptr<LogEntry>;
+            );
 
          //LogMessage(void);
 
@@ -38,35 +38,35 @@ namespace seville
                const QString& fromUsername = "",
                const QString& toUsername = "");
 
-         inline auto kind(void) const -> LogEntryKind {
+         inline LogEntryKind kind(void) const {
             return my_logEntryKind;
          }
 
-         inline auto setKind(const LogEntryKind& value) -> void {
+         inline void setKind(const LogEntryKind& value) {
             my_logEntryKind = value;
          }
 
-         inline auto message(void) const -> QString {
+         inline QString message(void) const {
             return my_message;
          }
 
-         inline auto setMessage(const QString& value) -> void {
+         inline void setMessage(const QString& value) {
             my_message = value;
          }
 
-         inline auto fromUsername(void) const -> QString {
+         inline QString fromUsername(void) const {
             return my_fromUsername;
          }
 
-         inline auto setFromUsername(const QString& value) -> void {
+         inline void setFromUsername(const QString& value) {
             my_fromUsername = value;
          }
 
-         inline auto toUsername(void) const -> QString {
+         inline QString toUsername(void) const {
             return my_toUsername;
          }
 
-         inline auto setToUsername(const QString& value) -> void {
+         inline void setToUsername(const QString& value) {
             my_toUsername = value;
          }
 
@@ -78,13 +78,13 @@ namespace seville
          QString my_fromUsername;
          QString my_toUsername;
 
-         auto do_init(
+         void do_init(
                LogEntryKind kind,
                const QString& message,
                const QString& fromUsername,
-               const QString& toUsername) -> void;
-         auto do_clear(void) -> void;
-         auto do_assign(const LogEntry& other) -> void;
+               const QString& toUsername);
+         void do_clear(void);
+         void do_assign(const LogEntry& other);
       };
    }
 }

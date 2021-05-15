@@ -9,7 +9,7 @@ namespace seville
          do_init();
       }
 
-      auto Prop::do_init(void) -> void {
+      void Prop::do_init(void) {
           my_id = 0;
           my_crc = 0;
       }

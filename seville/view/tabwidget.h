@@ -26,12 +26,12 @@ namespace seville
             explicit TabWidget(QWidget* parentWidgetPtr = nullptr);
             virtual ~TabWidget(void);
 
-            auto addNewTab(QWidget* contentWidgetPtr = nullptr) -> void;
-            auto closeCurrentTab(void) -> void;
-            auto removeTab(int index) -> void;
-            auto currentPalaceClientPtr(void) -> palace::Client*;
+            void addNewTab(QWidget* contentWidgetPtr = nullptr);
+            void closeCurrentTab(void);
+            void removeTab(int index);
+            palace::Client* currentPalaceClientPtr(void);
             // auto setBackground(void);
-            auto clear(void) -> void;
+            void clear(void);
 
          signals:
             void tabWasAddedWithWidgetPtrEvent(
@@ -55,18 +55,18 @@ namespace seville
             QLayout* my_mainLayoutPtr;
             //palace::Client* my_currentPalaceClientPtr;
 
-            auto do_setupView(void) -> void;
-            auto do_setupEvents(void) -> void;
-            auto do_setupSizing(void) -> void;
+            void do_setupView(void);
+            void do_setupEvents(void);
+            void do_setupSizing(void);
 
-            auto do_addNewTab(QWidget* contentWidgetPtr = nullptr) -> void;
-            auto do_closeTab(int index) -> void;
-            auto do_closeCurrentTab(void) -> void;
+            void do_addNewTab(QWidget* contentWidgetPtr = nullptr);
+            void do_closeTab(int index);
+            void do_closeCurrentTab(void);
 
-            auto do_teardownEvents(void) -> void;
+            void do_teardownEvents(void);
 
-            auto do_clear(void) -> void;
-            auto do_init(QWidget* contentWidgetPtr = nullptr) -> void;
+            void do_clear(void);
+            void do_init(QWidget* contentWidgetPtr = nullptr);
       };
    }
 }

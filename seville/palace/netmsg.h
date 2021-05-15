@@ -265,36 +265,37 @@ namespace seville
 
          //virtual ~NetMsg(void);
 
-         inline auto isValid(void) -> int {
+         inline int isValid(void) {
             //return my_isValidFlag;
-            return size() == NetMsg::kHeaderSize + static_cast<int>(do_bodyLen());
+            return size() ==
+                  NetMsg::kHeaderSize + static_cast<int>(do_bodyLen());
          }
 
          //inline auto setIsValid(int value) -> void {
          //   my_isValidFlag = value;
          //}
 
-         inline auto id(void) -> u32 {
+         inline u32 id(void) {
             return do_id();
          }
 
-         inline auto setId(u32 value) -> void {
+         inline void setId(u32 value) {
             do_setId(value);
          }
 
-         inline auto bodyLen(void) -> u32 {
+         inline u32 bodyLen(void) {
             return do_bodyLen();
          }
 
-         inline auto setBodyLen(u32 value) -> void {
+         inline void setBodyLen(u32 value) {
             do_setBodyLen(value);
          }
 
-         inline auto ref(void) -> u32 {
+         inline u32 ref(void) {
             return do_ref();
          }
 
-         inline auto setRef(u32 value) -> void {
+         inline void setRef(u32 value) {
             do_setRef(value);
          }
 
@@ -302,7 +303,7 @@ namespace seville
 //            return do_headerSize();
 //         }
 
-         inline auto contentSize(void) -> i32 {
+         inline i32 contentSize(void) {
             return do_contentSize();
          }
 
@@ -321,62 +322,62 @@ namespace seville
 //            }
 //         }
 
-         inline auto appendContent(u8 value) -> void {
+         inline void appendContent(u8 value) {
             do_setStreamCursorToContentEnd();
             streamWriteU8(value);
          }
 
-         inline auto appendContent(i8 value) -> void {
+         inline void appendContent(i8 value) {
             do_setStreamCursorToContentEnd();
             streamWriteI8(value);
          }
 
-         inline auto appendContent(u16 value) -> void {
+         inline void appendContent(u16 value) {
             do_setStreamCursorToContentEnd();
             streamWriteU16(value);
          }
 
-         inline auto appendContent(i16 value) -> void {
+         inline void appendContent(i16 value) {
             do_setStreamCursorToContentEnd();
             streamWriteI16(value);
          }
 
-         inline auto appendContent(u32 value) -> void {
+         inline void appendContent(u32 value) {
             do_setStreamCursorToContentEnd();
             streamWriteU32(value);
          }
 
-         inline auto appendContent(i32 value) -> void {
+         inline void appendContent(i32 value) {
             do_setStreamCursorToContentEnd();
             streamWriteI32(value);
          }
 
-         inline auto appendContent(u64 value) -> void {
+         inline void appendContent(u64 value) {
             do_setStreamCursorToContentEnd();
             streamWriteU64(value);
          }
 
-         inline auto appendContent(i64 value) -> void {
+         inline void appendContent(i64 value) {
             do_setStreamCursorToContentEnd();
             streamWriteI64(value);
          }
 
-         inline auto appendContent(const QString& value) -> void {
+         inline void appendContent(const QString& value) {
             do_setStreamCursorToContentEnd();
             streamWriteQString(value);
          }
 
-         inline auto appendContent(const std::string& value) -> void {
+         inline void appendContent(const std::string& value) {
             do_setStreamCursorToContentEnd();
             streamWriteString(value);
          }
 
-         inline auto appendContent(const QString& value, int len) -> void {
+         inline void appendContent(const QString& value, int len) {
             do_setStreamCursorToContentEnd();
             streamWriteFixedQString(value, len);
          }
 
-         inline auto appendContent(const std::string& value, int len) -> void {
+         inline void appendContent(const std::string& value, int len) {
             do_setStreamCursorToContentEnd();
             streamWriteFixedString(value, len);
          }
@@ -399,22 +400,21 @@ namespace seville
          //bool my_shouldSwapEndiannessFlag;
          int my_isValidFlag;
 
-         auto do_id(void) -> u32;
-         auto do_setId(u32 value) -> void;
-         auto do_bodyLen(void) -> u32;
-         auto do_setBodyLen(u32 value) -> void;
-         auto do_ref(void) -> u32;
-         auto do_setRef(u32 value) -> void;
+         u32 do_id(void);
+         void do_setId(u32 value);
+         u32 do_bodyLen(void);
+         void do_setBodyLen(u32 value);
+         u32 do_ref(void);
+         void do_setRef(u32 value);
 
          //auto do_headerSize(void) -> u32;
-         auto do_contentSize(void) -> u32;
+         u32 do_contentSize(void);
 
-         auto do_setStreamCursorToContentEnd(void) -> void;
-         auto do_setStreamCursorToContentStart(void) -> void;
+         void do_setStreamCursorToContentEnd(void);
+         void do_setStreamCursorToContentStart(void);
 
-         auto do_clear(void) -> void;
-         auto do_init(NetMsgOptions options = NetMsgOptions::kNoEndianSwap)
-               -> void;
+         void do_clear(void);
+         void do_init(NetMsgOptions options = NetMsgOptions::kNoEndianSwap);
       };
    }
 }

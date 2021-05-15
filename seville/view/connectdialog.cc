@@ -12,17 +12,17 @@ namespace seville
 {
    namespace view
    {
-      ConnectDialog::ConnectDialog(QWidget* widget_parent_ptr)
-         : QDialog(widget_parent_ptr)
+      ConnectDialog::ConnectDialog(QWidget* parentWidgetPtr)
+         : QDialog(parentWidgetPtr)
       {
          do_setupView();
          do_setupEvents();
       }
 
-      auto ConnectDialog::New(QWidget* widget_parent_ptr)
-            -> std::unique_ptr<ConnectDialog>
+      std::unique_ptr<ConnectDialog> ConnectDialog::New(
+            QWidget* parentWidgetPtr)
       {
-         auto instance = std::make_unique<ConnectDialog>(widget_parent_ptr);
+         auto instance = std::make_unique<ConnectDialog>(parentWidgetPtr);
          //std::make_optional<ConnectDialog*>();
 
          //if (object.has_value()) {

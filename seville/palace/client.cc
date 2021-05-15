@@ -34,7 +34,7 @@ namespace seville
       }
 
       //auto Client::do_receiveNetMsgFromSocket(void) -> int
-      auto Client::do_receiveNetMsgFromSocket(void) -> int //std::tuple<int, NetMsg>
+      int Client::do_receiveNetMsgFromSocket(void) //std::tuple<int, NetMsg>
       {
          auto readHeaderOk = 0;
          auto readContentOk = 0;
@@ -47,7 +47,7 @@ namespace seville
          //return my_netMsg;
       }
 
-      auto Client::do_readNetMsgHeaderFromSocket(void) -> int
+      int Client::do_readNetMsgHeaderFromSocket(void)
       { //_from_socket_ptr_(
             //QTcpSocket* socket_ptr) -> int {
 
@@ -81,7 +81,7 @@ namespace seville
          return NetMsg::kHeaderSize == netMsgHeaderSize;
       }
 
-      auto Client::do_readNetMsgContentFromSocket(void) -> int //(i32 len) -> int
+      int Client::do_readNetMsgContentFromSocket(void) //(i32 len) -> int
       {
             //QTcpSocket* socket_ptr) -> int {
          auto len = i32(my_netMsg.bodyLen());
@@ -129,7 +129,7 @@ namespace seville
          */
       }
 
-      auto Client::do_setupEvents(void) -> void
+      void Client::do_setupEvents(void)
       {
          // wire up events
          connect(&my_socket, &QTcpSocket::readyRead, //&QIODevice::readyRead,
@@ -163,26 +163,9 @@ namespace seville
 //               qCDebug(log_seville) << "ERROR: Socket Error";
 //            });
 
-         connect(
-            &my_roomBackgroundNetworkAccessManager, &QNetworkAccessManager::finished,
-            this, [this](QNetworkReply* replyPtr) {
-               if (replyPtr->error()) {
-                  my_logger.appendErrorMessage(
-                           //QString("Background failed to load."));
-                           QString("Background load error: %1")
-                           .arg(replyPtr->errorString()));
-               }
-               else {
-                  auto imageByteArray = replyPtr->readAll();
-                  auto const imageByteArrayPtr =
-                        reinterpret_cast<QByteArray*>(&imageByteArray);
-                  my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
-
-                  emit backgroundImageDidLoadEvent();
-               }
-
-               replyPtr->deleteLater();
-         });
+         connect(&my_roomBackgroundNetworkAccessManager,
+                 &QNetworkAccessManager::finished,
+                 this, &seville::palace::Client::on_roomBackgroundDidLoad);
 
 //            connect(
 //               &my_logger, &Logger::messageLogged,
@@ -196,16 +179,12 @@ namespace seville
 //                  do_logMessage(kind, message, fromUsername, toUsername);
 //               }
 //            );
-         connect(
-            &my_pingTimer, &QTimer::timeout,
-                  this, [this](void) {
-            do_sendPing();
-            //my_pingTimer.start();
-         });
+         connect(&my_pingTimer, &QTimer::timeout,
+                 this, &seville::palace::Client::do_sendPing);
       }
 
       //, const QMap<QString, QString>& mapOfHeaders)
-      auto Client::do_fetchBackgroundAsync(const QString& url) -> void
+      void Client::do_fetchBackgroundAsync(const QString& url)
       {
          // create HTTP request and set hostname
          QNetworkRequest request;
@@ -229,7 +208,7 @@ namespace seville
          my_roomBackgroundNetworkAccessManager.get(request);
       }
 
-      auto Client::do_fetchPropAsync(const QString& url) -> void
+      void Client::do_fetchPropAsync(const QString& url)
       {
          QNetworkRequest request;
          request.setUrl(url);
@@ -238,7 +217,7 @@ namespace seville
          my_roomBackgroundNetworkAccessManager.get(request);
       }
 
-      auto Client::do_clear(void) -> void
+      void Client::do_clear(void)
       {
          do_disconnectFromHost();
 
@@ -266,7 +245,7 @@ namespace seville
          my_netMsgTTLCount = 0;
       }
 
-      auto Client::do_resetReceiveTimer(void) -> void
+      void Client::do_resetReceiveTimer(void)
       {
 //         if (my_transferTimerId)
 //         {
@@ -275,8 +254,8 @@ namespace seville
 //         }
       }
 
-      auto Client::on_backgroundDidFetchAsync(
-            QNetworkReply* replyPtr) -> void
+      void Client::on_backgroundDidFetchAsync(
+            QNetworkReply* replyPtr)
       {
             if (replyPtr->error()) {
                my_logger.appendErrorMessage(
@@ -296,88 +275,113 @@ namespace seville
             replyPtr->deleteLater();
       }
 
-      auto Client::on_pingTimerDidTrigger(void) -> void
+      void Client::on_roomBackgroundDidLoad(QNetworkReply* replyPtr)
+      {
+         if (replyPtr->error()) {
+            my_logger.appendErrorMessage(
+                     //QString("Background failed to load."));
+                     QString("Background load error: %1")
+                     .arg(replyPtr->errorString()));
+         }
+         else {
+            auto imageByteArray = replyPtr->readAll();
+            auto const imageByteArrayPtr =
+                   reinterpret_cast<QByteArray*>(&imageByteArray);
+            my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
+
+            emit backgroundImageDidLoadEvent();
+         }
+
+         replyPtr->deleteLater();
+      }
+
+
+      void Client::on_pingTimerDidTrigger(void)
       {
          do_sendPing();
       }
 
-      auto Client::on_socketErrorDidOccur(
-            QAbstractSocket::SocketError socketError) -> void
+      void Client::on_socketErrorDidOccur(
+            QAbstractSocket::SocketError socketError)
       {
-         switch (socketError) {
-         case QAbstractSocket::SocketError::AddressInUseError:
+         if (socketError == QAbstractSocket::AddressInUseError) {
             my_logger.appendErrorMessage("Address in use");
-            break;
-         case QAbstractSocket::SocketError::ConnectionRefusedError:
+         }
+         else if (socketError == QAbstractSocket::ConnectionRefusedError) {
             my_logger.appendErrorMessage("Connection refused");
-            break;
-         case QAbstractSocket::SocketError::DatagramTooLargeError:
+         }
+         else if (socketError == QAbstractSocket::DatagramTooLargeError) {
             my_logger.appendErrorMessage("Datagram too large");
-            break;
-         case QAbstractSocket::SocketError::HostNotFoundError:
+         }
+         else if (socketError == QAbstractSocket::HostNotFoundError) {
             my_logger.appendErrorMessage("Host not found");
-            break;
-         case QAbstractSocket::SocketError::NetworkError:
+         }
+         else if (socketError == QAbstractSocket::NetworkError) {
             my_logger.appendErrorMessage("Network error");
-            break;
-         case QAbstractSocket::SocketError::OperationError:
+         }
+         else if (socketError == QAbstractSocket::OperationError) {
             my_logger.appendErrorMessage("Operation error");
-            break;
-         case QAbstractSocket::SocketError::ProxyAuthenticationRequiredError:
+         }
+         else if (socketError ==
+                  QAbstractSocket::ProxyAuthenticationRequiredError) {
             my_logger.appendErrorMessage("Proxy authentication required");
-            break;
-         case QAbstractSocket::SocketError::ProxyConnectionClosedError:
+         }
+         else if (socketError == QAbstractSocket::ProxyConnectionClosedError) {
             my_logger.appendErrorMessage("Proxy connection closed");
-            break;
-         case QAbstractSocket::SocketError::ProxyConnectionRefusedError:
+         }
+         else if (socketError == QAbstractSocket::ProxyConnectionRefusedError) {
             my_logger.appendErrorMessage("Proxy connection refused");
-            break;
-         case QAbstractSocket::SocketError::ProxyConnectionTimeoutError:
+         }
+         else if (socketError == QAbstractSocket::ProxyConnectionTimeoutError) {
             my_logger.appendErrorMessage("Proxy connection timeout");
-            break;
-         case QAbstractSocket::SocketError::ProxyNotFoundError:
+         }
+         else if (socketError == QAbstractSocket::ProxyNotFoundError) {
             my_logger.appendErrorMessage("Proxy not found");
-            break;
-         case QAbstractSocket::SocketError::ProxyProtocolError:
+         }
+         else if (socketError == QAbstractSocket::ProxyProtocolError) {
             my_logger.appendErrorMessage("Proxy protocol error");
-            break;
-         case QAbstractSocket::SocketError::RemoteHostClosedError:
+         }
+         else if (socketError == QAbstractSocket::RemoteHostClosedError) {
             my_logger.appendErrorMessage("Remote host closed connection");
-            break;
-         case QAbstractSocket::SocketError::SocketAccessError:
+         }
+         else if (socketError == QAbstractSocket::SocketAccessError) {
             my_logger.appendErrorMessage("Socket access error");
-            break;
-         case QAbstractSocket::SocketError::SocketAddressNotAvailableError:
+         }
+         else if (socketError ==
+                  QAbstractSocket::SocketAddressNotAvailableError) {
             my_logger.appendErrorMessage("Socket address not available");
-            break;
-         case QAbstractSocket::SocketError::SocketResourceError:
+         }
+         else if (socketError == QAbstractSocket::SocketResourceError) {
             my_logger.appendErrorMessage("Socket resource error");
-            break;
-         case QAbstractSocket::SocketError::SocketTimeoutError:
+         }
+         else if (socketError == QAbstractSocket::SocketTimeoutError) {
             my_logger.appendErrorMessage("Socket timeout error");
-            break;
-         case QAbstractSocket::SocketError::SslHandshakeFailedError:
+         }
+         else if (socketError ==
+                  QAbstractSocket::SocketError::SslHandshakeFailedError) {
             my_logger.appendErrorMessage("SSL handshake failed");
-            break;
-         case QAbstractSocket::SocketError::SslInternalError:
+         }
+         else if (socketError == QAbstractSocket::SslInternalError) {
             my_logger.appendErrorMessage("SSL internal error");
-            break;
-         case QAbstractSocket::SocketError::SslInvalidUserDataError:
+         }
+         else if (socketError == QAbstractSocket::SslInvalidUserDataError) {
             my_logger.appendErrorMessage("SSL invalid user data");
-            break;
-         case QAbstractSocket::SocketError::TemporaryError:
+         }
+         else if (socketError == QAbstractSocket::TemporaryError) {
             my_logger.appendErrorMessage("Temporary error");
-            break;
-         case QAbstractSocket::SocketError::UnfinishedSocketOperationError:
+         }
+         else if (socketError ==
+                  QAbstractSocket::UnfinishedSocketOperationError) {
             my_logger.appendErrorMessage("Unfinished socket operation error");
-            break;
-         case QAbstractSocket::SocketError::UnknownSocketError:
+         }
+         else if (socketError == QAbstractSocket::UnknownSocketError) {
             my_logger.appendErrorMessage("Unknown socket error");
-            break;
-         case QAbstractSocket::SocketError::UnsupportedSocketOperationError:
+         }
+         else if (socketError ==
+                  QAbstractSocket::UnsupportedSocketOperationError) {
             my_logger.appendErrorMessage("Unsupported socket operation");
-            break;
-         default:
+         }
+         else {
             my_logger.appendErrorMessage("Unknown Socket Error");
          }
 
@@ -386,7 +390,7 @@ namespace seville
          do_setConnectionState(ConnectionState::kDisconnectedState);
       }
 
-      auto Client::on_readyReadDidOccur(void) -> void
+      void Client::on_readyReadDidOccur(void)
       {
          //while (my_socket.bytesAvailable())
          do_readSocket();
@@ -396,7 +400,7 @@ namespace seville
 //                  .arg(my_socket.bytesAvailable()));
       }
 
-      auto Client::do_readSocket(void) -> void
+      void Client::do_readSocket(void)
       {
          //netmsg::Generic& netMsg = myNetMsg;
 
@@ -513,8 +517,7 @@ namespace seville
          }
       }
 
-      auto Client::do_setConnectionState(
-            ConnectionState connectionState) -> void
+      void Client::do_setConnectionState(ConnectionState connectionState)
       {
          if (connectionState != ConnectionState::kConnectedState)
             my_pingTimer.stop();
@@ -524,7 +527,7 @@ namespace seville
          // emit connectionStateDidChangeEvent(connectionState);
       }
 
-      auto Client::do_roomChat(const QString& text) -> void
+      void Client::do_roomChat(const QString& text)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return;
@@ -633,7 +636,7 @@ namespace seville
             auto split = text.split(' ');
             if (1 < split.length()) {
                auto ok = true;
-               auto roomId = split.at(1).toUInt(&ok);
+               auto roomId = split.at(1).toUShort(&ok);
                if (ok) {
                   do_sendGotoRoom(roomId);
                }
@@ -686,8 +689,8 @@ namespace seville
          }
       }
 
-      auto Client::do_connectToHost(
-            QString host, int port, QString username, int initialRoom) -> void
+      void Client::do_connectToHost(
+            QString host, int port, QString username, int initialRoom)
       {
          auto condHostTcpPort = (0 == port);
          auto actualHostTcpPort = static_cast<u16>(
@@ -720,7 +723,7 @@ namespace seville
          my_pingTimer.start();
       }
 
-      auto Client::do_disconnectFromHost(void) -> void
+      void Client::do_disconnectFromHost(void)
       {
          if (my_connectionState != ConnectionState::kDisconnectedState) {
             //my_logger.appendInfoMessage("Disconnected.");
@@ -731,7 +734,7 @@ namespace seville
          }
       }
 
-      auto Client::do_determineClientByteOrder(void) -> void
+      void Client::do_determineClientByteOrder(void)
       {
          auto isLittleEndian =
                (HostByteOrder::kLittleEndian * !Client::isBigEndian());
@@ -741,7 +744,7 @@ namespace seville
                static_cast<HostByteOrder>(isLittleEndian | isBigEndian);
       }
 
-      auto Client::do_determineServerByteOrder(void) -> int
+      int Client::do_determineServerByteOrder(void)
       {
          auto result = 0;
          // TODO more consideration here.
@@ -826,14 +829,13 @@ namespace seville
       }
       */
 
-      auto Client::do_determineIsConnected(void) const -> bool
+      bool Client::do_determineIsConnected(void) const
       {
          return my_socket.state() != QTcpSocket::ConnectedState ||
                my_connectionState != ConnectionState::kConnectedState;
       }
 
-      auto Client::do_determineShouldSwapEndianness(void) const
-         -> NetMsgOptions
+      NetMsgOptions Client::do_determineShouldSwapEndianness(void) const
       {
          auto notUnknownClientByteOrder =
                my_byteOrder != HostByteOrder::kUnknownEndian;
@@ -863,7 +865,7 @@ namespace seville
        * @brief do_receiveAltLogon
        * @return number of network messages handled
        */
-      auto Client::do_receiveAltLogon(void) -> int
+      int Client::do_receiveAltLogon(void)
       {
          my_logger.appendDebugMessage("> AltLogon");
 
@@ -899,7 +901,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveAltRoomDescription(void) -> int
+      int Client::do_receiveAltRoomDescription(void)
       {
          my_logger.appendDebugMessage("> AltRoomDescription");
 
@@ -907,7 +909,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveAssetIncoming(void) -> int
+      int Client::do_receiveAssetIncoming(void)
       {
          my_logger.appendDebugMessage("> AssetIncoming");
 
@@ -915,7 +917,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveAssetQuery(void) -> int
+      int Client::do_receiveAssetQuery(void)
       {
          my_logger.appendDebugMessage("> AssetQuery");
 
@@ -923,7 +925,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveAuthenticate(void) -> int
+      int Client::do_receiveAuthenticate(void)
       {
          my_logger.appendDebugMessage("> Authenticate");
 
@@ -931,7 +933,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveBlowthru(void) -> int
+      int Client::do_receiveBlowthru(void)
       {
          my_logger.appendDebugMessage("> BlowThru");
 
@@ -939,7 +941,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveConnectionError(void) -> int
+      int Client::do_receiveConnectionError(void)
       {
          my_logger.appendDebugMessage("> ConnectionError");
 
@@ -949,7 +951,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveDoorLock(void) -> int
+      int Client::do_receiveDoorLock(void)
       {
          my_logger.appendDebugMessage("> DoorLock");
 
@@ -957,7 +959,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveDoorUnlock(void) -> int
+      int Client::do_receiveDoorUnlock(void)
       {
          my_logger.appendDebugMessage("> DoorUnlock");
 
@@ -965,7 +967,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveDraw(void) -> int
+      int Client::do_receiveDraw(void)
       {
          my_logger.appendDebugMessage("> Draw");
 
@@ -973,7 +975,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveHttpServerLocation(void) -> int
+      int Client::do_receiveHttpServerLocation(void)
       {
          my_logger.appendDebugMessage("> HttpServerLocation");
 
@@ -987,13 +989,13 @@ namespace seville
          return result;
       }
 
-      auto Client::do_receiveMovement(void) -> int
+      int Client::do_receiveMovement(void)
       {
          my_logger.appendDebugMessage("> Movement");
 
          auto userId = my_netMsg.ref();
-         auto y = my_netMsg.streamReadU16();
-         auto x = my_netMsg.streamReadU16();
+         auto y = my_netMsg.streamReadI16();
+         auto x = my_netMsg.streamReadI16();
 
          auto userPtr = my_room.userPtrWithId(userId);
          userPtr->setX(x);
@@ -1004,7 +1006,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveNavigationError(void) -> int
+      int Client::do_receiveNavigationError(void)
       {
          my_logger.appendDebugMessage("> NavError!");
 
@@ -1012,7 +1014,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receivePictureMove(void) -> int
+      int Client::do_receivePictureMove(void)
       {
          my_logger.appendDebugMessage("> PictMove");
 
@@ -1022,7 +1024,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receivePing(void) -> int
+      int Client::do_receivePing(void)
       {
          my_logger.appendDebugMessage("Ping!");
 
@@ -1032,7 +1034,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receivePong(void) -> int
+      int Client::do_receivePong(void)
       {
          my_logger.appendDebugMessage("> Pong");
 
@@ -1043,7 +1045,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receivePropDelete(void) -> int
+      int Client::do_receivePropDelete(void)
       {
          my_logger.appendDebugMessage("> PropDelete");
 
@@ -1053,7 +1055,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receivePropMove(void) -> int
+      int Client::do_receivePropMove(void)
       {
          my_logger.appendDebugMessage("> PropMove");
 
@@ -1063,7 +1065,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receivePropNew(void) -> int
+      int Client::do_receivePropNew(void)
       {
          my_logger.appendDebugMessage("> PropNew");
 
@@ -1073,7 +1075,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveRoomDescend(void) -> int
+      int Client::do_receiveRoomDescend(void)
       {
          my_logger.appendDebugMessage("> RoomDescend");
 
@@ -1082,7 +1084,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveRoomDescription(void) -> int
+      int Client::do_receiveRoomDescription(void)
       {
          my_logger.appendDebugMessage("> RoomDescription");
 
@@ -1090,7 +1092,7 @@ namespace seville
          my_room.setFace(my_netMsg.streamReadU32());
          my_room.setId(my_netMsg.streamReadU16());
 
-         auto roomNameOffset = my_netMsg.streamReadU16();
+         auto roomNameOffset = my_netMsg.streamReadI16();
          auto backgroundImageNameOffset = my_netMsg.streamReadU16();
          auto artistNameOffset = my_netMsg.streamReadU16();
          auto passwordOffset = my_netMsg.streamReadU16();
@@ -1156,7 +1158,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveRoomUserList(void) -> int
+      int Client::do_receiveRoomUserList(void)
       {
          my_logger.appendDebugMessage("> RoomUserList");
 
@@ -1172,7 +1174,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveServerVersion(void) -> int
+      int Client::do_receiveServerVersion(void)
       {
          my_logger.appendDebugMessage("> ServerVersion");
 
@@ -1183,7 +1185,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveServerInfo(void) -> int
+      int Client::do_receiveServerInfo(void)
       {
          my_logger.appendDebugMessage("> ServerInfo");
 
@@ -1192,7 +1194,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_processUserNew(void) -> User
+      User Client::do_processUserNew(void)
       {
          my_logger.appendDebugMessage("> UserNew");
 
@@ -1204,21 +1206,21 @@ namespace seville
 
          for (auto i = 0; i < User::kNumPropCells; i++) {
             auto prop = Prop();
-            prop.setId(my_netMsg.streamReadU32());
-            prop.setCrc(my_netMsg.streamReadU32());
+            prop.setId(my_netMsg.streamReadI32());
+            prop.setCrc(my_netMsg.streamReadI32());
             user.propListPtr()->push_back(prop);
          }
 
-         user.setRoomId(my_netMsg.streamReadU16());
+         user.setRoomId(my_netMsg.streamReadI16());
          user.setFace(my_netMsg.streamReadU16());
          user.setColor(my_netMsg.streamReadU16());
 
-         auto unknown1 = my_netMsg.streamReadU16();
-         auto unknown2 = my_netMsg.streamReadU16();
+         auto unknown1 = my_netMsg.streamReadI16();
+         auto unknown2 = my_netMsg.streamReadI16();
          (void)unknown1;
          (void)unknown2;
 
-         user.setPropNum(my_netMsg.streamReadU16());
+         user.setPropNum(my_netMsg.streamReadI16());
          //if (user.propNum() < User::kNumPropCells) {
          //   auto propPtr = &user.propListPtr()->at(user.propNum());
          //   propPtr->setId(0);
@@ -1242,7 +1244,7 @@ namespace seville
          return user;
       }
 
-      auto Client::do_receiveUserNew(void) -> int
+      int Client::do_receiveUserNew(void)
       {
          auto user = do_processUserNew();
 
@@ -1254,7 +1256,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserColor(void) -> int
+      int Client::do_receiveUserColor(void)
       {
          my_logger.appendDebugMessage("> UserColor");
 
@@ -1270,7 +1272,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserExitRoom(void) -> int
+      int Client::do_receiveUserExitRoom(void)
       {
          my_logger.appendDebugMessage("> UserExitRoom");
 
@@ -1285,7 +1287,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserFace(void) -> int
+      int Client::do_receiveUserFace(void)
       {
          my_logger.appendDebugMessage("> UserFace");
 
@@ -1303,7 +1305,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserProp(void) -> int
+      int Client::do_receiveUserProp(void)
       {
          my_logger.appendDebugMessage("> UserProp");
 
@@ -1312,7 +1314,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserDescription(void) -> int
+      int Client::do_receiveUserDescription(void)
       {
          my_logger.appendDebugMessage("> UserDescription");
 
@@ -1320,7 +1322,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserRename(void) -> int
+      int Client::do_receiveUserRename(void)
       {
          my_logger.appendDebugMessage("> UserRename");
 
@@ -1344,7 +1346,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserLeaving(void) -> int
+      int Client::do_receiveUserLeaving(void)
       {
          my_logger.appendDebugMessage("> UserLeaving");
 
@@ -1357,7 +1359,7 @@ namespace seville
          user = my_server.userWithId(userId);
          my_server.removeUserWithId(userId);
 
-         auto userCount = my_netMsg.streamReadU32();
+         auto userCount = my_netMsg.streamReadI32();
          my_room.setUserCount(userCount);
 
          my_room.removeUserWithId(userId);
@@ -1367,7 +1369,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserLoggedOnAndMax(void) -> int
+      int Client::do_receiveUserLoggedOnAndMax(void)
       {
          my_logger.appendDebugMessage("> UserLoggedOnAndMax");
 
@@ -1377,7 +1379,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserStatus(void) -> int
+      int Client::do_receiveUserStatus(void)
       {
          my_logger.appendDebugMessage("> UserStatus");
 
@@ -1385,7 +1387,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveRoomList(void) -> int
+      int Client::do_receiveRoomList(void)
       {
          my_logger.appendDebugMessage("> RoomList");
 
@@ -1397,7 +1399,7 @@ namespace seville
 
          for (auto i = u32{0}; i < roomCount; i++) {
             auto room = Room();
-            room.setId(my_netMsg.streamReadU32());
+            room.setId(static_cast<u16>(my_netMsg.streamReadU32()));
             room.setFlags(my_netMsg.streamReadU16());
             room.setUserCount(my_netMsg.streamReadU16());
             // my_netMsg.streamSkip(sizeof(u16));
@@ -1414,7 +1416,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveUserList(void) -> int
+      int Client::do_receiveUserList(void)
       {
          my_logger.appendDebugMessage("> UserList");
 
@@ -1428,7 +1430,7 @@ namespace seville
             auto user = User();
             user.setId(my_netMsg.streamReadU32());
             user.setFlags(my_netMsg.streamReadU16());
-            user.setRoomId(my_netMsg.streamReadU16());
+            user.setRoomId(my_netMsg.streamReadI16());
             auto usernameLen = my_netMsg.streamReadU8();
             //user.setUsername(my_netMsg.streamReadFixedQString(usernameLen));
             user.setUsername(my_netMsg.streamReadAndDecodeQString(usernameLen));
@@ -1441,7 +1443,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveSpotMove(void) -> int
+      int Client::do_receiveSpotMove(void)
       {
          my_logger.appendDebugMessage("> SpotMove");
 
@@ -1449,7 +1451,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveSpotState(void) -> int
+      int Client::do_receiveSpotState(void)
       {
          my_logger.appendDebugMessage("> SpotState");
 
@@ -1457,22 +1459,23 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveTalk(void) -> int
+      int Client::do_receiveTalk(void)
       {
          my_logger.appendDebugMessage("> Talk");
 
          auto userId = my_netMsg.ref();
          auto user = my_room.userWithId(userId);
          //auto message = my_netMsg.streamReadByteArray(my_netMsg.len());
+         auto bodyLen = static_cast<i32>(my_netMsg.bodyLen());
          auto message =
-               my_netMsg.streamReadAndDecodeQString(my_netMsg.bodyLen());
+               my_netMsg.streamReadAndDecodeQString(bodyLen);
 
          my_logger.appendChatMessage(user.username(), message);
 
          return 1;
       }
 
-      auto Client::do_receiveWhisper(void) -> int
+      int Client::do_receiveWhisper(void)
       {
          my_logger.appendDebugMessage("> Whisper");
 
@@ -1486,8 +1489,8 @@ namespace seville
          // auto ciphertext = my_netMsg.streamReadByteArray(cipherLen);
          //auto ciphertext = my_netMsg.streamReadAndDecodeQString(cipherLen);
          // auto message = my_cipher.decipher(ciphertext);
-         auto message = my_netMsg.streamReadAndDecodeQString(
-                  my_netMsg.bodyLen());
+         auto bodyLen = static_cast<i32>(my_netMsg.bodyLen());
+         auto message = my_netMsg.streamReadAndDecodeQString(bodyLen);
 
          auto username = user.username();
          QString usernameFrom = QString("%1 (%2)").arg(username).arg(userId);
@@ -1502,7 +1505,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveXTalk(void) -> int
+      int Client::do_receiveXTalk(void)
       {
          my_logger.appendDebugMessage("> XTalk");
 
@@ -1527,7 +1530,7 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_receiveXWhisper(void) -> int
+      int Client::do_receiveXWhisper(void)
       {
          my_logger.appendDebugMessage("> XWhisper");
 
@@ -1554,14 +1557,14 @@ namespace seville
          return 1;
       }
 
-      auto Client::do_routeReceivedNetMsg(void) -> int
+      int Client::do_routeReceivedNetMsg(void)
       {
          auto result = 0;
          auto netMsgIdTmp = my_netMsg.id(); //u32At(NetMsg::kIdOffset);
          auto serverByteOrder = my_server.byteOrder();
          auto byteOrderMatch = (serverByteOrder == my_byteOrder);
          auto kind = (byteOrderMatch * netMsgIdTmp) |
-               (!byteOrderMatch * NetMsg::SwapI32(netMsgIdTmp));
+               (!byteOrderMatch * NetMsg::SwapU32(netMsgIdTmp));
 
          //auto netMsgId = my_netMsg.id(); //u32At(NetMsg::kIdOffset);
          //auto netMsgLen = my_netMsg.len(); //u32At(NetMsg::kLenOffset);
@@ -1749,7 +1752,7 @@ namespace seville
          return result;
       }
 
-      auto Client::do_sendLogon(void) -> int
+      int Client::do_sendLogon(void)
       {
          auto shouldSwapEndianness = do_determineShouldSwapEndianness();
          auto logonMsg = NetMsg(shouldSwapEndianness);
@@ -1907,12 +1910,13 @@ namespace seville
 //         msg.appendU32(0); /* ul3dEngineCaps* */
 
          //my_socket_.write(netmsg_logon);
-         return my_socket.write(logonMsg);
+         auto bytesWritten = my_socket.write(logonMsg);
+         return 0 < bytesWritten;
          //return my_socket.flush();
       }
 
-      auto Client::do_sendAuthenticate(
-            const QString& username, const QString& password) -> int
+      int Client::do_sendAuthenticate(
+            const QString& username, const QString& password)
       {
          // TODO stub
          (void)username;
@@ -1928,31 +1932,33 @@ namespace seville
          authMsg.setBodyLen(0);
          authMsg.setRef(NetMsg::kNoRef);
 
-         return my_socket.write(authMsg);
+         auto bytesWritten = my_socket.write(authMsg);
+         return 0 < bytesWritten;
          //return my_socket.flush();
       }
 
-      auto Client::do_sendTalk(const QString& text) -> int
+      int Client::do_sendTalk(const QString& text)
       {
          auto talkMsg = NetMsg(do_determineShouldSwapEndianness());
 
          talkMsg.setId(NetMsg::kTalkKind);
-         talkMsg.setBodyLen(text.length());
+         talkMsg.setBodyLen(static_cast<u32>(text.length()));
          talkMsg.setRef(my_userId);
 
          talkMsg.append(text.toUtf8());
          talkMsg.append('\0');
 
-         return my_socket.write(talkMsg);
+         auto bytesWritten = my_socket.write(talkMsg);
+         return 0 < bytesWritten;
          //return my_socket.flush();
       }
 
-      auto Client::do_sendXTalk(const QString& text) -> int
+      int Client::do_sendXTalk(const QString& text)
       {
          auto xTalkMsg = NetMsg(do_determineShouldSwapEndianness());
 
          xTalkMsg.setId(NetMsg::kXTalkKind);
-         auto len = text.length() + 3;
+         auto len = static_cast<u16>(text.length() + 3);
          xTalkMsg.setBodyLen(len);
          xTalkMsg.setRef(my_userId);
 
@@ -1962,31 +1968,35 @@ namespace seville
          xTalkMsg.append(ciphertext);
          xTalkMsg.append('\0');
 
-         return my_socket.write(xTalkMsg);
+         auto bytesWritten = my_socket.write(xTalkMsg);
+         return 0 < bytesWritten;
          //return my_socket.flush();
       }
 
-      auto Client::do_sendXWhisper(const u32 userId, const QString& text) -> int
+      int Client::do_sendXWhisper(const u32 userId, const QString& text)
       {
          auto msg = NetMsg(do_determineShouldSwapEndianness());
 
          msg.setId(NetMsg::kXWhisperKind);
-         auto len = NetMsg::kXWhisperBodyLen + text.length() + 3;
+         auto textLen = static_cast<u16>(text.length() + 3);
+         auto len = static_cast<u16>(NetMsg::kXWhisperBodyLen + textLen);
+
          msg.setBodyLen(len);
          msg.setRef(my_userId);
 
          auto plaintext = text.toUtf8();
          auto ciphertext = my_cipher.encipher(plaintext);
          msg.appendU32(userId);
-         msg.appendU16(text.length() + 3);
+         msg.appendU16(textLen);
          msg.append(ciphertext);
          msg.append('\0');
 
-         return my_socket.write(msg);
+         auto bytesWritten = my_socket.write(msg);
+         return 0 < bytesWritten;
          //return my_socket.flush();
       }
 
-      auto Client::do_sendPing(void) -> int
+      int Client::do_sendPing(void)
       {
          auto pingMsg = palace::NetMsg(do_determineShouldSwapEndianness());
 
@@ -1995,11 +2005,12 @@ namespace seville
          pingMsg.setRef(NetMsg::kNoRef);
 
          my_logger.appendDebugMessage(QString("Ping!"));
-         return my_socket.write(pingMsg);
+         auto bytesWritten = my_socket.write(pingMsg);
+         return 0 < bytesWritten;
          //return my_socket.flush();
       }
 
-      auto Client::do_sendPong(void) -> int
+      int Client::do_sendPong(void)
       {
          auto pongMsg = palace::NetMsg(do_determineShouldSwapEndianness());
 
@@ -2008,11 +2019,12 @@ namespace seville
          pongMsg.setRef(NetMsg::kNoRef);
 
          my_logger.appendDebugMessage(QString("Pong!"));
-         return my_socket.write(pongMsg);
+         auto bytesWritten = my_socket.write(pongMsg);
+         return 0 < bytesWritten;
          //return my_socket.flush();
       }
 
-      auto Client::do_sendGotoRoom(i16 roomId) -> int
+      int Client::do_sendGotoRoom(u16 roomId)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2025,13 +2037,14 @@ namespace seville
          gotoroomMsg.setBodyLen(NetMsg::kGotoRoomLen);
          gotoroomMsg.setRef(NetMsg::kNoRef);
 
-         gotoroomMsg.appendI16(roomId);
+         gotoroomMsg.appendU16(roomId);
 
-         return my_socket.write(gotoroomMsg);
+         auto bytesWritten = my_socket.write(gotoroomMsg);
+         return 0 < bytesWritten;
          //return my_socket.flush();
       }
 
-      auto Client::do_sendMove(i16 x, i16 y) -> int
+      int Client::do_sendMove(i16 x, i16 y)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2045,11 +2058,12 @@ namespace seville
          moveMsg.appendI16(x);
 
          // emit userMove signal to invalidate view
-         return my_socket.write(moveMsg);
+         auto bytesWritten = my_socket.write(moveMsg);
+         return 0 < bytesWritten;
          //return my_socket.flush();
       }
 
-      auto Client::do_sendRequestRoomList(void) -> int
+      int Client::do_sendRequestRoomList(void)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2059,10 +2073,11 @@ namespace seville
          msg.setBodyLen(NetMsg::kNoLen);
          msg.setRef(NetMsg::kNoRef);
 
-         return my_socket.write(msg);
+         auto bytesWritten = my_socket.write(msg);
+         return 0 < bytesWritten;
       }
 
-      auto Client::do_sendRequestUserList(void) -> int
+      int Client::do_sendRequestUserList(void)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2072,10 +2087,11 @@ namespace seville
          msg.setBodyLen(NetMsg::kNoLen);
          msg.setRef(NetMsg::kNoRef);
 
-         return my_socket.write(msg);
+         auto bytesWritten = my_socket.write(msg);
+         return 0 < bytesWritten;
       }
 
-      auto Client::do_sendRequestRoomAndUserLists(void) -> int
+      i32 Client::do_sendRequestRoomAndUserLists(void)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2090,13 +2106,13 @@ namespace seville
          serverUserListMsg.setBodyLen(NetMsg::kNoLen);
          serverUserListMsg.setRef(NetMsg::kNoRef);
 
-         auto res = my_socket.write(serverRoomListMsg);
-         res &= my_socket.write(serverUserListMsg);
+         auto writeByteCount = my_socket.write(serverRoomListMsg);
+         writeByteCount &= my_socket.write(serverUserListMsg);
 
-         return res;
+         return 0 < writeByteCount;
       }
 
-      auto Client::do_sendFace(u16 faceId) -> int
+      i32 Client::do_sendFace(u16 faceId)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2114,10 +2130,11 @@ namespace seville
 
          emit viewNeedsUpdatingEvent();
 
-         return my_socket.write(msg);
+         auto writeByteCount = my_socket.write(msg);
+         return 0 < writeByteCount;
       }
 
-      auto Client::do_sendFaceColor(u16 faceColorId) -> int
+      i32 Client::do_sendFaceColor(u16 faceColorId)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2135,15 +2152,16 @@ namespace seville
 
          emit viewNeedsUpdatingEvent();
 
-         return my_socket.write(msg);
+         auto writeByteCount = my_socket.write(msg);
+         return 0 < writeByteCount;
       }
 
-      auto Client::do_sendPropRequest(void) -> int
+      int Client::do_sendPropRequest(void)
       {
          return 0;
       }
 
-      auto Client::do_deinitEvents(void) -> void
+      void Client::do_deinitEvents(void)
       {
          disconnect(&my_socket, &QTcpSocket::readyRead,
                     this, &seville::palace::Client::on_readyReadDidOccur);
@@ -2171,14 +2189,14 @@ namespace seville
                     this, &Client::on_pingTimerDidTrigger);
       }
 
-      auto Client::do_deinit(void) -> void
+      void Client::do_deinit(void)
       {
          do_deinitEvents();
 
          do_disconnectFromHost();
       }
 
-      auto Client::do_initEvents(void) -> void
+      void Client::do_initEvents(void)
       {
          connect(&my_socket, &QTcpSocket::readyRead,
                  this, &seville::palace::Client::on_readyReadDidOccur);
@@ -2201,7 +2219,7 @@ namespace seville
                  this, &Client::on_pingTimerDidTrigger);
       }
 
-      auto Client::do_init(void) -> void
+      void Client::do_init(void)
       {
          do_initEvents();
 

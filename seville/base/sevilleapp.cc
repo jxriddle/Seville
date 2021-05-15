@@ -23,7 +23,7 @@ namespace seville
 //      delete my_mainWindowPtr;
 //   }
 
-   auto SevilleApp::main(int argc, char* argv[]) -> int
+   int SevilleApp::main(int argc, char* argv[])
    {
       QCoreApplication::setOrganizationName("Orkey");
       QCoreApplication::setApplicationName("Seville");

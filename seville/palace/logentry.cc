@@ -4,12 +4,12 @@ namespace seville
 {
    namespace palace
    {
-      auto LogEntry::New(
+      std::unique_ptr<LogEntry> LogEntry::New(
             LogEntryKind logEntryKind,
             const QString& message,
             const QString& fromUsername,
             const QString& toUsername
-         ) -> std::unique_ptr<LogEntry>
+         )
          //-> std::optional<LogMessage*>
       {
          //auto instance = std::make_optional<LogMessage*>();
@@ -48,7 +48,7 @@ namespace seville
          my_toUsername = toUsername;
       }
 
-      auto LogEntry::do_clear(void) -> void
+      void LogEntry::do_clear(void)
       {
          my_logEntryKind = LogEntryKind::kChatKind;
          my_message = "";
@@ -56,11 +56,11 @@ namespace seville
          my_toUsername = "";
       }
 
-      auto LogEntry::do_init(
+      void LogEntry::do_init(
             LogEntryKind kind,
             const QString& message,
             const QString& fromUsername,
-            const QString& toUsername) -> void
+            const QString& toUsername)
       {
          my_logEntryKind = kind;
          my_message = message;
@@ -68,7 +68,7 @@ namespace seville
          my_toUsername = toUsername;
       }
 
-      auto LogEntry::do_assign(const LogEntry& other) -> void
+      void LogEntry::do_assign(const LogEntry& other)
       {
          my_logEntryKind = other.my_logEntryKind;
          my_message = other.my_message;

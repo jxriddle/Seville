@@ -28,23 +28,23 @@ namespace seville
 
          static const u16 kDefaultPort = 9998;
 
-         inline auto clear(void) -> void {
+         inline void clear(void) {
             do_clear();
          }
 
-         inline auto byteOrder(void) const -> HostByteOrder {
+         inline HostByteOrder byteOrder(void) const {
             return my_byteOrder;
          }
 
-         inline auto setByteOrder(int byteOrder) -> void {
+         inline void setByteOrder(int byteOrder) {
             my_byteOrder = static_cast<HostByteOrder>(byteOrder);
          }
 
-         inline auto setByteOrder(const HostByteOrder& byteOrder) -> void {
+         inline void setByteOrder(const HostByteOrder& byteOrder) {
             my_byteOrder = byteOrder;
          }
 
-         inline auto roomListPtr(void) -> std::vector<Room>* {
+         inline std::vector<Room>* roomListPtr(void) {
             return &my_roomList; // .get();
          }
 
@@ -53,7 +53,7 @@ namespace seville
 //            my_roomList = std::move(roomListUnquePtr);
 //         }
 
-         inline auto userListPtr(void) -> std::vector<User>* {
+         inline std::vector<User>* userListPtr(void) {
             return &my_userList; // .get();
          }
 
@@ -63,7 +63,7 @@ namespace seville
 //            my_userList = std::move(userListUniquePtr);
 //         }
 
-         inline auto userWithId(u32 userId) -> User {
+         inline User userWithId(u32 userId) {
             for (auto& user: my_userList) {
                if (user.id() == userId) {
                   return user;
@@ -73,7 +73,7 @@ namespace seville
             return User();
          }
 
-         inline auto userPtrWithId(u32 userId) -> User* {
+         inline User* userPtrWithId(u32 userId) {
             for (auto& user: my_userList) {
                if (user.id() == userId) {
                   return &user;
@@ -83,7 +83,7 @@ namespace seville
             return nullptr;
          }
 
-         inline auto removeUserWithId(u32 userId) -> void {
+         inline void removeUserWithId(u32 userId) {
             auto i = u32{0};
             auto z = my_userList.size();
             while (i < z) {
@@ -94,40 +94,40 @@ namespace seville
             }
          }
 
-         inline auto hostname(void) const -> QString {
+         inline QString hostname(void) const {
             return my_host;
          }
 
-         inline auto setHost(const QString& host) -> void {
+         inline void setHost(const QString& host) {
             my_host = host;
          }
 
-         inline auto port(void) const -> u16 {
+         inline u16 port(void) const {
             return my_port;
          }
 
-         inline auto setPort(const u16 port) -> void {
+         inline void setPort(const u16 port) {
             my_port = port;
          }
 
-         inline auto version(void) -> u32 {
+         inline u32 version(void) {
             return my_version;
          }
 
-         inline auto setVersion(const u32 version) -> void {
+         inline void setVersion(const u32 version) {
             my_version = version;
          }
 
-         inline auto httpServerLocation(void) -> QString {
+         inline QString httpServerLocation(void) {
             return my_httpServerLocation;
          }
 
-         inline auto setHttpServerLocation(
-               const QString& httpServerLocation) -> void {
+         inline void setHttpServerLocation(
+               const QString& httpServerLocation) {
             my_httpServerLocation = httpServerLocation;
          }
 
-         inline auto httpPropLocation(void) -> QString {
+         inline QString httpPropLocation(void) {
             return QString("%1%2")
                   .arg(my_httpServerLocation)
                   .arg("webservice/props/get/");
@@ -142,15 +142,15 @@ namespace seville
          u32 my_version;
          QString my_httpServerLocation;
 
-         inline auto do_clear(void) -> void {
+         inline void do_clear(void) {
             my_roomList.clear();
             my_userList.clear();
          }
 
-         inline auto do_deinit(void) -> void {
+         inline void do_deinit(void) {
          }
 
-         inline auto do_init(void) -> void {
+         inline void do_init(void) {
             // my_roomList = std::make_unique<QList<Room>>();
             // my_userList = std::make_unique<QList<User>>();
 

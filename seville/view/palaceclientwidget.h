@@ -30,13 +30,13 @@ namespace seville
          static const int kDropShadowWidth = 0;
 
          explicit PalaceClientWidget(QWidget* parentWidgetPtr = nullptr);
-         //virtual ~ClientWidget(void);
+         virtual ~PalaceClientWidget(void);
 
          inline palace::Client* palaceClientPtr(void) {
             return my_palaceClientPtr;
          }
 
-         inline auto promptOpenConnection(void) -> void {
+         inline void promptOpenConnection(void) {
             do_promptOpenConnection(this);
          }
 
@@ -49,10 +49,10 @@ namespace seville
          // }
 
       protected:
-         auto paintEvent(QPaintEvent* eventPtr) -> void;
-         auto mousePressEvent(QMouseEvent* eventPtr) -> void;
+         void paintEvent(QPaintEvent* eventPtr);
+         void mousePressEvent(QMouseEvent* eventPtr);
          //void resizeEvent(QResizeEvent* resize_event_ptr) override;
-         auto currentChanged(int index) -> void;
+         void currentChanged(int index);
 
       signals:
          //void widgetBackgroundDidChangeEvent(int width, int height);
@@ -90,17 +90,19 @@ namespace seville
 
          view::MainWindow* do_mainWindowPtr(void);
 
-         auto do_init(void) -> void;
-         auto do_setupView(void) -> void;
-         auto do_setupEvents(void) -> void;
-         auto do_setupSizing(void) -> void;
+         void do_init(void);
+         void do_deinit(void);
+         void do_setupView(void);
+         void do_setupEvents(void);
+         void do_teardownEvents(void);
+         void do_setupSizing(void);
 
          // auto do_setBackgroundImage(const QPixmap& pixmap) -> void;
-         auto do_setBackgroundImage(const QImage& image) -> void;
-         auto do_setBackgroundImageFromFile(const QString& imagePath) -> void;
+         void do_setBackgroundImage(const QImage& image);
+         void do_setBackgroundImageFromFile(const QString& imagePath);
          // auto do_resizeBackgroundImage(QSize size) -> void;
-         auto do_promptOpenConnection(QWidget* parentPtr) -> void;
-         auto do_fetchBackgroundImage(const QString& fileUrl) -> void;
+         void do_promptOpenConnection(QWidget* parentPtr);
+         void do_fetchBackgroundImage(const QString& fileUrl);
          // auto do_clearBackgroundImage(void) -> void;
          // auto do_drawRoom(void) -> void;
       };

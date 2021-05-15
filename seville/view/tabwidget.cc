@@ -29,7 +29,7 @@ namespace seville
          do_init(contentWidgetPtr);
       }
 
-      auto TabWidget::removeTab(int index) -> void
+      void TabWidget::removeTab(int index)
       {
          QTabWidget::removeTab(index);
 
@@ -38,12 +38,12 @@ namespace seville
          }
       }
 
-      auto TabWidget::closeCurrentTab(void) -> void
+      void TabWidget::closeCurrentTab(void)
       {
 
       }
 
-      auto TabWidget::currentPalaceClientPtr(void) -> palace::Client*
+      palace::Client* TabWidget::currentPalaceClientPtr(void)
       {
          auto currentPalaceClientWidgetPtr =
                static_cast<seville::view::PalaceClientWidget*>(currentWidget());
@@ -56,12 +56,12 @@ namespace seville
          return currentPalaceClientPtr;
       }
 
-      auto TabWidget::clear(void) -> void
+      void TabWidget::clear(void)
       {
          do_clear();
       }
 
-      auto TabWidget::do_clear(void) -> void
+      void TabWidget::do_clear(void)
       {
          //my_currentPalaceClientPtr = nullptr;
       }
@@ -74,7 +74,7 @@ namespace seville
 //         return nullptr;
 //      }
 
-      auto do_logWidgetPtr(void) -> view::LogWidget*
+      view::LogWidget* do_logWidgetPtr(void)
       {
          foreach (auto w, qApp->topLevelWidgets())
             if (auto logWidgetPtr = qobject_cast<view::LogWidget*>(w))
@@ -82,7 +82,7 @@ namespace seville
          return nullptr;
       }
 
-      auto TabWidget::do_setupView(void) -> void
+      void TabWidget::do_setupView(void)
       {
          // setTabShape(QTabWidget::TabShape::Triangular);
          // setTabBar(&this->appTabBar);
@@ -104,7 +104,7 @@ namespace seville
          // setStyleSheet("border: 1px solid blue");
       }
 
-      auto TabWidget::do_teardownEvents(void) -> void
+      void TabWidget::do_teardownEvents(void)
       {
          // connect(tb, SIGNAL(clicked()), this, SLOT(on_addTab_triggered()));
          // this->connect(this, SIGNAL(tabCloseRequested(int)),
@@ -126,7 +126,7 @@ namespace seville
          //            this, &seville::view::TabWidget::on_tabBarDoubleClicked);
       }
 
-      auto TabWidget::do_setupEvents(void) -> void
+      void TabWidget::do_setupEvents(void)
       {
          // connect(tb, SIGNAL(clicked()), this, SLOT(on_addTab_triggered()));
          // this->connect(this, SIGNAL(tabCloseRequested(int)),
@@ -147,7 +147,7 @@ namespace seville
          //         this, &seville::view::TabWidget::on_tabBarDoubleClicked);
       }
 
-      auto TabWidget::do_addNewTab(QWidget* contentWidgetPtr) -> void
+      void TabWidget::do_addNewTab(QWidget* contentWidgetPtr)
 //               widget::ClientWidget* client_widget_ptr)
       {
          // new tab
@@ -190,14 +190,14 @@ namespace seville
          }
       }
 
-      auto TabWidget::do_setupSizing(void) -> void
+      void TabWidget::do_setupSizing(void)
       {
          my_mainLayoutPtr->setSizeConstraint(QLayout::SetMinimumSize);
          my_mainLayoutPtr->setContentsMargins(0, 0, 0, 0);
          my_mainLayoutPtr->setMargin(0);
       }
 
-      auto TabWidget::do_init(QWidget* contentWidgetPtr) -> void
+      void TabWidget::do_init(QWidget* contentWidgetPtr)
       {
          do_setupView();
          do_setupEvents();

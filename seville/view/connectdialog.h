@@ -21,27 +21,27 @@ namespace seville
       Q_OBJECT
 
       public:
-         static auto New(QWidget* parentWidgetPtr = nullptr)
-            -> std::unique_ptr<ConnectDialog>;
+         static std::unique_ptr<ConnectDialog>New(
+               QWidget* parentWidgetPtr = nullptr);
 
          explicit ConnectDialog(QWidget* parentWidgetPtr = nullptr);
          //virtual ~ConnectDialog(void);
 
-         inline auto address(void) -> QString {
+         inline QString address(void) {
             return my_urlLineEditPtr->text();
          }
 
-         inline auto host(void) -> QString {
+         inline QString host(void) {
             QStringList sl = my_urlLineEditPtr->text().split(':');
             return sl.first();
          }
 
-         inline auto port(void) -> quint16 {
+         inline quint16 port(void) {
             QStringList sl = my_urlLineEditPtr->text().split(':');
             return sl.last().toUShort();
          }
 
-         inline auto username(void) -> QString {
+         inline QString username(void) {
             return my_usernameLineEditPtr->text();
          }
 
@@ -61,8 +61,8 @@ namespace seville
          QPushButton* my_cancelPushButtonPtr;
          QDialogButtonBox* my_mainButtonBoxPtr;
 
-         auto do_setupView(void) -> void;
-         auto do_setupEvents(void) -> void;
+         void do_setupView(void);
+         void do_setupEvents(void);
       };
    }
 }

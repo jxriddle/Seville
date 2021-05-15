@@ -26,8 +26,8 @@ namespace seville
          void on_okButtonWasClickedEvent(void);
 
       private:
-         auto do_setupView(void) -> void;
-         auto do_init(void) -> void;
+         void do_setupView(void);
+         void do_init(void);
       };
    }
 }

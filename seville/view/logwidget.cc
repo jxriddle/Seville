@@ -16,7 +16,8 @@ namespace seville
          do_clear();
       }
 
-      auto LogWidget::New(QWidget* parentWidgetPtr) -> LogWidget* {
+      LogWidget* LogWidget::New(QWidget* parentWidgetPtr)
+      {
          auto instance = new LogWidget(parentWidgetPtr);
 
          return instance;
@@ -43,7 +44,7 @@ namespace seville
          }
       }
 
-      auto LogWidget::do_reloadFromPalaceClient(void) -> void
+      void LogWidget::do_reloadFromPalaceClient(void)
       {
          do_clear();
          auto loggerPtr = my_palaceClientPtr->loggerPtr();
@@ -53,7 +54,7 @@ namespace seville
          }
       }
 
-      auto LogWidget::do_clear(void) -> void
+      void LogWidget::do_clear(void)
       {
 //         my_mainLayoutPtr = nullptr;
 //         my_chatLineEditPtr = nullptr;
@@ -62,7 +63,7 @@ namespace seville
          my_logTextEditPtr->clear();
       }
 
-      auto LogWidget::do_setupView(void) -> void
+      void LogWidget::do_setupView(void)
       {
          my_mainLayoutPtr = new QVBoxLayout(this);
 
@@ -77,7 +78,7 @@ namespace seville
          my_mainLayoutPtr->addWidget(my_chatLineEditPtr);
       }
 
-      auto LogWidget::do_setupEvents(void) -> void
+      void LogWidget::do_setupEvents(void)
       {
       }
    }

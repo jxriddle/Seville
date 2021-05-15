@@ -21,30 +21,30 @@ namespace seville
          explicit Cipher(void); // = delete;
          virtual ~Cipher(void);
 
-         static auto New(void) -> std::unique_ptr<Cipher>;
+         static std::unique_ptr<Cipher> New(void);
          //std::optional<Cipher*>;
 
-         auto encipher(
+         QByteArray encipher(
                const QByteArray& plaintext,
-               i32 plaintextLimit = kPlaintextLimit) -> QByteArray;
+               i32 plaintextLimit = kPlaintextLimit);
 
-         auto decipher(const QByteArray& ciphertext) -> QByteArray;
+         QByteArray decipher(const QByteArray& ciphertext);
 
-         auto randomI8(i8 max) -> i8;
-         auto randomI16(i16 max) -> i16;
-         auto randomI32(void) -> i32;
-         auto randomF64(void) -> f64;
+         i8 randomI8(i8 max);
+         i16 randomI16(i16 max);
+         i32 randomI32(void);
+         f64 randomF64(void);
 
-         inline auto seed(void) const -> i32 {
+         inline i32 seed(void) const {
             return my_seed;
          }
 
-         inline auto setSeed(i32 seed) -> void {
+         inline void setSeed(i32 seed) {
             /* logical-not (!) changes non-zero -> 0, 0 -> 1 */
             do_setSeed(seed);
          }
 
-         inline auto clear(void) -> void {
+         inline void clear(void) {
             do_clear();
          }
 
@@ -56,10 +56,10 @@ namespace seville
          i16 my_lut[kLookupTableElementCount];
          i32 my_seed;
 
-         auto do_init(void) -> void;
-         auto do_setSeed(i32 seed) -> void;
-         auto do_deinit(void) -> void;
-         auto do_clear(void) -> void;
+         void do_init(void);
+         void do_setSeed(i32 seed);
+         void do_deinit(void);
+         void do_clear(void);
       };
    }
 }

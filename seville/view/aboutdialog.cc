@@ -10,7 +10,7 @@ namespace seville
           do_init();
       }
 
-      auto AboutDialog::on_okButtonWasClickedEvent(void) -> void {
+      void AboutDialog::on_okButtonWasClickedEvent(void) {
          close();
       }
 
@@ -18,24 +18,24 @@ namespace seville
       {
       }
 
-      auto AboutDialog::do_setupView(void) -> void {
+      void AboutDialog::do_setupView(void) {
          setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-         QVBoxLayout* layout_ptr = new QVBoxLayout(this);
-         QLabel* label_about_ptr =
+         QVBoxLayout* layoutPtr = new QVBoxLayout(this);
+         QLabel* aboutLabelPtr =
                new QLabel(QString("Seville v%1")
                           .arg(SevilleApp().kAppVersion), this);
 
-         layout_ptr->addWidget(label_about_ptr);
+         layoutPtr->addWidget(aboutLabelPtr);
 
-         QPushButton* button_ok_ptr = new QPushButton(tr("&OK"), this);
-         layout_ptr->addWidget(button_ok_ptr);
-         setLayout(layout_ptr);
+         QPushButton* okButtonPtr = new QPushButton(tr("&OK"), this);
+         layoutPtr->addWidget(okButtonPtr);
+         setLayout(layoutPtr);
 
-         connect(button_ok_ptr, &QPushButton::clicked,
+         connect(okButtonPtr, &QPushButton::clicked,
                  this, &seville::view::AboutDialog::on_okButtonWasClickedEvent);
       }
 
-      auto AboutDialog::do_init(void) -> void {
+      void AboutDialog::do_init(void) {
          do_setupView();
       }
    }

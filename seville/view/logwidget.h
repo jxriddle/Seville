@@ -22,13 +22,13 @@ namespace seville
          explicit LogWidget(QWidget* parentWidgetPtr = nullptr);
          //virtual ~LogWidget();
 
-         static auto New(QWidget* parentWidgetPtr = nullptr) -> LogWidget*;
+         static LogWidget* New(QWidget* parentWidgetPtr = nullptr);
 
-         inline auto palaceClientPtr(void) -> palace::Client* {
+         inline palace::Client* palaceClientPtr(void) {
             return my_palaceClientPtr;
          }
 
-         inline auto setPalaceClientPtr(palace::Client* value) -> void {
+         inline void setPalaceClientPtr(palace::Client* value) {
             auto previousPalaceClientPtr = my_palaceClientPtr;
             my_palaceClientPtr = value;
 
@@ -51,19 +51,19 @@ namespace seville
             }
          }
 
-         inline auto logTextEditPtr(void) -> QTextEdit* {
+         inline QTextEdit* logTextEditPtr(void) {
             return my_logTextEditPtr;
          }
 
-         inline auto chatLineEditPtr(void) -> QLineEdit* {
+         inline QLineEdit* chatLineEditPtr(void) {
             return my_chatLineEditPtr;
          }
 
-         inline auto chatLineEditIsVisible(void) -> bool {
+         inline bool chatLineEditIsVisible(void) {
             return my_chatLineEditPtr->isVisible();
          }
 
-         inline auto setChatLineEditIsVisible(bool value) -> void {
+         inline void setChatLineEditIsVisible(bool value) {
             my_chatLineEditPtr->setVisible(value);
          }
 
@@ -77,10 +77,10 @@ namespace seville
          QTextEdit* my_logTextEditPtr;
          QLineEdit* my_chatLineEditPtr;
 
-         auto do_setupView(void) -> void;
-         auto do_setupEvents(void) -> void;
-         auto do_clear(void) -> void;
-         auto do_reloadFromPalaceClient(void) -> void;
+         void do_setupView(void);
+         void do_setupEvents(void);
+         void do_clear(void);
+         void do_reloadFromPalaceClient(void);
       };
    }
 }

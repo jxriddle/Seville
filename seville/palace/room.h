@@ -24,7 +24,7 @@ namespace seville
          void backgroundDidChangeEvent(void);
 
       public:
-         static auto New(QObject* parentObjectPtr = nullptr) -> Room*
+         static Room* New(QObject* parentObjectPtr = nullptr)
          {
             auto instance_ptr = new Room(parentObjectPtr);
 
@@ -41,7 +41,7 @@ namespace seville
 
          Room& operator=(const Room& value);
 
-         inline auto userWithId(u32 userId) -> User {
+         inline User userWithId(u32 userId) {
             for (auto& user: my_userList) {
                if (user.id() == userId) {
                   return user;
@@ -51,7 +51,7 @@ namespace seville
             return User();
          }
 
-         inline auto userPtrWithId(u32 userId) -> User* {
+         inline User* userPtrWithId(u32 userId) {
             for (auto& user: my_userList) {
                if (user.id() == userId) {
                   return &user;
@@ -61,7 +61,7 @@ namespace seville
             return nullptr;
          }
 
-         inline auto removeUserWithId(u32 userId) -> void {
+         inline void removeUserWithId(u32 userId) {
             auto i = u32{0};
             auto z = my_userList.size();
             while (i < z) {
@@ -72,60 +72,60 @@ namespace seville
             }
          }
 
-         inline auto roomId(void) const -> u16 {
+         inline u16 roomId(void) const {
             return my_roomId;
          }
 
-         inline auto setId(u16 value) -> void {
+         inline void setId(u16 value) {
             my_roomId = value;
          }
 
-         inline auto flags(void) const -> u32 {
+         inline u32 flags(void) const {
             return my_flags;
          }
 
-         inline auto setFlags(u32 value) -> void {
+         inline void setFlags(u32 value) {
             my_flags = value;
          }
 
-         inline auto face(void) const -> u32 {
+         inline u32 face(void) const {
             return my_face;
          }
 
-         inline auto setFace(u32 value) -> void {
+         inline void setFace(u32 value) {
             my_face = value;
          }
 
-         inline auto reserved(void) const -> u16 {
+         inline i32 reserved(void) const {
             return my_reserved;
          }
 
-         inline auto setReserved(u16 value) -> void {
+         inline void setReserved(i32 value) {
             my_reserved = value;
          }
 
-         inline auto userCount(void) const -> u16 {
+         inline i32 userCount(void) const {
             //return my_userList.size();
             return my_userCount;
          }
 
-         inline auto setUserCount(u16 value) -> void {
+         inline void setUserCount(i32 value) {
             my_userCount = value;
          }
 
-         inline auto hotspotCount(void) const -> u16 {
+         inline i32 hotspotCount(void) const {
             return my_hotspotCount;
          }
 
-         inline auto setHotspotCount(u16 value) -> void {
+         inline void setHotspotCount(i32 value) {
             my_hotspotCount = value;
          }
 
-         inline auto hotspotListPtr(void) -> std::vector<Hotspot>* {
+         inline std::vector<Hotspot>* hotspotListPtr(void) {
             return &my_hotspotList;
          }
 
-         inline auto userListPtr(void) -> std::vector<User>* {
+         inline std::vector<User>* userListPtr(void) {
             return &my_userList;
          }
 
@@ -135,53 +135,53 @@ namespace seville
          //   my_hotspotsUniquePtr = std::move(hotspotsUniquePtr);
          //}
 
-         inline auto imageCount(void) const -> u16 {
+         inline i32 imageCount(void) const {
             return my_imageCount;
          }
 
-         inline auto setImageCount(u16 value) -> void {
+         inline void setImageCount(i32 value) {
             my_imageCount = value;
          }
 
-         inline auto loosePropCount(void) const -> u16 {
+         inline i32 loosePropCount(void) const {
             return my_loosePropCount;
          }
 
-         inline auto setLoosePropCount(u16 value) -> void {
+         inline void setLoosePropCount(i32 value) {
             my_loosePropCount = value;
          }
 
-         inline auto drawCommandsCount(void) const -> u16 {
+         inline i32 drawCommandsCount(void) const {
             return my_drawCommandsCount;
          }
 
-         inline auto setDrawCommandsCount(u16 value) -> void {
+         inline void setDrawCommandsCount(i32 value) {
             my_drawCommandsCount = value;
          }
 
-         inline auto roomName(void) const -> QString {
+         inline QString roomName(void) const {
             return my_roomName;
          }
 
-         inline auto setRoomName(const QString& value) {
+         inline void setRoomName(const QString& value) {
             my_roomName = value;
          }
 
-         inline auto backgroundImageName(void) -> QString {
+         inline QString backgroundImageName(void) {
             return my_backgroundImageName;
          }
 
-         inline auto setBackgroundImageName(
-               const QString& backgroundImageName) -> void {
+         inline void setBackgroundImageName(
+               const QString& backgroundImageName) {
             my_backgroundImageName = backgroundImageName;
          }
 
-         inline auto backgroundImage(void) const -> QImage {
+         inline QImage backgroundImage(void) const {
             return QImage::fromData(my_backgroundImageByteArray);
          }
 
-         inline auto setBackgroundImage(
-               const QImage& backgroundImage) -> void {
+         inline void setBackgroundImage(
+               const QImage& backgroundImage) {
             auto bits = backgroundImage.bits();
             my_backgroundImageByteArray.clear();
             my_backgroundImageByteArray.resize(0);
@@ -191,36 +191,36 @@ namespace seville
             emit backgroundDidChangeEvent();
          }
 
-         inline auto backgroundImageByteArray(void) const -> QByteArray {
+         inline QByteArray backgroundImageByteArray(void) const {
             return my_backgroundImageByteArray;
          }
 
-         inline auto setBackgroundImageByteArray(
-               const QByteArray& backgroundImageBytes) -> void {
+         inline void setBackgroundImageByteArray(
+               const QByteArray& backgroundImageBytes) {
             do_setBackgroundImageByteArray(backgroundImageBytes);
          }
 
-         inline auto backgroundImageByteArrayPtr(void) -> QByteArray* {
+         inline QByteArray* backgroundImageByteArrayPtr(void) {
             return &my_backgroundImageByteArray;
          }
 
-         inline auto artistName(void) -> QString {
+         inline QString artistName(void) {
             return my_artistName;
          }
 
-         inline auto setArtistName(const QString& artistName) -> void {
+         inline void setArtistName(const QString& artistName) {
             my_artistName = artistName;
          }
 
-         inline auto password(void) -> QString {
+         inline QString password(void) {
             return my_password;
          }
 
-         inline auto setPassword(const QString& password) -> void {
+         inline void setPassword(const QString& password) {
             my_password = password;
          }
 
-         inline auto clear(void) -> void {
+         inline void clear(void) {
             do_clear();
          }
 
@@ -228,12 +228,12 @@ namespace seville
          u32 my_flags;
          u32 my_face;
          u16 my_roomId;
-         u16 my_hotspotCount;
-         u16 my_imageCount;
-         u16 my_drawCommandsCount;
-         u16 my_userCount;
-         u16 my_loosePropCount;
-         u16 my_reserved;
+         i32 my_hotspotCount;
+         i32 my_imageCount;
+         i32 my_drawCommandsCount;
+         i32 my_userCount;
+         i32 my_loosePropCount;
+         i32 my_reserved;
          QByteArray my_backgroundImageByteArray;
          QString my_backgroundImageName;
          QString my_roomName;
@@ -241,14 +241,17 @@ namespace seville
          QString my_password;
          std::vector<Hotspot> my_hotspotList;
          std::vector<User> my_userList;
+         std::vector<Prop> my_loosePropList;
 
-         auto do_setupEvents(void) -> void;
-         auto do_clear(void) -> void;
-         auto do_setBackgroundImageByteArray(
-               const QByteArray& backgroundImageByteArray) -> void;
-         auto do_assign(const Room& room) -> void;
-         auto do_init(void) -> void; //const Room& room)
-         auto do_deinit(void) -> void;
+         void do_setupEvents(void);
+         void do_clear(void);
+         void do_setBackgroundImageByteArray(
+               const QByteArray& backgroundImageByteArray);
+         void do_fetchWebPropsAsync(
+               QString propServerUri, std::vector<i32>propIds);
+         void do_assign(const Room& room);
+         void do_init(void); //const Room& room)
+         void do_deinit(void);
       };
    }
 }

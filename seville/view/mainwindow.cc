@@ -176,9 +176,8 @@ namespace seville
 //         do_updateView();
 //      }
 
-      auto MainWindow::do_setCurrentPalaceClientWidgetPtr(
+      void MainWindow::do_setCurrentPalaceClientWidgetPtr(
             seville::view::PalaceClientWidget* currentPalaceClientWidget)
-         -> void
       {
          my_currentPalaceClientWidgetPtr = currentPalaceClientWidget;
 
@@ -189,7 +188,7 @@ namespace seville
          my_logWidgetPtr->setPalaceClientPtr(currentPalaceClientPtr);
       }
 
-      auto MainWindow::do_setupWindow(void) -> void
+      void MainWindow::do_setupWindow(void)
       {
          setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
          setUnifiedTitleAndToolBarOnMac(true);
@@ -207,7 +206,7 @@ namespace seville
 //                           primary_screen_ptr->geometry()));
       }
 
-      auto MainWindow::do_setupView(void) -> void
+      void MainWindow::do_setupView(void)
       {
          // Set Main Window to Tab Widget
          setCentralWidget(my_tabWidgetPtr);
@@ -251,7 +250,7 @@ namespace seville
          //restoreState(settings.value("mainWindowState").toByteArray());
       }
 
-      auto MainWindow::do_setupActions(void) -> void
+      void MainWindow::do_setupActions(void)
       {
          // Assign Action Shortcut Keys
          my_openHostConnectionActionPtr->setShortcut(QKeySequence::New);
@@ -266,7 +265,7 @@ namespace seville
          my_toggleLogActionPtr->setShortcut(Qt::CTRL | Qt::Key_L);
       }
 
-      auto MainWindow::do_setupMenus(void) -> void
+      void MainWindow::do_setupMenus(void)
       {
          // Create Menu Bar
          //my_menuBarPtr = new QMenuBar(this);
@@ -317,7 +316,7 @@ namespace seville
          layoutPtr->addWidget(my_menuBarPtr);
       }
 
-      auto MainWindow::do_setupToolbars(void) -> void
+      void MainWindow::do_setupToolbars(void)
       {
          //my_toolBarPtr->setStyleSheet("border: 1px solid red");
          //my_toolBarPtr->setMovable(false);
@@ -330,7 +329,7 @@ namespace seville
 //         my_toolBarPtr->addWidget(comboBoxPtr);
       }
 
-      auto MainWindow::do_setupDocks(void) -> void
+      void MainWindow::do_setupDocks(void)
       {
          auto palaceClientWidgetPtr =
                static_cast<PalaceClientWidget *>(
@@ -354,7 +353,7 @@ namespace seville
          addDockWidget(Qt::RightDockWidgetArea, my_logDockWidgetPtr);
       }
 
-      auto MainWindow::do_setupEvents(void) -> void
+      void MainWindow::do_setupEvents(void)
       {
          // Connect Action Signals to Slots
          connect(my_logDockWidgetPtr, &QDockWidget::topLevelChanged,
@@ -399,7 +398,7 @@ namespace seville
                  this, &seville::view::MainWindow::on_connectionStateDidChange);
       }
 
-      auto MainWindow::do_teardownEvents(void) -> void
+      void MainWindow::do_teardownEvents(void)
       {
          // Disconnect Action Signals from Slots
 
@@ -447,7 +446,7 @@ namespace seville
                     this, &seville::view::MainWindow::on_logWindowWasToggled);
       }
 
-      auto MainWindow::do_setupSizing(void) -> void
+      void MainWindow::do_setupSizing(void)
       {
          //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
          setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -466,7 +465,7 @@ namespace seville
          adjustSize();
       }
 
-      auto MainWindow::do_updateMenus(void) -> void
+      void MainWindow::do_updateMenus(void)
       {
          //auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
          auto currentPalaceClientWidgetPtr = my_currentPalaceClientWidgetPtr;
@@ -495,7 +494,7 @@ namespace seville
          }
       }
 
-      auto MainWindow::do_updateView(void) -> void
+      void MainWindow::do_updateView(void)
       {
          do_updateMenus();
 
@@ -503,7 +502,7 @@ namespace seville
          // my_currentPalaceClientWidgetPtr->drawRoom();
       }
 
-      auto MainWindow::do_init(void) -> void
+      void MainWindow::do_init(void)
       {
          // Create Actions
          my_openHostConnectionActionPtr = new QAction(tr("&Connect"), this);
@@ -551,7 +550,7 @@ namespace seville
 //            QMainWindow::resizeEvent(event_ptr);
 //         }
 
-      auto MainWindow::do_deinit(void) -> void
+      void MainWindow::do_deinit(void)
       {
          do_teardownEvents();
 

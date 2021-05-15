@@ -12,7 +12,7 @@ namespace seville
 
       // Logger::~Logger(void) {}
 
-      auto Log::New(void) -> Log*
+      Log* Log::New(void)
       {
          auto instance = new Log();
 
@@ -23,13 +23,13 @@ namespace seville
          return instance;
       }
 
-      auto Log::do_init(LogMode mode) -> void
+      void Log::do_init(LogMode mode)
       {
          my_logEntriesUniquePtr = std::make_unique<std::vector<LogEntry>>();
          my_mode = mode;
       }
 
-      auto Log::do_appendLogEntry(const LogEntry& logEntry) -> void
+      void Log::do_appendLogEntry(const LogEntry& logEntry)
       {
          my_logEntriesUniquePtr->push_back(logEntry);
          emit logEntryWasAppendedEvent(logEntry);

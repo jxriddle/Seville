@@ -23,14 +23,13 @@ namespace seville
          do_init(options);
       }
 
-      auto NetMsg::do_init(NetMsgOptions options)
-            -> void
+      void NetMsg::do_init(NetMsgOptions options)
       {
          setShouldSwapEndianness(NetMsgOptions::kEndianSwap == options);
          do_clear();
       }
 
-      auto NetMsg::do_clear(void) -> void
+      void NetMsg::do_clear(void)
       {
          my_isValidFlag = 0;
 
@@ -57,7 +56,7 @@ namespace seville
 //         return count * sizeof(u32);
 //      }
 
-      auto NetMsg::do_contentSize(void) -> u32
+      u32 NetMsg::do_contentSize(void)
       {
          //return my_contentSize;
          auto z = size();
@@ -67,46 +66,48 @@ namespace seville
          return result;
       }
 
-      auto NetMsg::do_id(void) -> u32
+      u32 NetMsg::do_id(void)
       {
          return u32At(NetMsg::kIdOffset);
       }
 
-      auto NetMsg::do_setId(u32 value) -> void
+      void NetMsg::do_setId(u32 value)
       {
          //my_headerFlags &= 0b001;
          setU32At(NetMsg::kIdOffset, value);
       }
 
-      auto NetMsg::do_bodyLen(void) -> u32
+      u32 NetMsg::do_bodyLen(void)
       {
          return u32At(NetMsg::kLenOffset);
       }
 
-      auto NetMsg::do_setBodyLen(u32 value) -> void
+      void NetMsg::do_setBodyLen(u32 value)
       {
          //my_headerFlags &= 0b010;
          setU32At(NetMsg::kLenOffset, value);
       }
 
-      auto NetMsg::do_ref(void) -> u32
+      u32 NetMsg::do_ref(void)
       {
          return u32At(NetMsg::kRefOffset);
       }
 
-      auto NetMsg::do_setRef(u32 value) -> void
+      void NetMsg::do_setRef(u32 value)
       {
          //my_headerFlags &= 0b100;
          setU32At(NetMsg::kRefOffset, value);
       }
 
-      auto NetMsg::do_setStreamCursorToContentEnd(void) -> void {
+      void NetMsg::do_setStreamCursorToContentEnd(void)
+      {
          setStreamCursorPosition(
                   (size() <= NetMsg::kHeaderSize) * NetMsg::kHeaderSize
                   | (NetMsg::kHeaderSize < size()) * size());
       }
 
-      auto NetMsg::do_setStreamCursorToContentStart(void) -> void {
+      void NetMsg::do_setStreamCursorToContentStart(void)
+      {
          setStreamCursorPosition(NetMsg::kHeaderSize);
       }
 

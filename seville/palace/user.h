@@ -27,141 +27,145 @@ namespace seville
 
          User& operator=(const User& value);
 
-         inline auto color(void) const -> int {
+         inline i32 color(void) const {
             return my_color;
          }
 
-         inline auto setColor(int value) -> void {
+         inline void setColor(i32 value) {
             my_color = value;
          }
 
-         inline auto face(void) const -> int {
+         inline i32 face(void) const {
             return my_face;
          }
 
-         inline auto setFace(int value) -> void {
+         inline void setFace(i32 value) {
             my_face = value;
          }
 
-         inline auto x(void) const -> int {
+         inline i32 x(void) const {
             return my_x;
          }
 
-         inline auto setX(int value) -> void {
+         inline void setX(i32 value) {
             my_x = value;
          }
 
-         inline auto y(void) const -> int {
+         inline i32 y(void) const {
             return my_y;
          }
 
-         inline auto setY(int value) -> void {
+         inline void setY(i32 value) {
             my_y = value;
          }
 
-         inline auto username(void) const -> QString {
+         inline QString username(void) const {
             return my_username;
          }
 
-         inline auto setUsername(const QString& value) -> void {
+         inline void setUsername(const QString& value) {
             my_username = value;
          }
 
-         inline auto wizPass(void) const -> QString {
+         inline QString wizPass(void) const {
             return my_wizardPassword;
          }
 
-         inline auto setWizPass(const QString& value) -> void {
+         inline void setWizPass(const QString& value) {
             my_wizardPassword = value;
          }
 
-         inline auto id(void) const -> u32 {
+         inline u32 id(void) const {
             return my_id;
          }
 
-         inline auto setId(u32 value) -> void {
+         inline void setId(u32 value) {
             my_id = value;
          }
 
-         inline auto flags(void) -> u16 {
+         inline u16 flags(void) {
             return my_flags;
          }
 
-         inline auto setFlags(u16 value) -> void {
+         inline void setFlags(u16 value) {
             my_flags = value;
          }
 
-         inline auto idCrc(void) const -> u32 {
+         inline u32 idCrc(void) const {
             return my_idCrc;
          }
 
-         inline auto setIdCrc(u32 value) -> void {
+         inline void setIdCrc(u32 value) {
             my_idCrc = value;
          }
 
-         inline auto idCounter(void) const -> u32 {
+         inline u32 idCounter(void) const {
             return my_idCounter;
          }
 
-         inline auto setIdCounter(u32 value) -> void {
+         inline void setIdCounter(u32 value) {
             my_idCounter = value;
          }
 
-         inline auto idChanged(void) const -> bool {
+         inline bool idChanged(void) const {
             return my_idChangedFlag;
          }
 
-         inline auto setIdChanged(bool value) -> void {
+         inline void setIdChanged(bool value) {
             my_idChangedFlag = value;
          }
 
-         inline auto regCrc(void) const -> u32 {
+         inline u32 regCrc(void) const {
             return my_regCrc;
          }
 
-         inline auto setRegCrc(u32 value) -> void {
+         inline void setRegCrc(u32 value) {
             my_regCrc = value;
          }
 
-         inline auto regCounter(void) const -> u32 {
+         inline u32 regCounter(void) const {
             return my_regCounter;
          }
 
-         inline auto setRegCounter(u32 value) -> void {
+         inline void setRegCounter(u32 value) {
             my_regCounter = value;
          }
 
-         inline auto roomId(void) const -> i16 {
+         inline i16 roomId(void) const {
             return my_roomId;
          }
 
-         inline auto setRoomId(i16 id) -> void {
+         inline void setRoomId(i16 id) {
             my_roomId = id;
          }
 
-         inline auto propListPtr(void) -> std::vector<Prop>* {
+         inline std::vector<Prop>* propListPtr(void) {
             return &my_propList;
          }
 
-         inline auto propNum(void) -> i16 {
+         inline i16 propNum(void) {
             return my_propNum;
          }
 
-         inline auto setPropNum(i16 value) {
+         inline void setPropNum(i16 value) {
             my_propNum = value;
          }
 
-         inline auto clear(void) -> void {
+         inline void clear(void) {
             do_clear();
          }
 
-         inline auto hasHeadProp(void) -> u32 {
+         inline i32 hasHeadProp(void) {
             return do_hasHeadProp();
          }
 
 //         inline auto propsPtr(void) -> u32* {
 //            return &my_props;
 //         }
+
+         inline void fetchWebPropAsync(const QString& propServerUri) {
+            do_fetchWebPropAsync(propServerUri);
+         }
 
       public slots:
          void on_webPropDidFetchAsync(QNetworkReply* replyPtr);
@@ -171,10 +175,10 @@ namespace seville
          u16 my_flags;
          QString my_username;
          QString my_wizardPassword;
-         int my_face;
-         int my_x;
-         int my_y;
-         int my_color;
+         i32 my_face;
+         i32 my_x;
+         i32 my_y;
+         i32 my_color;
          bool my_idChangedFlag;
          u32 my_idCounter;
          u32 my_idCrc;
@@ -183,22 +187,22 @@ namespace seville
          i16 my_roomId;
          std::vector<Prop> my_propList;
          i16 my_propNum;
-         u32 my_headPropFlag;
+         i32 my_headPropFlag;
          QImage my_webPropImage;
          QNetworkAccessManager my_webPropFetcher;
 
          //u32 my_props[kNumPropCells];
 
-         auto do_hasHeadProp(void) -> u32;
-         auto do_fetchWebPropAsync(QString propServerUri) -> void;
+         i32 do_hasHeadProp(void);
+         void do_fetchWebPropAsync(const QString& propServerUri);
 
-         auto do_clear(void) -> void;
-         auto do_assign(const User& user) -> void;
+         void do_clear(void);
+         void do_assign(const User& user);
 
-         auto do_deinit(void) -> void;
-         auto do_init(void) -> void;
+         void do_deinit(void);
+         void do_init(void);
 
-         auto do_init(const User& user) -> void {
+         void do_init(const User& user) {
             do_assign(user);
          }
       };

@@ -30,11 +30,11 @@ namespace seville
          do_deinit();
       }
 
-      auto Room::do_setupEvents(void) -> void
+      void Room::do_setupEvents(void)
       {
       }
 
-      auto Room::do_clear(void) -> void
+      void Room::do_clear(void)
       {
          my_roomId = 0;
          my_flags = 0;
@@ -51,8 +51,8 @@ namespace seville
          my_backgroundImageByteArray.truncate(0);
       }
 
-      auto Room::do_setBackgroundImageByteArray(
-            const QByteArray& backgroundImageByteArray) -> void
+      void Room::do_setBackgroundImageByteArray(
+            const QByteArray& backgroundImageByteArray)
       {
          my_backgroundImageByteArray.clear();
          my_backgroundImageByteArray.resize(0);
@@ -61,7 +61,7 @@ namespace seville
          emit backgroundDidChangeEvent();
       }
 
-      auto Room::do_assign(const Room& room) -> void
+      void Room::do_assign(const Room& room)
       {
          my_roomId = room.my_roomId;
          my_backgroundImageByteArray =
@@ -84,13 +84,13 @@ namespace seville
          }
       }
 
-      auto Room::do_init(void) -> void //const Room& room)
+      void Room::do_init(void) //const Room& room)
       {
          //do_assign(room);
          do_setupEvents();
       }
 
-      auto Room::do_deinit(void) -> void
+      void Room::do_deinit(void)
       {
 
       }

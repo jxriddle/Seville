@@ -19,16 +19,16 @@ namespace seville
          Host(void);
          virtual ~Host(void);
 
-         static auto IsBigEndian(void) -> bool;
+         static bool IsBigEndian(void);
 
-         static auto SwapI16(const qint16 unswapped) -> qint16;
-         static auto SwapU16(const quint16 unswapped) -> quint16;
-         static auto SwapI32(const qint32 unswapped) -> qint32;
-         static auto SwapU32(const quint32 unswapped) -> quint32;
+         static qint16 SwapI16(const qint16 unswapped);
+         static quint16 SwapU16(const quint16 unswapped);
+         static qint32 SwapI32(const qint32 unswapped);
+         static quint32 SwapU32(const quint32 unswapped);
 
       private:
-         static auto do_swap_word(const quint16 unswapped) -> quint16;
-         static auto do_swap_dword(const quint32 unswapped) -> quint32;
+         static quint16 do_swap_word(const quint16 unswapped);
+         static quint32 do_swap_dword(const quint32 unswapped);
       };
    }
 }

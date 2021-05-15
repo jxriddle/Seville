@@ -21,19 +21,19 @@ namespace seville
       public:
          Prop(void);
 
-         inline auto id(void) -> i32 {
+         inline i32 id(void) {
             return my_id;
          }
 
-         inline auto setId(i32 value) {
+         inline void setId(i32 value) {
             my_id = value;
          }
 
-         inline auto crc(void) -> i32 {
+         inline i32 crc(void) {
             return my_crc;
          }
 
-         inline auto setCrc(i32 value) -> void {
+         inline void setCrc(i32 value) {
             my_crc = value;
          }
 

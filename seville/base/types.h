@@ -32,5 +32,4 @@ namespace seville
    };
 }
 
-
 #endif  // SEVILLE_TYPES_H_
