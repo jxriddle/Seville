@@ -1189,7 +1189,9 @@ namespace seville
       {
          my_logger.appendDebugMessage("> ServerInfo");
 
-         // stub
+         // my_server.setVersion();
+
+         // TODO STUB
 
          return 1;
       }
@@ -1250,6 +1252,9 @@ namespace seville
 
          my_logger.appendInfoMessage(
                   QString("%1 has entered the room").arg(user.username()));
+
+         if (user.id() != my_userId)
+            my_room.userListPtr()->push_back(user);
 
          emit viewNeedsUpdatingEvent();
 
@@ -1362,7 +1367,8 @@ namespace seville
          auto userCount = my_netMsg.streamReadI32();
          my_room.setUserCount(userCount);
 
-         my_room.removeUserWithId(userId);
+         if (user.id() != my_userId)
+            my_room.removeUserWithId(userId);
 
          emit viewNeedsUpdatingEvent();
 
