@@ -321,20 +321,20 @@ namespace seville
                      auto propSize = QSize();
                      propSize.setWidth(propSizeJsonObj["w"].toString().toInt());
                      propSize.setHeight(propSizeJsonObj["h"].toString().toInt());
-                     my_logger.appendInfoMessage(
-                              QString("size: (%1, %2)")
-                              .arg(QString::number(propSize.width()))
-                              .arg(QString::number(propSize.height())));
+//                     my_logger.appendDebugMessage(
+//                              QString("size: (%1, %2)")
+//                              .arg(QString::number(propSize.width()))
+//                              .arg(QString::number(propSize.height())));
                      prop.setSize(propSize);
                      auto propOffsetJsonObj =
                            propJsonObj["offsets"].toObject();
                      auto propOffset = QPoint();
                      propOffset.setX(propOffsetJsonObj["x"].toString().toInt());
                      propOffset.setY(propOffsetJsonObj["y"].toString().toInt());
-                     my_logger.appendInfoMessage(
-                              QString("offset: (%1, %2)")
-                              .arg(QString::number(propOffset.x()))
-                              .arg(QString::number(propOffset.y())));
+//                     my_logger.appendDebugMessage(
+//                              QString("offset: (%1, %2)")
+//                              .arg(QString::number(propOffset.x()))
+//                              .arg(QString::number(propOffset.y())));
                      prop.setOffset(propOffset);
                      prop.setFlags(propJsonObj["flags"].toInt());
 
@@ -2165,14 +2165,14 @@ namespace seville
 
       void Client::do_fetchPropListAsync(const std::vector<i32>& propIdList)
       {
-         my_logger.appendInfoMessage(
+         my_logger.appendDebugMessage(
                   "Requesting prop list for ids...");
 
          auto propListUri = my_server.httpPropListLocation();
          auto json = QJsonObject();
          auto propIdArray = QJsonArray();
          for (const auto& propId: propIdList) {
-            my_logger.appendInfoMessage(QString("%1").arg(propId));
+            my_logger.appendDebugMessage(QString("%1").arg(propId));
             auto propIdObject = QJsonObject();
             propIdObject["id"] = propId;
             propIdArray.append(propIdObject);
