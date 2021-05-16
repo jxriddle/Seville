@@ -303,7 +303,7 @@ namespace seville
 //            return do_headerSize();
 //         }
 
-         inline i32 contentSize(void) {
+         inline u32 contentSize(void) {
             return do_contentSize();
          }
 

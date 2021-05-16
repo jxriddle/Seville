@@ -41,7 +41,7 @@ namespace seville
 
          Room& operator=(const Room& value);
 
-         inline User userWithId(u32 userId) {
+         inline User userWithId(i32 userId) {
             for (auto& user: my_userList) {
                if (user.id() == userId) {
                   return user;
@@ -51,7 +51,7 @@ namespace seville
             return User();
          }
 
-         inline User* userPtrWithId(u32 userId) {
+         inline User* userPtrWithId(i32 userId) {
             for (auto& user: my_userList) {
                if (user.id() == userId) {
                   return &user;
@@ -61,7 +61,7 @@ namespace seville
             return nullptr;
          }
 
-         inline void removeUserWithId(u32 userId) {
+         inline void removeUserWithId(i32 userId) {
             auto i = u32{0};
             auto z = my_userList.size();
             while (i < z) {

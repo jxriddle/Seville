@@ -75,11 +75,11 @@ namespace seville
             my_wizardPassword = value;
          }
 
-         inline u32 id(void) const {
+         inline i32 id(void) const {
             return my_id;
          }
 
-         inline void setId(u32 value) {
+         inline void setId(i32 value) {
             my_id = value;
          }
 

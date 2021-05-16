@@ -5,6 +5,11 @@
 #include <QDebug>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QJsonValue>
 #include <QTcpSocket>
 
 #include "seville/base/sevilleapp.h"
@@ -163,9 +168,18 @@ namespace seville
 //               qCDebug(log_seville) << "ERROR: Socket Error";
 //            });
 
-         connect(&my_roomBackgroundNetworkAccessManager,
+         connect(&my_networkAccessManager,
                  &QNetworkAccessManager::finished,
-                 this, &seville::palace::Client::on_roomBackgroundDidLoad);
+                 this,
+                 &seville::palace::Client::on_networkAccessManagerDidFinish);
+
+         // connect(&my_propListNetworkAccessManager,
+         //         &QNetworkAccessManager::finished,
+         //         this, &seville::palace::Client::on_propListDidFetchAsync);
+
+         // connect(&my_propNetworkAccessManager,
+         //         &QNetworkAccessManager::finished,
+         //         this, &seville::palace::Client::on_propDidFetchAsync);
 
 //            connect(
 //               &my_logger, &Logger::messageLogged,
@@ -205,17 +219,17 @@ namespace seville
 //               }
 //            }
 
-         my_roomBackgroundNetworkAccessManager.get(request);
+         my_networkAccessManager.get(request);
       }
 
-      void Client::do_fetchPropAsync(const QString& url)
-      {
-         QNetworkRequest request;
-         request.setUrl(url);
-         request.setRawHeader("User-Agent", "Seville 1.0");
+//      void Client::do_fetchPropAsync(const QString& url)
+//      {
+//         QNetworkRequest request;
+//         request.setUrl(url);
+//         request.setRawHeader("User-Agent", "Seville 1.0");
 
-         my_roomBackgroundNetworkAccessManager.get(request);
-      }
+//         my_networkAccessManager.get(request);
+//      }
 
       void Client::do_clear(void)
       {
@@ -254,47 +268,140 @@ namespace seville
 //         }
       }
 
-      void Client::on_backgroundDidFetchAsync(
-            QNetworkReply* replyPtr)
+      void Client::on_networkAccessManagerDidFinish(QNetworkReply* replyPtr)
       {
-            if (replyPtr->error()) {
-               my_logger.appendErrorMessage(
-                        //QString("Background failed to load."));
-                        QString("Background load error: %1")
-                        .arg(replyPtr->errorString()));
+         if (replyPtr == nullptr)
+            return;
+
+         auto url = replyPtr->url();
+         auto contentType =
+               replyPtr->header(QNetworkRequest::ContentTypeHeader);
+
+         auto isErrorReply = replyPtr->error();
+         auto errorString = replyPtr->errorString();
+         auto content = replyPtr->readAll();
+
+         replyPtr->deleteLater();
+
+         if (isErrorReply) {
+            my_logger.appendErrorMessage(
+                     QString("HTTP network load error: %1").arg(errorString));
+            return;
+         }
+
+         if (contentType == QString("application/json")) {
+            if (url == my_server.httpPropListLocation()) {
+               auto jsonDoc = QJsonDocument::fromJson(content);
+               if (jsonDoc.isEmpty()) {
+                  my_logger.appendInfoMessage("Json Content empty!");
+                  return;
+               }
+
+               // my_logger.appendInfoMessage(content);
+               auto imgUrl = jsonDoc["img_url"].toString();
+               my_server.setHttpPropStorageLocation(imgUrl);
+               auto propJsonArray = jsonDoc["props"].toArray();
+               auto userListPtr = my_room.userListPtr();
+               if (userListPtr == nullptr)
+                  return;
+
+               auto z = propJsonArray.size();
+               for (auto i = 0; i < z; i++) {
+                  auto propJsonObj = propJsonArray[i].toObject();
+                  auto isSuccessful = propJsonObj["success"].toBool();
+                  if (isSuccessful) {
+                  // prop.setIsLoaded(propJsonObj["success"].toBool());
+                     auto prop = Prop();
+                     prop.setImageLoadedFlag(isSuccessful);
+                     prop.setId(propJsonObj["id"].toInt());
+                     prop.setFormat(propJsonObj["format"].toString());
+                     prop.setCrc(propJsonObj["crc"].toInt());
+                     prop.setName(propJsonObj["name"].toString());
+                     auto propSizeJsonObj = propJsonObj["size"].toObject();
+                     auto propSize = QSize();
+                     propSize.setWidth(propSizeJsonObj["w"].toString().toInt());
+                     propSize.setHeight(propSizeJsonObj["h"].toString().toInt());
+                     my_logger.appendInfoMessage(
+                              QString("size: (%1, %2)")
+                              .arg(QString::number(propSize.width()))
+                              .arg(QString::number(propSize.height())));
+                     prop.setSize(propSize);
+                     auto propOffsetJsonObj =
+                           propJsonObj["offsets"].toObject();
+                     auto propOffset = QPoint();
+                     propOffset.setX(propOffsetJsonObj["x"].toString().toInt());
+                     propOffset.setY(propOffsetJsonObj["y"].toString().toInt());
+                     my_logger.appendInfoMessage(
+                              QString("offset: (%1, %2)")
+                              .arg(QString::number(propOffset.x()))
+                              .arg(QString::number(propOffset.y())));
+                     prop.setOffset(propOffset);
+                     prop.setFlags(propJsonObj["flags"].toInt());
+
+                     // attach this prop to the appropriate user.
+                     for (auto& user: *userListPtr) {
+                        if (user.propListPtr() == nullptr)
+                           continue;
+
+                        auto propId = prop.id();
+                        if (user.propListPtr()->at(0).id() == propId) {
+                           user.propListPtr()->at(0) = prop;
+                           auto url = QUrl(
+                                    my_server.httpPropStorageLocation() +
+                                    QString::number(propId));
+
+                           // my_logger.appendInfoMessage(
+                           //          QString("Requesting prop at %1")
+                           //          .arg(url.toString()));
+
+                           auto request = QNetworkRequest(url);
+                           request.setHeader(
+                                    QNetworkRequest::UserAgentHeader,
+                                    "Seville 1.0");
+                           my_networkAccessManager.get(request);
+                        }
+                     }
+                  }
+               }
             }
-            else {
-               auto imageByteArray = replyPtr->readAll();
+         }
+         else {
+            auto propStorageLocationLen =
+                  my_server.httpPropStorageLocation().length();
+
+            if (url == my_server.httpServerLocation() +
+                       my_room.backgroundImageName()) {
+               auto imageByteArray = content;
                auto const imageByteArrayPtr =
                      reinterpret_cast<QByteArray*>(&imageByteArray);
                my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
 
                emit backgroundImageDidLoadEvent();
             }
+            else if (0 < propStorageLocationLen &&
+                     url.toString().left(propStorageLocationLen) ==
+                     my_server.httpPropStorageLocation()) {
 
-            replyPtr->deleteLater();
-      }
+               auto propId = url.toString().right(
+                        url.toString().length() -
+                        my_server.httpPropStorageLocation().length()).toInt();
 
-      void Client::on_roomBackgroundDidLoad(QNetworkReply* replyPtr)
-      {
-         if (replyPtr->error()) {
-            my_logger.appendErrorMessage(
-                     //QString("Background failed to load."));
-                     QString("Background load error: %1")
-                     .arg(replyPtr->errorString()));
+               for (auto& user: *my_room.userListPtr()) {
+                  auto propImage = QImage::fromData(content);
+
+                  if (user.propListPtr()->at(0).id() == propId) {
+                     // my_logger.appendInfoMessage(
+                     //          QString("Setting prop image for user with id %1")
+                     //          .arg(user.id()));
+                     user.propListPtr()->at(0).setPropImage(propImage);
+                  }
+
+                  emit viewNeedsUpdatingEvent();
+               }
+            }
+
          }
-         else {
-            auto imageByteArray = replyPtr->readAll();
-            auto const imageByteArrayPtr =
-                   reinterpret_cast<QByteArray*>(&imageByteArray);
-            my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
-
-            emit backgroundImageDidLoadEvent();
-         }
-
-         replyPtr->deleteLater();
       }
-
 
       void Client::on_pingTimerDidTrigger(void)
       {
@@ -560,8 +667,8 @@ namespace seville
          else if (text.left(QString("'propserver").length()) ==
                   QString("'propserver")) {
             my_logger.appendInfoMessage(
-                     QString("My propserver location is: %1")
-                     .arg(my_server.httpPropLocation()));
+                     QString("My propserver list location is: %1")
+                     .arg(my_server.httpPropListLocation()));
          }
          else if (text.left(QString("'usercount").length()) ==
                   QString("'usercount")) {
@@ -984,7 +1091,7 @@ namespace seville
 
          auto url = my_netMsg.streamReadQString(256);
          my_server.setHttpServerLocation(url);
-         my_logger.appendDebugMessage(QString("HTTP Server is %1").arg(url));
+         my_logger.appendDebugMessage(QString("Media is located at %1").arg(url));
 
          return result;
       }
@@ -1164,12 +1271,17 @@ namespace seville
 
          my_room.userListPtr()->clear();
 
+         auto propIdList = std::vector<i32>();
          auto roomUserCount = i32(my_netMsg.ref());
          for (auto i = 0; i < roomUserCount; i++) {
-            //auto user = User();
-            do_processUserNew();
-            //my_room.userListPtr()->push_back(user);
+            auto user = do_processUserNew();
+            // if (user.id() != my_userId)
+            my_room.userListPtr()->push_back(user);
+            if (user.propListPtr() != nullptr)
+               propIdList.push_back(user.propListPtr()->at(0).id());
          }
+
+         do_fetchPropListAsync(propIdList);
 
          return 1;
       }
@@ -1202,7 +1314,7 @@ namespace seville
 
          auto user = User();
 
-         user.setId(my_netMsg.streamReadU32());
+         user.setId(my_netMsg.streamReadI32());
          user.setY(my_netMsg.streamReadU16());
          user.setX(my_netMsg.streamReadU16());
 
@@ -1240,8 +1352,8 @@ namespace seville
          //auto usernamePaddedLen = (4 - (usernameLen & 3)) - 1; // + usernameLen;
          //my_netMsg.streamSkip(usernamePaddedLen);
 
-         my_room.userListPtr()->push_back(user);
-         my_room.setUserCount(my_room.userCount() + 1);
+         // my_room.userListPtr()->push_back(user);
+         // my_room.setUserCount(my_room.userCount() + 1);
 
          return user;
       }
@@ -1253,8 +1365,11 @@ namespace seville
          my_logger.appendInfoMessage(
                   QString("%1 has entered the room").arg(user.username()));
 
-         if (user.id() != my_userId)
-            my_room.userListPtr()->push_back(user);
+         // if (user.id() != my_userId) {
+         my_room.userListPtr()->push_back(user);
+         // }
+
+         my_room.setUserCount(my_room.userCount() + 1);
 
          emit viewNeedsUpdatingEvent();
 
@@ -1282,10 +1397,15 @@ namespace seville
          my_logger.appendDebugMessage("> UserExitRoom");
 
          auto userId = my_netMsg.ref();
-         auto user = my_room.userWithId(userId);
-         my_room.removeUserWithId(userId);
-         my_logger.appendInfoMessage(
-                  QString("%1 has left the room.").arg(user.username()));
+
+         if (userId != my_userId)
+         {
+            auto user = my_room.userWithId(userId);
+            my_logger.appendInfoMessage(
+                     QString("%1 has left the room.").arg(user.username()));
+
+            my_room.removeUserWithId(userId);
+         }
 
          emit viewNeedsUpdatingEvent();
 
@@ -1365,10 +1485,12 @@ namespace seville
          my_server.removeUserWithId(userId);
 
          auto userCount = my_netMsg.streamReadI32();
-         my_room.setUserCount(userCount);
+         my_room.setUserCount(userCount); // TODO room or server user count?
 
          if (user.id() != my_userId)
             my_room.removeUserWithId(userId);
+         else
+            my_room.clear();
 
          emit viewNeedsUpdatingEvent();
 
@@ -1434,7 +1556,7 @@ namespace seville
 
          for (auto i = u32{0}; i < userCount; i++) {
             auto user = User();
-            user.setId(my_netMsg.streamReadU32());
+            user.setId(my_netMsg.streamReadI32());
             user.setFlags(my_netMsg.streamReadU16());
             user.setRoomId(my_netMsg.streamReadI16());
             auto usernameLen = my_netMsg.streamReadU8();
@@ -1761,162 +1883,41 @@ namespace seville
       int Client::do_sendLogon(void)
       {
          auto shouldSwapEndianness = do_determineShouldSwapEndianness();
-         auto logonMsg = NetMsg(shouldSwapEndianness);
+         auto netMsg = NetMsg(shouldSwapEndianness);
 
-         //QByteArray logon_netmsg;
-         //QDataStream out(&logon_netmsg, QIODevice::WriteOnly);
-         //buf.setByteOrder();
-         //stream.setDevice
+         netMsg.setId(NetMsg::kLogonKind);
+         netMsg.setBodyLen(NetMsg::kLogonSize);
+         netMsg.setRef(NetMsg::kNoRef);
 
-//         out << NetMsg::kLogonKind;
-//         out << NetMsg::kLogonSize;
-//         out << NetMsg::kNoRef;
-         //logonNetmsg.setId(NetMsg::kLogonKind);
-         //logonNetmsg.setLen(NetMsg::kLogonSize);
-         //logonNetmsg.setRef(NetMsg::kNoRef);
-
-         logonMsg.setId(NetMsg::kLogonKind);
-         logonMsg.setBodyLen(NetMsg::kLogonSize);
-         logonMsg.setRef(NetMsg::kNoRef);
-
-         logonMsg.appendU32(my_regCrc);
-         logonMsg.appendU32(my_regCounter);
-         logonMsg.appendFixedPascalQString(
+         netMsg.appendU32(my_regCrc);
+         netMsg.appendU32(my_regCounter);
+         netMsg.appendFixedPascalQString(
                   my_username, NetMsg::kLogonMaximumUsernameSize);
-         logonMsg.appendFixedPascalQString(
+         netMsg.appendFixedPascalQString(
                   my_wizpass, NetMsg::kLogonWizardPasswordSize);
-         logonMsg.appendU32(
+         netMsg.appendU32(
                   FlagAuxOptions::kAuthenticate | FlagAuxOptions::kWin32);
-         logonMsg.appendU32(my_idCounter);
-         logonMsg.appendU32(my_idCrc);
-         logonMsg.appendU32(kMagicFromPChat);
-         logonMsg.appendU32(kMagicFromPChat);
-         logonMsg.appendU32(kMagicFromPChat);
-         logonMsg.appendU16(my_room.roomId());
-         logonMsg.appendFixedQString(kIdent, kIdentLen);
-         logonMsg.appendU32(0);
-         logonMsg.appendU32(
+         netMsg.appendU32(my_idCounter);
+         netMsg.appendU32(my_idCrc);
+         netMsg.appendU32(kMagicFromPChat);
+         netMsg.appendU32(kMagicFromPChat);
+         netMsg.appendU32(kMagicFromPChat);
+         netMsg.appendU16(my_room.roomId());
+         netMsg.appendFixedQString(kIdent, kIdentLen);
+         netMsg.appendU32(0);
+         netMsg.appendU32(
                   UploadCapabilities::kPalaceAssetUpload |
                   UploadCapabilities::kHttpFileUpload);
-         logonMsg.appendU32(
+         netMsg.appendU32(
                   DownloadCapabilities::kPalaceAssetDownload |
                   DownloadCapabilities::kPalaceFileDownload |
                   DownloadCapabilities::kHttpFileDownload |
                   DownloadCapabilities::kHttpFileExtendedDownload);
-         logonMsg.appendU32(EngineCapabilities2d::kPalace2dEngine);
-         logonMsg.appendU32(GraphicsCapabilities2d::kGif87);
-         logonMsg.appendU32(GraphicsCapabilities3d::kNo3dGraphics);
+         netMsg.appendU32(EngineCapabilities2d::kPalace2dEngine);
+         netMsg.appendU32(GraphicsCapabilities2d::kGif87);
+         netMsg.appendU32(GraphicsCapabilities3d::kNo3dGraphics);
 
-               // Mark
-
-//         netmsg::LogonObject netmsg_logon(
-//                  do_determine_should_swap_endianness());
-//         netmsg_logon.set_reg_crc(my_user_.RegCrc());
-//         netmsg_logon.set_reg_counter(my_user_.RegCounter());
-//         netmsg_logon.set_username(my_user_.Username());
-//         netmsg_logon.set_wizard_password(my_user_.WizPass());
-
-//         netmsg_logon.set_flags(
-//                  static_cast<u32>(FlagAuxOptions::kAuthenticate) |
-//                  static_cast<u32>(FlagAuxOptions::kWin32));
-
-//         netmsg_logon.set_puid_counter(my_puid_counter_);
-//         netmsg_logon.set_puid_crc(my_puid_crc_);
-//         netmsg_logon.set_demo_elapsed(kMagicFromPChat);
-//         netmsg_logon.set_total_elapsed(kMagicFromPChat);
-//         netmsg_logon.set_demo_limit(kMagicFromPChat);
-//         netmsg_logon.set_initial_room_id(my_room_.RoomId());
-//         netmsg_logon.set_reserved(kIdent);
-//         netmsg_logon.set_upload_requested_protocol_version(0);
-
-//         netmsg_logon.set_upload_capabilities(
-//                  static_cast<u32>(UploadCapabilities::kPalaceAssetUpload) |
-//                  static_cast<u32>(UploadCapabilities::kHttpFileUpload));
-
-//         netmsg_logon.set_download_capabilities(
-//                  static_cast<u32>(
-//                     DownloadCapabilities::kPalaceAssetDownload) |
-//                  static_cast<u32>(
-//                     DownloadCapabilities::kPalaceFileDownload) |
-//                  static_cast<u32>(
-//                     DownloadCapabilities::kHttpFileDownload) |
-//                  static_cast<u32>(
-//                     DownloadCapabilities::kHttpFileExtendedDownload));
-
-//         netmsg_logon.set_engine_capabilities_2d(
-//                  static_cast<u32>(EngineCapabilities2d::kPalace2dEngine));
-//         netmsg_logon.set_graphics_capabilities_2d(
-//                  static_cast<u32>(GraphicsCapabilities2d::kGif87));
-//         netmsg_logon.set_graphics_capabilities_3d(
-//                  static_cast<u32>(GraphicsCapabilities3d::kNo3dGraphics));
-
-               // End Mark
-
-         //netMsgRxDs_->setByteOrder(myServer.byteOrder());
-         //if (ds.skipRawData(Net::Msg::kNet::MsgHeaderSize) < 0) {
-         //return false; }
-
-         /* Header */
-//         msg.appendU32(netmsg::Kind::LogonKind);
-//         msg.appendI32(netmsg::kByteSizeOfLogon);
-//         msg.appendU32(0);
-
-//         msg.appendU32(myUser.regCrc());
-//         msg.appendU32(myUser.regCounter());
-         //logonMsg.appendDw(myCurrentRoom.id());
-
-         /* Username */
-//         u8 nUsernameChars = static_cast<u8>(myUser.username().length());
-//         msg.appendU8(nUsernameChars);
-
-//         int iUsernameChars = 0;
-//         while (iUsernameChars < nUsernameChars) {
-//            msg.append(myUser.username().at(iUsernameChars));
-//            iUsernameChars++;
-//         }
-
-//         while (iUsernameChars < kByteSizeOfLongestUsername) {
-//            msg.append('\0');
-//            iUsernameChars++;
-//         }
-//         //logonMsg.append('\0');
-
-//         /* Wizard password */
-//         u8 nWizpassChars = 0;
-//         msg.appendU8(nWizpassChars);
-
-//         int iWizpassChars = 0;
-//         while (iWizpassChars < kByteSizeOfLongestWizpass) {
-//            //int z = myUser.
-//            msg.append('\0');
-//            iWizpassChars++;
-//         }
-//         //logonMsg.append('\0');
-
-//         msg.appendU32(myUser.idCounter());
-//         msg.appendU32(myUser.idCrc());
-//         msg.appendU32(kAuxFlagsAuthenticate | kAuxFlagsWin32);
-//         msg.appendU32(kDemoElapsed); /* demoElapsed*: */
-//         msg.appendU32(kTotalElapsed); /* totalElapsed*: */
-//         msg.appendU32(kDemoLimit); /* demoLimit*: */
-//         msg.appendU16(myCurrentRoom.id()); /* initialRoom: */
-
-//         /* ident */
-//         for (int i = 0; i < kByteSizeOfIdent; i++) {
-//            msg.append(kIdent[i]);
-//         }
-
-//         msg.appendU32(0); /* ulReqProtoVer */
-//         msg.appendU32(kUlCapsAssetsPalace | kUlCapsFilesHttp);
-         /* ulUploadCaps */
-//         msg.appendU32(kDlCapsAssetsPalace | kDlCapsFilesPalace |
-         //   kDlCapsFilesHttp | kDlCapsFilesHttpSvr); /* ulDownloadCaps */
-//         msg.appendU32(0); /* ul2dEngineCaps* */
-//         msg.appendU32(0); /* ul2dGraphicsCaps* */
-//         msg.appendU32(0); /* ul3dEngineCaps* */
-
-         //my_socket_.write(netmsg_logon);
-         auto bytesWritten = my_socket.write(logonMsg);
+         auto bytesWritten = my_socket.write(netMsg);
          return 0 < bytesWritten;
          //return my_socket.flush();
       }
@@ -2162,12 +2163,37 @@ namespace seville
          return 0 < writeByteCount;
       }
 
-      int Client::do_sendPropRequest(void)
+      void Client::do_fetchPropListAsync(const std::vector<i32>& propIdList)
       {
-         return 0;
+         my_logger.appendInfoMessage(
+                  "Requesting prop list for ids...");
+
+         auto propListUri = my_server.httpPropListLocation();
+         auto json = QJsonObject();
+         auto propIdArray = QJsonArray();
+         for (const auto& propId: propIdList) {
+            my_logger.appendInfoMessage(QString("%1").arg(propId));
+            auto propIdObject = QJsonObject();
+            propIdObject["id"] = propId;
+            propIdArray.append(propIdObject);
+         }
+         json["props"] = propIdArray;
+
+         auto jsonDoc = QJsonDocument(json);
+         auto request = QNetworkRequest(propListUri);
+         request.setHeader(
+                  QNetworkRequest::ContentTypeHeader, "application/json");
+         request.setHeader(QNetworkRequest::UserAgentHeader, "Seville 1.0");
+
+         my_networkAccessManager.post(request, jsonDoc.toJson());
       }
 
-      void Client::do_deinitEvents(void)
+//      void Client::do_fetchPropAsync(i32 propId)
+//      {
+
+//      }
+
+      void Client::do_teardownEvents(void)
       {
          disconnect(&my_socket, &QTcpSocket::readyRead,
                     this, &seville::palace::Client::on_readyReadDidOccur);
@@ -2183,9 +2209,10 @@ namespace seville
                     this, &Client::on_socketErrorDidOccur);
 #endif
 
-         disconnect(&my_roomBackgroundNetworkAccessManager,
+         disconnect(&my_networkAccessManager,
                     &QNetworkAccessManager::finished,
-                    this, &Client::on_backgroundDidFetchAsync);
+                    this,
+                    &Client::on_networkAccessManagerDidFinish);
 
          // disconnect(&my_propNetworkAccessManager,
          //            &QNetworkAccessManager::finished,
@@ -2197,37 +2224,14 @@ namespace seville
 
       void Client::do_deinit(void)
       {
-         do_deinitEvents();
+         do_teardownEvents();
 
          do_disconnectFromHost();
       }
 
-      void Client::do_initEvents(void)
-      {
-         connect(&my_socket, &QTcpSocket::readyRead,
-                 this, &seville::palace::Client::on_readyReadDidOccur);
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-         connect(
-            &my_socket,QOverload<QAbstractSocket::SocketError>
-                  ::of(&QAbstractSocket::error),
-            this, &Client::on_socketErrorDidOccur);
-#else
-         connect(&my_socket, QOverload<QAbstractSocket::SocketError>::of(
-                    &QAbstractSocket::errorOccurred),
-                 this, &Client::on_socketErrorDidOccur);
-#endif
-
-         connect(&my_roomBackgroundNetworkAccessManager, &QNetworkAccessManager::finished,
-                 this, &Client::on_backgroundDidFetchAsync);
-
-         connect(&my_pingTimer, &QTimer::timeout,
-                 this, &Client::on_pingTimerDidTrigger);
-      }
-
       void Client::do_init(void)
       {
-         do_initEvents();
+         do_setupEvents();
 
          do_clear();
 

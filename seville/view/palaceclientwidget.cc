@@ -441,21 +441,39 @@ namespace seville
 
          for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr())
          {
-            auto face = user.face();
-            auto color = user.color();
-            auto rect = QRect(face * kSmileyWidth,
-                              color * kSmileyHeight,
-                              kSmileyWidth,
-                              kSmileyHeight);
+            QImage userImage;
 
-            QImage userImage = my_spritesheet.copy(rect);
-            painter.drawImage(user.x(), //  - kSmileyWidth / 2,
-                              user.y(), // - kSmileyHeight / 2,
-                              userImage);
+            if (user.propListPtr() != nullptr &&
+                user.propListPtr()->at(0).imageLoadedFlag())
+            {
+               auto propInstance = user.propListPtr()->at(0);
+               userImage = propInstance.propImage();
+               // auto propOffset = propInstance.offset();
+               auto propSize = propInstance.size();
+
+               painter.drawImage(user.x() - (propSize.width() / 2), // - propOffset.x()
+                                 user.y() - (propSize.height() / 2), // propOffset.y()
+                                 userImage);
+            } else {
+               auto face = user.face();
+               auto color = user.color();
+               auto rect = QRect(face * kSmileyWidth,
+                                 color * kSmileyHeight,
+                                 kSmileyWidth,
+                                 kSmileyHeight);
+
+               userImage = my_spritesheet.copy(rect);
+               painter.drawImage(user.x(), //  - kSmileyWidth / 2,
+                                 user.y(), // - kSmileyHeight / 2,
+                                 userImage);
+            }
 
             // QBrush blackBrush(Qt::black);
             // QPen pen(Qt::gray);
+         }
 
+         for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr())
+         {
             auto font = QFont("Sans-Serif", 10, QFont::Bold);
             // font.setWeight(3);
 
@@ -496,7 +514,7 @@ namespace seville
             painter.setFont(font);
             painter.setPen(Qt::black);
             // painter.drawPath(painterPath);
-            painter.drawText(nameTextPoint + QPoint(0, 1), user.username());
+            painter.drawText(nameTextPoint + QPoint(0, 2), user.username());
 
             // draw name
             // painter.setPen(Qt::Pen

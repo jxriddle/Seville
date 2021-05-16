@@ -127,10 +127,18 @@ namespace seville
             my_httpServerLocation = httpServerLocation;
          }
 
-         inline QString httpPropLocation(void) {
+         inline QString httpPropListLocation(void) {
             return QString("%1%2")
                   .arg(my_httpServerLocation)
                   .arg("webservice/props/get/");
+         }
+
+         inline QString httpPropStorageLocation(void) {
+            return my_httpPropStorageLocation;
+         }
+
+         inline void setHttpPropStorageLocation(const QString& value) {
+            my_httpPropStorageLocation = value;
          }
 
       private:
@@ -141,6 +149,7 @@ namespace seville
          u16 my_port;
          u32 my_version;
          QString my_httpServerLocation;
+         QString my_httpPropStorageLocation;
 
          inline void do_clear(void) {
             my_roomList.clear();

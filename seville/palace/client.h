@@ -319,18 +319,16 @@ namespace seville
          void viewNeedsUpdatingEvent(void);
 
       public slots:
-         void on_backgroundDidFetchAsync(QNetworkReply* replyPtr);
+         void on_networkAccessManagerDidFinish(QNetworkReply* replyPtr);
          void on_pingTimerDidTrigger(void);
          void on_readyReadDidOccur(void);
          void on_socketErrorDidOccur(QAbstractSocket::SocketError);
-         void on_roomBackgroundDidLoad(QNetworkReply* replyPtr);
 
       private:
          //NetMsgReadState netMsgReadState;
          Log my_logger;
          //QImage my_background_img;
-         QNetworkAccessManager my_roomBackgroundNetworkAccessManager;
-         QNetworkAccessManager my_propNetworkAccessManager;
+         QNetworkAccessManager my_networkAccessManager;
          //NetMsg my_netmsg_rx;
          //QDataStream *my_netmsg_rx_ds_ptr;
          //NetMsg my_netmsg_tx_ptr;
@@ -350,7 +348,7 @@ namespace seville
          QString my_host;
          quint16 my_port;
          Server my_server;
-         u32 my_userId;
+         i32 my_userId;
          Room my_room;
          Cipher my_cipher;
          QTimer my_timer;
@@ -394,8 +392,12 @@ namespace seville
 
          //         }
          void do_setupEvents(void);
+
          void do_fetchBackgroundAsync(const QString& url);
-         void do_fetchPropAsync(const QString& url);
+         // void do_fetchPropAsync(const QString& url);
+         void do_fetchPropListAsync(const std::vector<i32>& propIdList);
+         // void do_fetchPropAsync(i32 propId);
+
          void do_clear(void);
          void do_resetReceiveTimer(void);
          void do_readSocket(void);
@@ -480,11 +482,10 @@ namespace seville
          int do_sendRequestRoomAndUserLists(void);
          int do_sendFaceColor(u16 colorId);
          int do_sendFace(u16 face);
-         int do_sendPropRequest(void);
 
          int do_routeReceivedNetMsg(void);
 
-         void do_deinitEvents(void);
+         void do_teardownEvents(void);
          void do_initEvents(void);
          void do_deinit(void);
          void do_init(void);
