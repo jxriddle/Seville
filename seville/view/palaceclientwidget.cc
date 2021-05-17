@@ -448,11 +448,11 @@ namespace seville
             {
                auto propInstance = user.propListPtr()->at(0);
                userImage = propInstance.propImage();
-               // auto propOffset = propInstance.offset();
-               auto propSize = propInstance.size();
+               auto propOffset = propInstance.offset();
+               // auto propSize = propInstance.size();
 
-               painter.drawImage(user.x() - (propSize.width() / 2), // - propOffset.x()
-                                 user.y() - (propSize.height() / 2), // propOffset.y()
+               painter.drawImage(user.x() + propOffset.x(),
+                                 user.y() + propOffset.y(),
                                  userImage);
             } else {
                auto face = user.face();
