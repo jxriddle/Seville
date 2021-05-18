@@ -42,7 +42,7 @@ namespace seville
          Room& operator=(const Room& value);
 
          inline User userWithId(i32 userId) {
-            for (auto& user: my_userList) {
+            for (auto& user: my_users) {
                if (user.id() == userId) {
                   return user;
                }
@@ -52,7 +52,7 @@ namespace seville
          }
 
          inline User* userPtrWithId(i32 userId) {
-            for (auto& user: my_userList) {
+            for (auto& user: my_users) {
                if (user.id() == userId) {
                   return &user;
                }
@@ -63,16 +63,16 @@ namespace seville
 
          inline void removeUserWithId(i32 userId) {
             auto i = u32{0};
-            auto z = my_userList.size();
+            auto z = my_users.size();
             while (i < z) {
-               if (my_userList[i].id() == userId) {
-                  my_userList.erase(my_userList.begin() + i);
+               if (my_users[i].id() == userId) {
+                  my_users.erase(my_users.begin() + i);
                }
                i++;
             }
          }
 
-         inline u16 roomId(void) const {
+         inline u16 id(void) const {
             return my_roomId;
          }
 
@@ -121,12 +121,12 @@ namespace seville
             my_hotspotCount = value;
          }
 
-         inline std::vector<Hotspot>* hotspotListPtr(void) {
-            return &my_hotspotList;
+         inline std::vector<Hotspot>* hotspotsPtr(void) {
+            return &my_hotspots;
          }
 
-         inline std::vector<User>* userListPtr(void) {
-            return &my_userList;
+         inline std::vector<User>* usersPtr(void) {
+            return &my_users;
          }
 
          //inline auto setHotspotsUniquePtr(
@@ -228,29 +228,32 @@ namespace seville
          u32 my_flags;
          u32 my_face;
          u16 my_roomId;
+         u16 my_tmp16_;
          i32 my_hotspotCount;
          i32 my_imageCount;
          i32 my_drawCommandsCount;
          i32 my_userCount;
          i32 my_loosePropCount;
          i32 my_reserved;
+         i32 my_tmp32_;
          QByteArray my_backgroundImageByteArray;
          QString my_backgroundImageName;
          QString my_roomName;
          QString my_artistName;
          QString my_password;
-         std::vector<Hotspot> my_hotspotList;
-         std::vector<User> my_userList;
-         std::vector<Prop> my_loosePropList;
+         std::vector<Hotspot> my_hotspots;
+         std::vector<User> my_users;
+         std::vector<Prop> my_looseProps;
 
-         void do_setupEvents(void);
-         void do_clear(void);
          void do_setBackgroundImageByteArray(
                const QByteArray& backgroundImageByteArray);
-         void do_fetchWebPropsAsync(
-               QString propServerUri, std::vector<i32>propIds);
+
+         void do_setupEvents(void);
+
          void do_assign(const Room& room);
-         void do_init(void); //const Room& room)
+
+         void do_clear(void);
+         void do_init(void);
          void do_deinit(void);
       };
    }

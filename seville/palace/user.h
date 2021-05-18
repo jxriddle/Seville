@@ -139,8 +139,8 @@ namespace seville
             my_roomId = id;
          }
 
-         inline std::vector<Prop>* propListPtr(void) {
-            return &my_propList;
+         inline std::vector<Prop>* propsPtr(void) {
+            return &my_props;
          }
 
          inline i16 propNum(void) {
@@ -163,15 +163,15 @@ namespace seville
 //            return &my_props;
 //         }
 
-         inline void fetchWebPropAsync(const QString& propServerUri) {
-            do_fetchWebPropAsync(propServerUri);
-         }
+         // inline void fetchWebPropAsync(const QString& propServerUri) {
+         //    do_fetchWebPropAsync(propServerUri);
+         // }
 
       public slots:
-         void on_webPropDidFetchAsync(QNetworkReply* replyPtr);
+         // void on_webPropDidFetchAsync(QNetworkReply* replyPtr);
 
       private:
-         u32 my_id;
+         i32 my_id;
          u16 my_flags;
          QString my_username;
          QString my_wizardPassword;
@@ -185,16 +185,14 @@ namespace seville
          u32 my_regCounter;
          u32 my_regCrc;
          i16 my_roomId;
-         std::vector<Prop> my_propList;
+         std::vector<Prop> my_props;
          i16 my_propNum;
          i32 my_headPropFlag;
-         QImage my_webPropImage;
-         QNetworkAccessManager my_webPropFetcher;
 
          //u32 my_props[kNumPropCells];
 
          i32 do_hasHeadProp(void);
-         void do_fetchWebPropAsync(const QString& propServerUri);
+         // void do_fetchWebPropAsync(const QString& propServerUri);
 
          void do_clear(void);
          void do_assign(const User& user);

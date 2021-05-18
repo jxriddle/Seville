@@ -28,7 +28,7 @@ namespace seville
          my_roomId = 0;
          my_headPropFlag = 0;
 
-         my_propList.clear();
+         my_props.clear();
       }
 
       void User::do_assign(const User& user)
@@ -48,56 +48,55 @@ namespace seville
          my_wizardPassword = user.my_wizardPassword;
          my_roomId = user.my_roomId;
 
-         for (auto& prop: user.my_propList) {
-            my_propList.push_back(prop);
+         my_props.clear();
+         for (auto prop: user.my_props) {
+            my_props.push_back(prop);
          }
       }
 
       void User::do_init(void)
       {
-         do_clear();
       }
 
       void User::do_deinit(void)
       {
-
       }
 
-      void User::do_fetchWebPropAsync(const QString& propServerUri)
-      {
-         auto request = QNetworkRequest(propServerUri);
-         request.setRawHeader("Content-Type", "application/json");
-         auto data = QString("{\"props\"[");
+//      void User::do_fetchWebPropAsync(const QString& propServerUri)
+//      {
+//         auto request = QNetworkRequest(propServerUri);
+//         request.setRawHeader("Content-Type", "application/json");
+//         auto data = QString("{\"props\"[");
 
-         data.append(QString("{\"id\": %1}").arg(my_id));
+//         data.append(QString("{\"id\": %1}").arg(my_id));
 
-         data.append("]}");
-         // auto postReply = my_webPropFetcher.post(request, data);
-         // auto json = postReply;
-      }
+//         data.append("]}");
+//         // auto postReply = my_webPropFetcher.post(request, data);
+//         // auto json = postReply;
+//      }
 
-      void User::on_webPropDidFetchAsync(QNetworkReply* replyPtr)
-      {
-         if (replyPtr->error()) {
-            // my_logger.appendErrorMessage(
-                     //QString("Background failed to load."));
-            //          QString("Prop load error: %1")
-            //          .arg(replyPtr->errorString()));
-         }
-         else {
-            auto imageByteArray = replyPtr->readAll();
-            auto const imageByteArrayPtr =
-                  reinterpret_cast<QByteArray*>(&imageByteArray);
-            (void)imageByteArrayPtr;
+//      void User::on_webPropDidFetchAsync(QNetworkReply* replyPtr)
+//      {
+//         if (replyPtr->error()) {
+//            // my_logger.appendErrorMessage(
+//                     //QString("Background failed to load."));
+//            //          QString("Prop load error: %1")
+//            //          .arg(replyPtr->errorString()));
+//         }
+//         else {
+//            auto imageByteArray = replyPtr->readAll();
+//            auto const imageByteArrayPtr =
+//                  reinterpret_cast<QByteArray*>(&imageByteArray);
+//            (void)imageByteArrayPtr;
 
-            // my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
+//            // my_room.setBackgroundImageByteArray(*imageByteArrayPtr);
 
-            // emit backgroundImageDidLoadEvent();
-            // emit viewNeedsUpdatingEvent();
-         }
+//            // emit backgroundImageDidLoadEvent();
+//            // emit viewNeedsUpdatingEvent();
+//         }
 
-         replyPtr->deleteLater();
-      }
+//         replyPtr->deleteLater();
+//      }
 
       User::~User(void)
       {
@@ -108,6 +107,7 @@ namespace seville
          : QObject(parentPtr)
       {
          do_init();
+         do_clear();
       }
 
       User::User(const User& user, QObject* parentPtr)

@@ -132,6 +132,7 @@ namespace seville
       void MainWindow::on_tabWasAddedWithClientWidgetPtr(
             PalaceClientWidget* palaceClientWidgetPtr)
       {
+         (void)palaceClientWidgetPtr;
          // connect(palaceClientWidgetPtr,
          //         &PalaceClientWidget::widgetBackgroundDidChangeEvent,
          //         my_tabWidgetPtr, &TabWidget::on_widgetBackgroundDidChange);
@@ -147,6 +148,7 @@ namespace seville
       void MainWindow::on_tabWasRemovedWithClientWidgetPtr(
             PalaceClientWidget* palaceClientWidgetPtr)
       {
+         (void)palaceClientWidgetPtr;
          // disconnect(palaceClientWidgetPtr,
          //            &PalaceClientWidget::widgetBackgroundDidChangeEvent,
          //            my_tabWidgetPtr, &TabWidget::on_widgetBackgroundDidChange);

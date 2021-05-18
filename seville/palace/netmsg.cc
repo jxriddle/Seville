@@ -56,7 +56,7 @@ namespace seville
 //         return count * sizeof(u32);
 //      }
 
-      u32 NetMsg::do_contentSize(void)
+      i32 NetMsg::do_contentSize(void)
       {
          //return my_contentSize;
          auto z = size();
@@ -77,26 +77,26 @@ namespace seville
          setU32At(NetMsg::kIdOffset, value);
       }
 
-      u32 NetMsg::do_bodyLen(void)
+      i32 NetMsg::do_bodyLen(void)
       {
-         return u32At(NetMsg::kLenOffset);
+         return i32At(NetMsg::kLenOffset);
       }
 
-      void NetMsg::do_setBodyLen(u32 value)
+      void NetMsg::do_setBodyLen(i32 value)
       {
          //my_headerFlags &= 0b010;
-         setU32At(NetMsg::kLenOffset, value);
+         setI32At(NetMsg::kLenOffset, value);
       }
 
-      u32 NetMsg::do_ref(void)
+      i32 NetMsg::do_ref(void)
       {
-         return u32At(NetMsg::kRefOffset);
+         return i32At(NetMsg::kRefOffset);
       }
 
-      void NetMsg::do_setRef(u32 value)
+      void NetMsg::do_setRef(i32 value)
       {
          //my_headerFlags &= 0b100;
-         setU32At(NetMsg::kRefOffset, value);
+         setI32At(NetMsg::kRefOffset, value);
       }
 
       void NetMsg::do_setStreamCursorToContentEnd(void)

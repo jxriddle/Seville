@@ -14,7 +14,6 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
-//#include "seville/base/sevilleapp.h"
 #include "seville/palace/server.h"
 #include "seville/palace/user.h"
 #include "seville/palace/room.h"
@@ -152,47 +151,11 @@ namespace seville
          static const int kMaxSizeOfUsernameSize = 31;
          static const int kMaxSizeOfWizpassSize = 31;
          static const int kSizeOfIdentSize = 6;
-         static const int kDefaultSizeOfChunkReadSize = 100; /* netmsg::kHeaderSize; */
+         static const int kDefaultSizeOfChunkReadSize = 100;
          static const int kMinSizeOfShortestChunkReadSize = 1;
 
          static const int kNumFaces = 13;
          static const int kNumFaceColors = 17;
-
-//            static const int kDemoElapsed = 0x00011940;
-//            static const int kTotalElapsed = 0x00011940;
-//            static const int kDemoLimit = 0x00011940;
-
-//            static const quint32 kAuxFlagsUnknownMachine    = 0x00000000;
-//            static const quint32 kAuxFlagsMac68k            = 0x00000001;
-//            static const quint32 kAuxFlagsMacPpc            = 0x00000002;
-//            static const quint32 kAuxFlagsWin16             = 0x00000003;
-//            static const quint32 kAuxFlagsWin32             = 0x00000004;
-//            static const quint32 kAuxFlagsJava              = 0x00000005;
-//            static const quint32 kAuxFlagsBsd               = 0x00000006;
-//            static const quint32 kAuxFlagsLinux             = 0x00000007;
-//            static const quint32 kAuxFlagsOSMask            = 0x0000000F;
-//            static const quint32 kAuxFlagsAuthenticate      = 0x80000000;
-
-//            static const quint32 kUlCapsAssetsPalace        = 0x00000001;
-//            static const quint32 kUlCapsAssetsFtp           = 0x00000002;
-//            static const quint32 kUlCapsAssetsHttp          = 0x00000004;
-//            static const quint32 kUlCapsAssetsOther         = 0x00000008;
-//            static const quint32 kUlCapsFilesPalace         = 0x00000010;
-//            static const quint32 kUlCapsFilesFtp            = 0x00000020;
-//            static const quint32 kUlCapsFilesHttp           = 0x00000040;
-//            static const quint32 kUlCapsFilesOther          = 0x00000080;
-//            static const quint32 kUlCapsExtendPkt           = 0x00000100;
-
-//            static const quint32 kDlCapsAssetsPalace        = 0x00000001;
-//            static const quint32 kDlCapsAssetsFtp           = 0x00000002;
-//            static const quint32 kDlCapsAssetsHttp          = 0x00000004;
-//            static const quint32 kDlCapsAssetsOther         = 0x00000008;
-//            static const quint32 kDlCapsFilesPalace         = 0x00000010;
-//            static const quint32 kDlCapsFilesFtp            = 0x00000020;
-//            static const quint32 kDlCapsFilesHttp           = 0x00000040;
-//            static const quint32 kDlCapsFilesOther          = 0x00000080;
-//            static const quint32 kDlCapsFilesHttpSvr        = 0x00000100;
-//            static const quint32 kDlCapsExtendPkt           = 0x00000200;
 
          explicit Client(QObject* parentObjectPtr = nullptr);
          virtual ~Client(void);
@@ -325,21 +288,12 @@ namespace seville
          void on_socketErrorDidOccur(QAbstractSocket::SocketError);
 
       private:
-         //NetMsgReadState netMsgReadState;
          Log my_logger;
-         //QImage my_background_img;
          QNetworkAccessManager my_networkAccessManager;
-         //NetMsg my_netmsg_rx;
-         //QDataStream *my_netmsg_rx_ds_ptr;
-         //NetMsg my_netmsg_tx_ptr;
-         //QDataStream *my_netmsg_tx_ds_ptr;
-         //palace::NetMsg my_netmsg_in;
-         //NetMsg my_incomingNetMsg;
          int my_transferTimerId;
          QTimer my_pingTimer;
          QTimer my_netmsgReceiveTimer;
          QTime my_pongTime;
-         //QByteArray my_buffer;
          HostByteOrder my_byteOrder;
          ConnectionState my_connectionState;
          QTcpSocket my_socket;
@@ -353,14 +307,8 @@ namespace seville
          Cipher my_cipher;
          QTimer my_timer;
          //int my_transfer_timer_id;
-//         i32 my_netMsgId;
-//         i32 my_netMsgLen;
-//         i32 my_netMsgRef;
-         //ByteArray my_netMsgHeader;
-         //ByteArray my_netMsgBody;
          NetMsg my_netMsg;
          u32 my_netMsgTTLCount;
-         //i32 my_netMsgSize;
          u32 my_idCrc;
          u32 my_idCounter;
          bool my_isUserIdChanged;
@@ -383,20 +331,10 @@ namespace seville
          //         kIntervalToTimeoutForPongInMs = value;
          //      }
 
-      //public slots:
-         //void on_readyRead(void);
-         //void on_socketError(void);
-         //void on_pingTimer(QTimerEvent* pingTimeEvent);
-//         void on_(QNetworkReply* reply)
-//         {
-
-         //         }
          void do_setupEvents(void);
 
          void do_fetchBackgroundAsync(const QString& url);
-         // void do_fetchPropAsync(const QString& url);
          void do_fetchPropListAsync(const std::vector<i32>& propIdList);
-         // void do_fetchPropAsync(i32 propId);
 
          void do_clear(void);
          void do_resetReceiveTimer(void);
@@ -404,86 +342,86 @@ namespace seville
 
          void do_setConnectionState(ConnectionState clientState);
 
-         int do_receiveNetMsgFromSocket(void);
-         int do_readNetMsgHeaderFromSocket(void);
-         int do_readNetMsgContentFromSocket(void);
+         i32 do_receiveNetMsgFromSocket(void);
+         i32 do_readNetMsgHeaderFromSocket(void);
+         i32 do_readNetMsgContentFromSocket(void);
 
          void do_connectToHost(
                QString host,
-               int port = 9998,
+               i32 port = 9998,
                QString username = "Seville User",
-               int initialRoom = 0);
+               i32 initialRoom = 0);
          void do_disconnectFromHost(void);
 
          void do_roomChat(const QString& text);
 
          void do_determineClientByteOrder(void);
-         int do_determineServerByteOrder(void);
+         i32 do_determineServerByteOrder(void);
          bool do_determineIsConnected(void) const;
          NetMsgOptions do_determineShouldSwapEndianness(void) const;
 
          User do_processUserNew(void);
+         i32 do_parseCommand(const QString& text);
+         i32 do_routeReceivedNetMsg(void);
 
-         int do_receiveAltLogon(void);
-         int do_receiveAltRoomDescription(void);
-         int do_receiveAssetIncoming(void);
-         int do_receiveAssetQuery(void);
-         int do_receiveAuthenticate(void);
-         int do_receiveBlowthru(void);
-         int do_receiveConnectionError(void);
-         int do_receiveDoorLock(void);
-         int do_receiveDoorUnlock(void);
-         int do_receiveDraw(void);
-         int do_receiveHttpServerLocation(void);
-         int do_receiveMovement(void);
-         int do_receiveNavigationError(void);
-         int do_receivePictureMove(void);
-         int do_receivePing(void);
-         int do_receivePong(void);
-         int do_receivePropDelete(void);
-         int do_receivePropMove(void);
-         int do_receivePropNew(void);
-         int do_receiveRoomDescend(void);
-         int do_receiveRoomDescription(void);
-         int do_receiveRoomUserList(void);
-         int do_receiveServerVersion(void);
-         int do_receiveServerInfo(void);
-         int do_receiveUserNew(void);
-         int do_receiveUserColor(void);
-         int do_receiveUserExitRoom(void);
-         int do_receiveUserFace(void);
-         int do_receiveUserProp(void);
-         int do_receiveUserDescription(void);
-         int do_receiveUserRename(void);
-         int do_receiveUserLeaving(void);
-         int do_receiveUserLoggedOnAndMax(void);
-         int do_receiveUserStatus(void);
-         int do_receiveRoomList(void);
-         int do_receiveUserList(void);
-         int do_receiveSpotMove(void);
-         int do_receiveSpotState(void);
-         int do_receiveTalk(void);
-         int do_receiveWhisper(void);
-         int do_receiveXTalk(void);
-         int do_receiveXWhisper(void);
+         i32 do_receiveAltLogon(void);
+         i32 do_receiveAltRoomDescription(void);
+         i32 do_receiveAssetIncoming(void);
+         i32 do_receiveAssetQuery(void);
+         i32 do_receiveAuthenticate(void);
+         i32 do_receiveBlowthru(void);
+         i32 do_receiveConnectionError(void);
+         i32 do_receiveDoorLock(void);
+         i32 do_receiveDoorUnlock(void);
+         i32 do_receiveDraw(void);
+         i32 do_receiveHttpServerLocation(void);
+         i32 do_receiveMovement(void);
+         i32 do_receiveNavigationError(void);
+         i32 do_receivePictureMove(void);
+         i32 do_receivePing(void);
+         i32 do_receivePong(void);
+         i32 do_receivePropDelete(void);
+         i32 do_receivePropMove(void);
+         i32 do_receivePropNew(void);
+         i32 do_receiveRoomDescend(void);
+         i32 do_receiveRoomDescription(void);
+         i32 do_receiveRoomUserList(void);
+         i32 do_receiveServerVersion(void);
+         i32 do_receiveServerInfo(void);
+         i32 do_receiveUserNew(void);
+         i32 do_receiveUserColor(void);
+         i32 do_receiveUserExitRoom(void);
+         i32 do_receiveUserFace(void);
+         i32 do_receiveUserProp(void);
+         i32 do_receiveUserDescription(void);
+         i32 do_receiveUserRename(void);
+         i32 do_receiveUserLeaving(void);
+         i32 do_receiveUserLoggedOnAndMax(void);
+         i32 do_receiveUserStatus(void);
+         i32 do_receiveRoomList(void);
+         i32 do_receiveUserList(void);
+         i32 do_receiveSpotMove(void);
+         i32 do_receiveSpotState(void);
+         i32 do_receiveTalk(void);
+         i32 do_receiveWhisper(void);
+         i32 do_receiveXTalk(void);
+         i32 do_receiveXWhisper(void);
 
-         int do_sendLogon(void);
-         int do_sendAuthenticate(
+         i32 do_sendLogon(void);
+         i32 do_sendAuthenticate(
                const QString &username, const QString &password);
-         int do_sendTalk(const QString& text);
-         int do_sendXTalk(const QString& text);
-         int do_sendXWhisper(const u32 userId, const QString& text);
-         int do_sendPing(void);
-         int do_sendPong(void);
-         int do_sendGotoRoom(u16 roomId);
-         int do_sendMove(i16 x, i16 y);
-         int do_sendRequestRoomList(void);
-         int do_sendRequestUserList(void);
-         int do_sendRequestRoomAndUserLists(void);
-         int do_sendFaceColor(u16 colorId);
-         int do_sendFace(u16 face);
-
-         int do_routeReceivedNetMsg(void);
+         i32 do_sendTalk(const QString& text);
+         i32 do_sendXTalk(const QString& text);
+         i32 do_sendXWhisper(const u32 userId, const QString& text);
+         i32 do_sendPing(void);
+         i32 do_sendPong(void);
+         i32 do_sendGotoRoom(u16 roomId);
+         i32 do_sendMove(i16 x, i16 y);
+         i32 do_sendRequestRoomList(void);
+         i32 do_sendRequestUserList(void);
+         i32 do_sendRequestRoomAndUserLists(void);
+         i32 do_sendFaceColor(u16 colorId);
+         i32 do_sendFace(u16 face);
 
          void do_teardownEvents(void);
          void do_initEvents(void);

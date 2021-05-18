@@ -19,15 +19,15 @@ namespace seville
       Q_OBJECT
 
       public:
-         static const u32 kSmileyHeight = 45;
-         static const u32 kSmileyWidth = 45;
-         static const u32 kMaxPropWidth = 132;
-         static const u32 kMaxPropHeight = 132;
+         static const i32 kSmileyHeight = 45;
+         static const i32 kSmileyWidth = 45;
+         static const i32 kMaxPropWidth = 132;
+         static const i32 kMaxPropHeight = 132;
 
-         static const int kNumNameColors = 16;
+         static const i32 kNumNameColors = 16;
          QColor kNameColors[kNumNameColors];
 
-         static const int kDropShadowWidth = 0;
+         static const i32 kDropShadowWidth = 0;
 
          explicit PalaceClientWidget(QWidget* parentWidgetPtr = nullptr);
          virtual ~PalaceClientWidget(void);

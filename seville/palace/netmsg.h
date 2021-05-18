@@ -283,19 +283,19 @@ namespace seville
             do_setId(value);
          }
 
-         inline u32 bodyLen(void) {
+         inline i32 bodyLen(void) {
             return do_bodyLen();
          }
 
-         inline void setBodyLen(u32 value) {
+         inline void setBodyLen(i32 value) {
             do_setBodyLen(value);
          }
 
-         inline u32 ref(void) {
+         inline i32 ref(void) {
             return do_ref();
          }
 
-         inline void setRef(u32 value) {
+         inline void setRef(i32 value) {
             do_setRef(value);
          }
 
@@ -303,7 +303,7 @@ namespace seville
 //            return do_headerSize();
 //         }
 
-         inline u32 contentSize(void) {
+         inline i32 contentSize(void) {
             return do_contentSize();
          }
 
@@ -402,13 +402,13 @@ namespace seville
 
          u32 do_id(void);
          void do_setId(u32 value);
-         u32 do_bodyLen(void);
-         void do_setBodyLen(u32 value);
-         u32 do_ref(void);
-         void do_setRef(u32 value);
+         i32 do_bodyLen(void);
+         void do_setBodyLen(i32 value);
+         i32 do_ref(void);
+         void do_setRef(i32 value);
 
          //auto do_headerSize(void) -> u32;
-         u32 do_contentSize(void);
+         i32 do_contentSize(void);
 
          void do_setStreamCursorToContentEnd(void);
          void do_setStreamCursorToContentStart(void);

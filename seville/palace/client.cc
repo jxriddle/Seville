@@ -301,8 +301,8 @@ namespace seville
                auto imgUrl = jsonDoc["img_url"].toString();
                my_server.setHttpPropStorageLocation(imgUrl);
                auto propJsonArray = jsonDoc["props"].toArray();
-               auto userListPtr = my_room.userListPtr();
-               if (userListPtr == nullptr)
+               auto usersPtr = my_room.usersPtr();
+               if (usersPtr == nullptr)
                   return;
 
                auto z = propJsonArray.size();
@@ -339,13 +339,15 @@ namespace seville
                      prop.setFlags(propJsonObj["flags"].toInt());
 
                      // attach this prop to the appropriate user.
-                     for (auto& user: *userListPtr) {
-                        if (user.propListPtr() == nullptr)
+                     // for (auto& user: *usersPtr) {
+                     auto z = usersPtr->size();
+                     for (auto i = u32{0}; i < z; i++) {
+                        if (usersPtr->at(i).propsPtr() == nullptr)
                            continue;
 
                         auto propId = prop.id();
-                        if (user.propListPtr()->at(0).id() == propId) {
-                           user.propListPtr()->at(0) = prop;
+                        if (usersPtr->at(i).propsPtr()->at(0).id() == propId) {
+                           usersPtr->at(i).propsPtr()->at(0) = prop;
                            auto url = QUrl(
                                     my_server.httpPropStorageLocation() +
                                     QString::number(propId));
@@ -386,20 +388,21 @@ namespace seville
                         url.toString().length() -
                         my_server.httpPropStorageLocation().length()).toInt();
 
-               for (auto& user: *my_room.userListPtr()) {
+               // for (auto& user: *my_room.usersPtr()) {
+               auto z = my_room.usersPtr()->size();
+               for (auto i = u32{0}; i < z; i++) {
                   auto propImage = QImage::fromData(content);
 
-                  if (user.propListPtr()->at(0).id() == propId) {
+                  if (my_room.usersPtr()->at(i).propsPtr()->at(0).id() == propId) {
                      // my_logger.appendInfoMessage(
                      //          QString("Setting prop image for user with id %1")
                      //          .arg(user.id()));
-                     user.propListPtr()->at(0).setPropImage(propImage);
+                     my_room.usersPtr()->at(i).propsPtr()->at(0).setPropImage(propImage);
                   }
 
                   emit viewNeedsUpdatingEvent();
                }
             }
-
          }
       }
 
@@ -634,24 +637,22 @@ namespace seville
          // emit connectionStateDidChangeEvent(connectionState);
       }
 
-      void Client::do_roomChat(const QString& text)
+      i32 Client::do_parseCommand(const QString& text)
       {
-         if (my_connectionState != ConnectionState::kConnectedState)
-            return;
-
-         if (text.length() <= 0)
-            return;
+         auto isParsed = 0;
 
          if (text.toStdString() == "'who") {
-            auto userListPtr = my_room.userListPtr();
-            my_logger.appendInfoMessage(QString("Listing %1/%2 (%3/%4) users in room...")
+            isParsed = 1;
+            auto userListPtr = my_room.usersPtr();
+            my_logger.appendInfoMessage(
+                     QString("Listing %1/%2 (%3/%4) users in room...")
                   .arg(my_room.userCount())
                   .arg(my_server.userListPtr()->size())
-                  .arg(my_room.userListPtr()->size())
+                  .arg(my_room.usersPtr()->size())
                   .arg(my_server.userListPtr()->size()));
 
             for (auto i = u32{0}; i < userListPtr->size(); i++) {
-               auto user = my_room.userListPtr()->at(i);
+               auto user = my_room.usersPtr()->at(i);
                my_logger.appendInfoMessage(
                         QString("%1 (%2) is here")
                         .arg(user.username())
@@ -660,37 +661,42 @@ namespace seville
          }
          else if (text.left(QString("'webserver").length()) ==
                   QString("'webserver")) {
+            isParsed = 1;
             my_logger.appendInfoMessage(
                      QString("My webserver location is: %1")
                      .arg(my_server.httpServerLocation()));
          }
          else if (text.left(QString("'propserver").length()) ==
                   QString("'propserver")) {
+            isParsed = 1;
             my_logger.appendInfoMessage(
                      QString("My propserver list location is: %1")
                      .arg(my_server.httpPropListLocation()));
          }
          else if (text.left(QString("'usercount").length()) ==
                   QString("'usercount")) {
+            isParsed = 1;
             my_logger.appendInfoMessage(
                      QString("Server user count: %1")
                      .arg(my_server.userListPtr()->size()));
          }
          else if (text.left(QString("'roomusercount").length()) ==
                   QString("'roomusercount")) {
+            isParsed = 1;
             my_logger.appendInfoMessage(
                      QString("Room user count: %1")
-                     .arg(my_room.userListPtr()->size()));
+                     .arg(my_room.usersPtr()->size()));
          }
          else if (text.left(QString("'propids ").length()) ==
                   QString("'propids ")) {
+            isParsed = 1;
             auto split = text.split(' ');
             if (1 < split.length()) {
                auto ok = true;
                auto userId = split.at(1).toUShort(&ok);
                auto user = my_room.userWithId(userId);
                for (auto i = u32{0}; i < User::kNumPropCells; i++) {
-                  auto prop = user.propListPtr()->at(i);
+                  auto prop = user.propsPtr()->at(i);
                   my_logger.appendInfoMessage(
                            QString("User %1 propId[%2]: %3 (crc: %4)")
                            .arg(userId)
@@ -702,6 +708,7 @@ namespace seville
          }
          else if (text.left(QString("'w ").length()) ==
                   QString("'w ")) {
+            isParsed = 1;
             auto split = text.split(' ');
             if (2 < split.length()) {
                auto ok = true;
@@ -718,6 +725,7 @@ namespace seville
          }
          else if (text.left(QString("'face ").length()) ==
                   QString("'face ")) {
+            isParsed = 1;
             auto split = text.split(' ');
             if (1 < split.length()) {
                auto ok = true;
@@ -729,6 +737,7 @@ namespace seville
          }
          else if (text.left(QString("'color ").length()) ==
                   QString("'color ")) {
+            isParsed = 1;
             auto split = text.split(' ');
             if (1 < split.length()) {
                auto ok = true;
@@ -740,6 +749,7 @@ namespace seville
          }
          else if (text.left(QString("'gotoroom ").length()) ==
                   QString("'gotoroom ")) {
+            isParsed = 1;
             auto split = text.split(' ');
             if (1 < split.length()) {
                auto ok = true;
@@ -751,11 +761,12 @@ namespace seville
          }
          else if (text.left(QString("'roomswithusers").length()) ==
                     QString("'roomswithusers")) {
+            isParsed = 1;
             my_logger.appendInfoMessage("Listing rooms with users...");
             for (auto& room: *my_server.roomListPtr()) {
                auto roomName = room.roomName();
                auto roomUserCount = room.userCount();
-               auto roomId = room.roomId();
+               auto roomId = room.id();
                if (0 < roomUserCount) {
                   my_logger.appendInfoMessage(QString("%1 (%2), users: %3")
                                               .arg(roomName)
@@ -766,11 +777,12 @@ namespace seville
          }
          else if (text.left(QString("'rooms").length()) ==
                   QString("'rooms")) {
+            isParsed = 1;
             my_logger.appendInfoMessage("Listing all rooms...");
             for (auto& room: *my_server.roomListPtr()) {
                auto roomName = room.roomName();
                auto roomUserCount = room.userCount();
-               auto roomId = room.roomId();
+               auto roomId = room.id();
                my_logger.appendInfoMessage(QString("%1 (%2), users: %3")
                                            .arg(roomName)
                                            .arg(roomId)
@@ -779,6 +791,7 @@ namespace seville
          }
          else if (text.left(QString("'users").length()) ==
                   QString("'users")) {
+            isParsed = 1;
             my_logger.appendInfoMessage("Listing all users...");
             for (auto& user: *my_server.userListPtr()) {
                auto username = user.username();
@@ -791,9 +804,20 @@ namespace seville
                         .arg(roomId));
             }
          }
-         else {
+
+         return isParsed;
+      }
+
+      void Client::do_roomChat(const QString& text)
+      {
+         if (my_connectionState != ConnectionState::kConnectedState)
+            return;
+
+         if (text.length() <= 0)
+            return;
+
+         if (!do_parseCommand(text))
             do_sendXTalk(text);
-         }
       }
 
       void Client::do_connectToHost(
@@ -1091,7 +1115,8 @@ namespace seville
 
          auto url = my_netMsg.streamReadQString(256);
          my_server.setHttpServerLocation(url);
-         my_logger.appendDebugMessage(QString("Media is located at %1").arg(url));
+         my_logger.appendDebugMessage(
+                  QString("Media is located at %1").arg(url));
 
          return result;
       }
@@ -1248,7 +1273,7 @@ namespace seville
          for (auto i = 0; i < hotspotCount; i++) {
             auto hotspot = Hotspot();
             // TODO fill out hotspot
-            my_room.hotspotListPtr()->push_back(hotspot);
+            my_room.hotspotsPtr()->push_back(hotspot);
          }
 
          auto backgroundImageUri =
@@ -1269,16 +1294,16 @@ namespace seville
       {
          my_logger.appendDebugMessage("> RoomUserList");
 
-         my_room.userListPtr()->clear();
+         my_room.usersPtr()->clear();
 
          auto propIdList = std::vector<i32>();
          auto roomUserCount = i32(my_netMsg.ref());
          for (auto i = 0; i < roomUserCount; i++) {
             auto user = do_processUserNew();
             // if (user.id() != my_userId)
-            my_room.userListPtr()->push_back(user);
-            if (user.propListPtr() != nullptr)
-               propIdList.push_back(user.propListPtr()->at(0).id());
+            my_room.usersPtr()->push_back(user);
+            if (user.propsPtr() != nullptr)
+               propIdList.push_back(user.propsPtr()->at(0).id());
          }
 
          do_fetchPropListAsync(propIdList);
@@ -1322,7 +1347,7 @@ namespace seville
             auto prop = Prop();
             prop.setId(my_netMsg.streamReadI32());
             prop.setCrc(my_netMsg.streamReadI32());
-            user.propListPtr()->push_back(prop);
+            user.propsPtr()->push_back(prop);
          }
 
          user.setRoomId(my_netMsg.streamReadI16());
@@ -1366,7 +1391,7 @@ namespace seville
                   QString("%1 has entered the room").arg(user.username()));
 
          // if (user.id() != my_userId) {
-         my_room.userListPtr()->push_back(user);
+         my_room.usersPtr()->push_back(user);
          // }
 
          my_room.setUserCount(my_room.userCount() + 1);
@@ -1434,6 +1459,17 @@ namespace seville
       {
          my_logger.appendDebugMessage("> UserProp");
 
+         auto propId = my_netMsg.streamReadI32();
+         auto userId = my_netMsg.ref();
+         (void)propId;
+         (void)userId;
+         // auto user = my_room.userWithId(userId);
+         // auto propListPtr = user.propsPtr();
+         // auto i = 0;
+         // auto propRequestList = std::vector<i32>();
+         // propList.push_back(user.propsPtr()->at(0).id());
+         // do_fetchPropListAsync(propList);
+
          emit viewNeedsUpdatingEvent();
 
          return 1;
@@ -1476,7 +1512,7 @@ namespace seville
          my_logger.appendDebugMessage("> UserLeaving");
 
          auto userId = my_netMsg.ref();
-         auto user = my_server.userWithId(userId);
+         auto user = my_room.userWithId(userId);
 
          my_logger.appendInfoMessage(
                   QString("%1 has signed off.").arg(user.username()));
@@ -1501,9 +1537,19 @@ namespace seville
       {
          my_logger.appendDebugMessage("> UserLoggedOnAndMax");
 
-         emit viewNeedsUpdatingEvent();
+         // auto user = do_processUserNew();
 
-         // stub
+         // my_logger.appendInfoMessage(
+         //          QString("%1 signed on.")
+         //          .arg(user.username()));
+
+         // my_server.userListPtr()->push_back(user);
+
+         // if (user.roomId() == my_room.id())
+         //    my_room.userListPtr()->push_back(user);
+
+         // emit viewNeedsUpdatingEvent();
+
          return 1;
       }
 
@@ -1523,9 +1569,8 @@ namespace seville
          roomListPtr->clear();
 
          auto roomCount = my_netMsg.ref();
-         //if()
 
-         for (auto i = u32{0}; i < roomCount; i++) {
+         for (auto i = i32{0}; i < roomCount; i++) {
             auto room = Room();
             room.setId(static_cast<u16>(my_netMsg.streamReadU32()));
             room.setFlags(my_netMsg.streamReadU16());
@@ -1552,9 +1597,8 @@ namespace seville
          userListPtr->clear();
 
          auto userCount = my_netMsg.ref();
-         //if()
 
-         for (auto i = u32{0}; i < userCount; i++) {
+         for (auto i = i32{0}; i < userCount; i++) {
             auto user = User();
             user.setId(my_netMsg.streamReadI32());
             user.setFlags(my_netMsg.streamReadU16());
@@ -1902,7 +1946,7 @@ namespace seville
          netMsg.appendU32(kMagicFromPChat);
          netMsg.appendU32(kMagicFromPChat);
          netMsg.appendU32(kMagicFromPChat);
-         netMsg.appendU16(my_room.roomId());
+         netMsg.appendU16(my_room.id());
          netMsg.appendFixedQString(kIdent, kIdentLen);
          netMsg.appendU32(0);
          netMsg.appendU32(
@@ -1949,7 +1993,7 @@ namespace seville
          auto talkMsg = NetMsg(do_determineShouldSwapEndianness());
 
          talkMsg.setId(NetMsg::kTalkKind);
-         talkMsg.setBodyLen(static_cast<u32>(text.length()));
+         talkMsg.setBodyLen(static_cast<i32>(text.length()));
          talkMsg.setRef(my_userId);
 
          talkMsg.append(text.toUtf8());
@@ -2036,7 +2080,7 @@ namespace seville
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
 
-         my_room.userListPtr()->clear();
+         my_room.usersPtr()->clear();
          my_room.setId(roomId);
 
          auto gotoroomMsg = palace::NetMsg(do_determineShouldSwapEndianness());
@@ -2187,11 +2231,6 @@ namespace seville
 
          my_networkAccessManager.post(request, jsonDoc.toJson());
       }
-
-//      void Client::do_fetchPropAsync(i32 propId)
-//      {
-
-//      }
 
       void Client::do_teardownEvents(void)
       {

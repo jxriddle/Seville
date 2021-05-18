@@ -45,8 +45,8 @@ namespace seville
          my_loosePropCount = 0;
          my_reserved = 0;
          my_backgroundImageName = "";
-         my_hotspotList.clear();
-         my_userList.clear();
+         my_hotspots.clear();
+         my_users.clear();
 
          my_backgroundImageByteArray.truncate(0);
       }
@@ -79,8 +79,8 @@ namespace seville
          my_roomId = room.my_roomId;
          my_roomName = room.my_roomName;
          my_userCount = room.my_userCount;
-         for (auto& user: room.my_userList) {
-            my_userList.push_back(user);
+         for (auto& user: room.my_users) {
+            my_users.push_back(user);
          }
       }
 

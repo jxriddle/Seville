@@ -422,8 +422,9 @@ namespace seville
          }
          else if (my_palaceClientPtr->connectionState() ==
                   palace::ConnectionState::kConnectedState) {
-            my_palaceClientPtr->move(mouseEventPtr->x() - kSmileyWidth / 2,
-                                     mouseEventPtr->y() - kSmileyHeight / 2);
+            my_palaceClientPtr->move(
+                     static_cast<i16>(mouseEventPtr->x() - kSmileyWidth / 2),
+                     static_cast<i16>(mouseEventPtr->y() - kSmileyHeight / 2));
          }
       }
 
@@ -439,32 +440,32 @@ namespace seville
          QPainter painter(this);
          painter.drawImage(8, 8, my_backgroundImage);
 
-         for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr())
+         auto usersPtr = my_palaceClientPtr->roomPtr()->usersPtr();
+         auto z = usersPtr->size();
+         // for (auto& user: *my_palaceClientPtr->roomPtr()->usersPtr())
+         for (auto i = u32{0}; i < z; i++)
          {
-            QImage userImage;
-
-            if (user.propListPtr() != nullptr &&
-                user.propListPtr()->at(0).imageLoadedFlag())
+            if (usersPtr->at(i).propsPtr() != nullptr &&
+                usersPtr->at(i).propsPtr()->at(0).imageLoadedFlag())
             {
-               auto propInstance = user.propListPtr()->at(0);
-               userImage = propInstance.propImage();
+               auto propInstance = usersPtr->at(i).propsPtr()->at(0);
+               auto userImagePtr = propInstance.propImagePtr();
                auto propOffset = propInstance.offset();
-               // auto propSize = propInstance.size();
 
-               painter.drawImage(user.x() + propOffset.x(),
-                                 user.y() + propOffset.y(),
-                                 userImage);
+               painter.drawImage(usersPtr->at(i).x() + propOffset.x(),
+                                 usersPtr->at(i).y() + propOffset.y(),
+                                 *userImagePtr);
             } else {
-               auto face = user.face();
-               auto color = user.color();
+               auto face = usersPtr->at(i).face();
+               auto color = usersPtr->at(i).color();
                auto rect = QRect(face * kSmileyWidth,
                                  color * kSmileyHeight,
                                  kSmileyWidth,
                                  kSmileyHeight);
 
-               userImage = my_spritesheet.copy(rect);
-               painter.drawImage(user.x(), //  - kSmileyWidth / 2,
-                                 user.y(), // - kSmileyHeight / 2,
+               auto userImage = my_spritesheet.copy(rect);
+               painter.drawImage(usersPtr->at(i).x(), //  - kSmileyWidth / 2,
+                                 usersPtr->at(i).y(), // - kSmileyHeight / 2,
                                  userImage);
             }
 
@@ -472,7 +473,8 @@ namespace seville
             // QPen pen(Qt::gray);
          }
 
-         for (auto& user: *my_palaceClientPtr->roomPtr()->userListPtr())
+         // for (auto& user: *my_palaceClientPtr->roomPtr()->usersPtr())
+         for (auto i = u32{0}; i < z; i++)
          {
             auto font = QFont("Sans-Serif", 10, QFont::Bold);
             // font.setWeight(3);
@@ -480,12 +482,12 @@ namespace seville
             auto fontMetrics = QFontMetrics(font);
 
             auto width = fontMetrics.boundingRect(
-                     user.username()).width() + kDropShadowWidth;
+                     usersPtr->at(i).username()).width() + kDropShadowWidth;
 
             // auto nameTextRect = QRect();
             auto nameTextPoint =
-                  QPoint(user.x() + (kSmileyWidth / 2) - (width / 2.0),
-                         user.y() + 56);
+                  QPoint(usersPtr->at(i).x() + (kSmileyWidth / 2) - (width / 2.0),
+                         usersPtr->at(i).y() + 56);
 
             // nameTextRect.setX(user.x());
             // nameTextRect.setY(user.y());
@@ -507,22 +509,27 @@ namespace seville
             painter.setFont(font);
             painter.setPen(Qt::black);
             // painter.drawPath(painterPath);
-            painter.drawText(nameTextPoint + QPoint(0, -1), user.username());
-            painter.drawText(nameTextPoint + QPoint(-1, 0), user.username());
-            painter.drawText(nameTextPoint + QPoint(1, 0), user.username());
+            painter.drawText(
+                     nameTextPoint + QPoint(0, -1), usersPtr->at(i).username());
+            painter.drawText(
+                     nameTextPoint + QPoint(-1, 0), usersPtr->at(i).username());
+            painter.drawText(
+                     nameTextPoint + QPoint(1, 0), usersPtr->at(i).username());
 
             painter.setFont(font);
             painter.setPen(Qt::black);
             // painter.drawPath(painterPath);
-            painter.drawText(nameTextPoint + QPoint(0, 2), user.username());
+            painter.drawText(
+                     nameTextPoint + QPoint(0, 1), usersPtr->at(i).username());
 
             // draw name
             // painter.setPen(Qt::Pen
             painter.setFont(font);
-            if (0 <= user.color() && user.color() < kNumNameColors)
-              painter.setPen(kNameColors[user.color()]);
+            if (0 <= usersPtr->at(i).color() &&
+                usersPtr->at(i).color() < kNumNameColors)
+              painter.setPen(kNameColors[usersPtr->at(i).color()]);
 
-            painter.drawText(nameTextPoint, user.username());
+            painter.drawText(nameTextPoint, usersPtr->at(i).username());
          }
 
          // update();

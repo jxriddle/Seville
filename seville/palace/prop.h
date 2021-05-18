@@ -22,6 +22,7 @@ namespace seville
       {
       public:
          Prop(void);
+         Prop(const Prop& value);
 
          inline i32 id(void) {
             return my_id;
@@ -79,8 +80,8 @@ namespace seville
             my_flags = flags;
          }
 
-         inline QImage propImage(void) {
-            return my_propImage;
+         inline QImage* propImagePtr(void) {
+            return &my_propImage;
          }
 
          inline void setPropImage(const QImage& value) {
@@ -103,6 +104,11 @@ namespace seville
             my_name = value;
          }
 
+         Prop operator=(const Prop& value) {
+            do_assign(value);
+            return *this;
+         }
+
       private:
          i32 my_id;
          i32 my_crc;
@@ -113,8 +119,13 @@ namespace seville
          QSize my_size;
          QPoint my_offset;
          i32 my_flags;
-         QImage my_propImage;
          i32 my_imageLoadedFlag;
+         // QImage* my_propImagePtr;
+         QImage my_propImage;
+
+         void do_assign(const Prop& value);
+
+         void do_init(const Prop& value);
 
          void do_clear(void);
          void do_init(void);
