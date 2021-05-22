@@ -58,6 +58,9 @@ namespace seville
          //void widgetBackgroundDidChangeEvent(int width, int height);
          void widgetBackgroundDidChangeEvent(void);
          void serverNameWasSetEvent(QWidget* senderPtr, const QString& value);
+         void connectionStateDidChangeEvent(
+               QWidget* senderPtr,
+               const palace::ConnectionState connectionState);
 
       public slots:
          //void updateGeometry(void);

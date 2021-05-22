@@ -71,7 +71,7 @@ namespace seville
          // void on_client_widget_background_did_change(void);
          // void on_clientWidgetDidResize(int width, int height);
          void on_connectionStateDidChange(
-               palace::ConnectionState connectionState);
+               QWidget* sender, const palace::ConnectionState connectionState);
          void on_tabWasAddedWithClientWidgetPtr(
                seville::view::PalaceClientWidget* palaceClientWidgetPtr);
          void on_tabWasRemovedWithClientWidgetPtr(
@@ -116,14 +116,11 @@ namespace seville
          void do_setupToolbars(void);
          void do_setupDocks(void);
          void do_setupEvents(void);
+         void do_teardownEvents(void);
          void do_setupSizing(void);
 
          void do_updateMenus(void);
          void do_updateView(void);
-
-         void do_teardownEvents(void);
-         void do_setCurrentPalaceClientWidgetPtr(
-               seville::view::PalaceClientWidget* currentPalaceClientWidget);
 
          void do_init(void);
          void do_deinit(void);

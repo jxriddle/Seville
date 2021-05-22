@@ -361,7 +361,9 @@ namespace seville
                                     QNetworkRequest::UserAgentHeader,
                                     "Seville 1.0");
                            my_networkAccessManager.get(request);
-                        }
+                        } // else {
+                        //    my_room.loosePropsPtr()->
+                        // }
                      }
                   }
                }
@@ -1215,6 +1217,8 @@ namespace seville
          prop.setOffset(propOffset);
 
          my_room.loosePropsPtr()->push_back(prop);
+
+         do_fetchPropsAsync(*my_room.loosePropsPtr());
 
          emit viewNeedsUpdatingEvent();
 

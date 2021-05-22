@@ -172,12 +172,12 @@ namespace seville
                  &seville::view::PalaceClientWidget::
                  on_backgroundImageDidLoad);
 
-//         connect(my_palaceClientPtr,
-//                 &seville::palace::Client::
-//                 connectionStateDidChangeEvent,
-//                 this,
-//                 &seville::view::PalaceClientWidget::
-//                 on_connectionStateDidChange);
+         connect(my_palaceClientPtr,
+                 &seville::palace::Client::
+                 connectionStateDidChangeEvent,
+                 this,
+                 &seville::view::PalaceClientWidget::
+                 on_connectionStateDidChange);
 
          connect(my_palaceClientPtr,
                  &seville::palace::Client::viewNeedsUpdatingEvent,
@@ -217,12 +217,12 @@ namespace seville
                  &seville::view::PalaceClientWidget::
                  on_backgroundImageDidLoad);
 
-//         disconnect(my_palaceClientPtr,
-//                 &seville::palace::Client::
-//                 connectionStateDidChangeEvent,
-//                 this,
-//                 &seville::view::PalaceClientWidget::
-//                 on_connectionStateDidChange);
+        disconnect(my_palaceClientPtr,
+                   &seville::palace::Client::
+                   connectionStateDidChangeEvent,
+                   this,
+                   &seville::view::PalaceClientWidget::
+                   on_connectionStateDidChange);
 
          disconnect(my_palaceClientPtr,
                  &seville::palace::Client::viewNeedsUpdatingEvent,
@@ -580,13 +580,9 @@ namespace seville
       void PalaceClientWidget::on_connectionStateDidChange(
             palace::ConnectionState connectionState)
       {
-         (void)connectionState;
-         //if (palace::ConnectionState::kHandshakingState ==
-         //      connectionState) {
-         //   (void)connectionState;
-         //}
-         //if (connectionState == palace::ConnectionState::kDisconnectedState)
-         //   do_clearBackgroundImage();
+         // TODO switch
+
+         emit connectionStateDidChangeEvent(this, connectionState);
       }
 
       void PalaceClientWidget::on_chatLineEditDidPressReturn(void)

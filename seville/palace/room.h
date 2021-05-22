@@ -129,6 +129,12 @@ namespace seville
             return &my_users;
          }
 
+         inline std::vector<Prop>* loosePropsPtr(void) {
+            return &my_looseProps;
+         }
+
+         // inline void setLoosePropsPtr()
+
          //inline auto setHotspotsUniquePtr(
          //      std::unique_ptr<QList<Hotspot>> hotspotsUniquePtr) -> void
          //{

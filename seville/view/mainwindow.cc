@@ -52,22 +52,29 @@ namespace seville
       //}
 
       void MainWindow::on_connectionStateDidChange(
-            palace::ConnectionState connectionState)
+            QWidget* senderPtr,
+            const palace::ConnectionState connectionState)
       {
-         (void)connectionState;
-         if (my_tabWidgetPtr == nullptr)
-            return;
+         auto currentPalaceClientWidgetPtr = my_tabWidgetPtr->currentWidget();
 
-         if (my_tabWidgetPtr->currentPalaceClientPtr() == nullptr)
-            return;
-
-         if (my_tabWidgetPtr->currentPalaceClientPtr()->loggerPtr() == nullptr)
-            return;
-
-         my_tabWidgetPtr->currentPalaceClientPtr()->loggerPtr()
-               ->appendDebugMessage("***Client Connection State Did Change***");
-
-         // do_updateMenus();
+         if (senderPtr != nullptr && currentPalaceClientWidgetPtr != nullptr &&
+             senderPtr == currentPalaceClientWidgetPtr) {
+            // auto isDisconnected =
+            //       connectionState == palace::ConnectionState::kDisconnectedState;
+            switch (connectionState) {
+            case palace::ConnectionState::kConnectedState:
+               my_openHostConnectionActionPtr->setEnabled(false);
+               my_closeHostConnectionActionPtr->setEnabled(true);
+               break;
+            case palace::ConnectionState::kHandshakingState:
+               my_openHostConnectionActionPtr->setEnabled(false);
+               my_closeHostConnectionActionPtr->setEnabled(false);
+               break;
+            default:
+               my_openHostConnectionActionPtr->setEnabled(true);
+               my_closeHostConnectionActionPtr->setEnabled(false);
+            }
+         }
       }
 
       void MainWindow::on_quitAppWasRequested(void)
@@ -121,18 +128,31 @@ namespace seville
 
       void MainWindow::on_newTabRequested(void)
       {
-         my_tabWidgetPtr->addNewTab();
+         auto palaceClientWidgetPtr = new PalaceClientWidget(my_tabBarPtr);
+         connect(palaceClientWidgetPtr,
+                 &seville::view::PalaceClientWidget::
+                 connectionStateDidChangeEvent,
+                 this, &seville::view::MainWindow::on_connectionStateDidChange);
+
+         my_tabWidgetPtr->addNewTab(palaceClientWidgetPtr);
       }
 
       void MainWindow::on_closeTabRequested(void)
       {
-         my_tabWidgetPtr->closeCurrentTab();
+         // my_tabWidgetPtr->closeCurrentTab();
+         my_tabWidgetPtr->removeTab(my_tabWidgetPtr->currentIndex());
       }
 
       void MainWindow::on_tabWasAddedWithClientWidgetPtr(
             PalaceClientWidget* palaceClientWidgetPtr)
       {
-         (void)palaceClientWidgetPtr;
+         // auto palaceClientWidgetPtr = new PalaceClientWidget(my_tabBarPtr);
+         connect(palaceClientWidgetPtr,
+                 &seville::view::PalaceClientWidget::
+                 connectionStateDidChangeEvent,
+                 this, &seville::view::MainWindow::on_connectionStateDidChange);
+
+         my_tabWidgetPtr->addNewTab(palaceClientWidgetPtr);
          // connect(palaceClientWidgetPtr,
          //         &PalaceClientWidget::widgetBackgroundDidChangeEvent,
          //         my_tabWidgetPtr, &TabWidget::on_widgetBackgroundDidChange);
@@ -162,33 +182,26 @@ namespace seville
 
       void MainWindow::on_currentTabDidChange(int index)
       {
-         (void)index;
          auto currentPalaceClientWidgetPtr =
                qobject_cast<seville::view::PalaceClientWidget*>(
-                  my_tabWidgetPtr->currentWidget());
+                  my_tabWidgetPtr->widget(index));
 
-          if (currentPalaceClientWidgetPtr != nullptr)
-            do_setCurrentPalaceClientWidgetPtr(currentPalaceClientWidgetPtr);
+          if (currentPalaceClientWidgetPtr != nullptr) {
+             my_currentPalaceClientWidgetPtr = currentPalaceClientWidgetPtr;
 
-         //auto palaceClientPtr = palaceClientWidgetPtr.palaceClientPtr();
+             // do_updateMenus();
+
+             auto currentPalaceClientPtr =
+                   my_currentPalaceClientWidgetPtr->palaceClientPtr();
+
+             my_logWidgetPtr->setPalaceClientPtr(currentPalaceClientPtr);
+          }
       }
 
 //      void MainWindow::on_viewNeedsUpdating(void)
 //      {
 //         do_updateView();
 //      }
-
-      void MainWindow::do_setCurrentPalaceClientWidgetPtr(
-            seville::view::PalaceClientWidget* currentPalaceClientWidget)
-      {
-         my_currentPalaceClientWidgetPtr = currentPalaceClientWidget;
-
-         // do_updateMenus();
-
-         auto currentPalaceClientPtr =
-               my_currentPalaceClientWidgetPtr->palaceClientPtr();
-         my_logWidgetPtr->setPalaceClientPtr(currentPalaceClientPtr);
-      }
 
       void MainWindow::do_setupWindow(void)
       {
@@ -394,20 +407,27 @@ namespace seville
                  this,
                  &seville::view::MainWindow::on_tabWasRemovedWithClientWidgetPtr);
 
-         auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
-         connect(palaceClientPtr,
-                 &seville::palace::Client::connectionStateDidChangeEvent,
-                 this, &seville::view::MainWindow::on_connectionStateDidChange);
+         // auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
+         // auto palaceClient0Ptr = qobject_cast<view::PalaceClientWidget*>(
+         //          my_tabWidgetPtr->widget(0));
+         // if (palaceClient0Ptr != nullptr) {
+         //    connect(palaceClient0Ptr,
+         //            &seville::view::PalaceClientWidget::
+         //            connectionStateDidChangeEvent,
+         //            this,
+         //            &seville::view::MainWindow::on_connectionStateDidChange);
+         // }
       }
 
       void MainWindow::do_teardownEvents(void)
       {
          // Disconnect Action Signals from Slots
 
-         auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
-         disconnect(palaceClientPtr,
-                 &seville::palace::Client::connectionStateDidChangeEvent,
-                 this, &seville::view::MainWindow::on_connectionStateDidChange);
+         // auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
+         // disconnect(palaceClientPtr,
+         //         &seville::view::PalaceClientWidget::
+         //            connectionStateDidChangeEvent,
+         //         this, &seville::view::MainWindow::on_connectionStateDidChange);
 
          disconnect(my_logDockWidgetPtr, &QDockWidget::topLevelChanged,
                  this, &seville::view::MainWindow::on_topLevelDidChange);
