@@ -38,8 +38,8 @@ namespace seville
          do_deinit();
       }
 
-      //auto Client::do_receiveNetMsgFromSocket(void) -> int
-      int Client::do_receiveNetMsgFromSocket(void) //std::tuple<int, NetMsg>
+      //auto Client::do_receiveNetMsgFromSocket(void) -> i32
+      i32 Client::do_receiveNetMsgFromSocket(void) //std::tuple<i32, NetMsg>
       {
          auto readHeaderOk = 0;
          auto readContentOk = 0;
@@ -52,9 +52,9 @@ namespace seville
          //return my_netMsg;
       }
 
-      int Client::do_readNetMsgHeaderFromSocket(void)
+      i32 Client::do_readNetMsgHeaderFromSocket(void)
       { //_from_socket_ptr_(
-            //QTcpSocket* socket_ptr) -> int {
+            //QTcpSocket* socket_ptr) -> i32 {
 
          auto nBytesToCompleteHeader = i32(
                NetMsg::kHeaderSize - my_netMsg.size());
@@ -86,9 +86,9 @@ namespace seville
          return NetMsg::kHeaderSize == netMsgHeaderSize;
       }
 
-      int Client::do_readNetMsgContentFromSocket(void) //(i32 len) -> int
+      i32 Client::do_readNetMsgContentFromSocket(void) //(i32 len) -> i32
       {
-            //QTcpSocket* socket_ptr) -> int {
+            //QTcpSocket* socket_ptr) -> i32 {
          auto len = i32(my_netMsg.bodyLen());
          auto contentSize_0 = my_netMsg.contentSize();
          //if (size_0 < NetMsg::kHeaderSize)
@@ -123,7 +123,7 @@ namespace seville
       /*
          if (0 < nNet::MsgBytesExpected)
          {
-            doReadDataIntoNet::Msg(
+            doReadDatai32oNet::Msg(
                   netMsg, Net::Msg::kHeaderSize + nNet::MsgBytesExpected);
          }
 
@@ -472,7 +472,7 @@ namespace seville
             my_logger.appendErrorMessage("SSL handshake failed");
          }
          else if (socketError == QAbstractSocket::SslInternalError) {
-            my_logger.appendErrorMessage("SSL internal error");
+            my_logger.appendErrorMessage("SSL i32ernal error");
          }
          else if (socketError == QAbstractSocket::SslInvalidUserDataError) {
             my_logger.appendErrorMessage("SSL invalid user data");
@@ -549,7 +549,7 @@ namespace seville
             // if (my_netMsgBody.size() < NetMsg::kHeaderSize)
             // {
             //   my_transferTimerId =
-            //       startTimer(kIntervalTimeoutForTransferInMs);
+            //       startTimer(ki32ervalTimeoutForTransferInMs);
             //   continue;
             // }
             // my_netMsgSize = my_netMsgBody.size();
@@ -821,7 +821,7 @@ namespace seville
       }
 
       void Client::do_connectToHost(
-            QString host, int port, QString username, int initialRoom)
+            QString host, i32 port, QString username, i32 initialRoom)
       {
          auto condHostTcpPort = (0 == port);
          auto actualHostTcpPort = static_cast<u16>(
@@ -850,7 +850,7 @@ namespace seville
          emit connectionStateDidChangeEvent(ConnectionState::kHandshakingState);
 
          my_socket.connectToHost(host, actualHostTcpPort);
-         my_pingTimer.setInterval(60000);
+         my_pingTimer.setInterval(kDefaultPingInterval);
          my_pingTimer.start();
       }
 
@@ -875,7 +875,7 @@ namespace seville
                static_cast<HostByteOrder>(isLittleEndian | isBigEndian);
       }
 
-      int Client::do_determineServerByteOrder(void)
+      i32 Client::do_determineServerByteOrder(void)
       {
          auto result = 0;
          // TODO more consideration here.
@@ -926,7 +926,7 @@ namespace seville
       }
 
       /*
-      int Client::do_readDataIntoNetMsg(netmsg::Generic& netMsg, i32 maxSize) {
+      i32 Client::do_readDatai32oNetMsg(netmsg::Generic& netMsg, i32 maxSize) {
          if (netmsg::kByteSizeMaximum < maxSize)
             return 0;
 
@@ -936,16 +936,16 @@ namespace seville
 
          auto nBytesAvailable = mySocket.bytesAvailable();
          auto netMsgSize = netMsg.size();
-         int isHeader = netMsgSize < netmsg::kByteSizeOfHeader;
+         i32 isHeader = netMsgSize < netmsg::kByteSizeOfHeader;
          i32 chunkReadSize =
                (isHeader * netmsg::kByteSizeOfHeader) |
                (!isHeader * kByteSizeOfDefaultChunkRead);
 
          while (0 < nBytesAvailable && netMsgSize < maxSize) {
-            //int remainingSize = (maxSize - netMsgSize);
+            //i32 remainingSize = (maxSize - netMsgSize);
             QByteArray chunk = mySocket.read(chunkReadSize);
             netMsg.append(chunk);
-            //int shouldReadMinChunkSize =
+            //i32 shouldReadMinChunkSize =
             //    remainingSize < kPalClientDefaultChunkReadSize;
             //chunkReadSize =
             //(!shouldReadMinChunkSize * kPalClientDefaultChunkReadSize) |
@@ -955,7 +955,7 @@ namespace seville
             chunkReadSize = nBytesAvailable;
          }
 
-         int nBytesRead = netMsgSize - nBytesBeforeRead;
+         i32 nBytesRead = netMsgSize - nBytesBeforeRead;
          return nBytesRead;
       }
       */
@@ -996,7 +996,7 @@ namespace seville
        * @brief do_receiveAltLogon
        * @return number of network messages handled
        */
-      int Client::do_receiveAltLogon(void)
+      i32 Client::do_receiveAltLogon(void)
       {
          my_logger.appendDebugMessage("> AltLogon");
 
@@ -1032,7 +1032,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveAltRoomDescription(void)
+      i32 Client::do_receiveAltRoomDescription(void)
       {
          my_logger.appendDebugMessage("> AltRoomDescription");
 
@@ -1040,7 +1040,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveAssetIncoming(void)
+      i32 Client::do_receiveAssetIncoming(void)
       {
          my_logger.appendDebugMessage("> AssetIncoming");
 
@@ -1048,7 +1048,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveAssetQuery(void)
+      i32 Client::do_receiveAssetQuery(void)
       {
          my_logger.appendDebugMessage("> AssetQuery");
 
@@ -1056,7 +1056,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveAuthenticate(void)
+      i32 Client::do_receiveAuthenticate(void)
       {
          my_logger.appendDebugMessage("> Authenticate");
 
@@ -1064,15 +1064,17 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveBlowthru(void)
+      i32 Client::do_receiveBlowthru(void)
       {
          my_logger.appendDebugMessage("> BlowThru");
 
-         // stub
+         auto charset = my_netMsg.streamReadI32();
+         my_server.setCharset(charset);
+
          return 1;
       }
 
-      int Client::do_receiveConnectionError(void)
+      i32 Client::do_receiveConnectionError(void)
       {
          my_logger.appendDebugMessage("> ConnectionError");
 
@@ -1082,7 +1084,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveDoorLock(void)
+      i32 Client::do_receiveDoorLock(void)
       {
          my_logger.appendDebugMessage("> DoorLock");
 
@@ -1090,7 +1092,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveDoorUnlock(void)
+      i32 Client::do_receiveDoorUnlock(void)
       {
          my_logger.appendDebugMessage("> DoorUnlock");
 
@@ -1098,7 +1100,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveDraw(void)
+      i32 Client::do_receiveDraw(void)
       {
          my_logger.appendDebugMessage("> Draw");
 
@@ -1106,7 +1108,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveHttpServerLocation(void)
+      i32 Client::do_receiveHttpServerLocation(void)
       {
          my_logger.appendDebugMessage("> HttpServerLocation");
 
@@ -1121,7 +1123,7 @@ namespace seville
          return result;
       }
 
-      int Client::do_receiveMovement(void)
+      i32 Client::do_receiveMovement(void)
       {
          my_logger.appendDebugMessage("> Movement");
 
@@ -1138,7 +1140,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveNavigationError(void)
+      i32 Client::do_receiveNavigationError(void)
       {
          my_logger.appendDebugMessage("> NavError!");
 
@@ -1146,7 +1148,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receivePictureMove(void)
+      i32 Client::do_receivePictureMove(void)
       {
          my_logger.appendDebugMessage("> PictMove");
 
@@ -1156,7 +1158,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receivePing(void)
+      i32 Client::do_receivePing(void)
       {
          my_logger.appendDebugMessage("Ping!");
 
@@ -1166,7 +1168,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receivePong(void)
+      i32 Client::do_receivePong(void)
       {
          my_logger.appendDebugMessage("> Pong");
 
@@ -1177,7 +1179,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receivePropDelete(void)
+      i32 Client::do_receivePropDelete(void)
       {
          my_logger.appendDebugMessage("> PropDelete");
 
@@ -1187,7 +1189,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receivePropMove(void)
+      i32 Client::do_receivePropMove(void)
       {
          my_logger.appendDebugMessage("> PropMove");
 
@@ -1197,17 +1199,29 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receivePropNew(void)
+      i32 Client::do_receivePropNew(void)
       {
          my_logger.appendDebugMessage("> PropNew");
 
+         auto propId = my_netMsg.streamReadI32();
+         auto propCrc = my_netMsg.streamReadU32();
+         auto propY = my_netMsg.streamReadI16();
+         auto propX = my_netMsg.streamReadI16();
+
+         auto prop = Prop();
+         prop.setId(propId);
+         prop.setCrc(propCrc);
+         auto propOffset = QPoint(propX, propY);
+         prop.setOffset(propOffset);
+
+         my_room.loosePropsPtr()->push_back(prop);
+
          emit viewNeedsUpdatingEvent();
 
-         // stub
          return 1;
       }
 
-      int Client::do_receiveRoomDescend(void)
+      i32 Client::do_receiveRoomDescend(void)
       {
          my_logger.appendDebugMessage("> RoomDescend");
 
@@ -1216,7 +1230,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveRoomDescription(void)
+      i32 Client::do_receiveRoomDescription(void)
       {
          my_logger.appendDebugMessage("> RoomDescription");
 
@@ -1290,28 +1304,28 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveRoomUserList(void)
+      i32 Client::do_receiveRoomUserList(void)
       {
          my_logger.appendDebugMessage("> RoomUserList");
 
          my_room.usersPtr()->clear();
 
-         auto propIdList = std::vector<i32>();
+         auto props = std::vector<Prop>();
          auto roomUserCount = i32(my_netMsg.ref());
          for (auto i = 0; i < roomUserCount; i++) {
             auto user = do_processUserNew();
             // if (user.id() != my_userId)
             my_room.usersPtr()->push_back(user);
             if (user.propsPtr() != nullptr)
-               propIdList.push_back(user.propsPtr()->at(0).id());
+               props.push_back(user.propsPtr()->at(0));
          }
 
-         do_fetchPropListAsync(propIdList);
+         do_fetchPropsAsync(props);
 
          return 1;
       }
 
-      int Client::do_receiveServerVersion(void)
+      i32 Client::do_receiveServerVersion(void)
       {
          my_logger.appendDebugMessage("> ServerVersion");
 
@@ -1322,13 +1336,16 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveServerInfo(void)
+      i32 Client::do_receiveServerInfo(void)
       {
          my_logger.appendDebugMessage("> ServerInfo");
 
-         // my_server.setVersion();
+         auto serverInfo1 = my_netMsg.streamReadI32();
+         (void)serverInfo1;
+         auto serverName = my_netMsg.streamReadPascalQString();
+         my_server.setName(serverName);
 
-         // TODO STUB
+         emit serverNameWasSetEvent(serverName);
 
          return 1;
       }
@@ -1359,7 +1376,7 @@ namespace seville
          (void)unknown1;
          (void)unknown2;
 
-         user.setPropNum(my_netMsg.streamReadI16());
+         user.setPropCount(my_netMsg.streamReadI16());
          //if (user.propNum() < User::kNumPropCells) {
          //   auto propPtr = &user.propListPtr()->at(user.propNum());
          //   propPtr->setId(0);
@@ -1383,7 +1400,7 @@ namespace seville
          return user;
       }
 
-      int Client::do_receiveUserNew(void)
+      i32 Client::do_receiveUserNew(void)
       {
          auto user = do_processUserNew();
 
@@ -1401,7 +1418,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveUserColor(void)
+      i32 Client::do_receiveUserColor(void)
       {
          my_logger.appendDebugMessage("> UserColor");
 
@@ -1417,7 +1434,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveUserExitRoom(void)
+      i32 Client::do_receiveUserExitRoom(void)
       {
          my_logger.appendDebugMessage("> UserExitRoom");
 
@@ -1437,7 +1454,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveUserFace(void)
+      i32 Client::do_receiveUserFace(void)
       {
          my_logger.appendDebugMessage("> UserFace");
 
@@ -1455,35 +1472,56 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveUserProp(void)
+      i32 Client::do_receiveUserProp(void)
       {
          my_logger.appendDebugMessage("> UserProp");
 
-         auto propId = my_netMsg.streamReadI32();
+         auto nProps = my_netMsg.streamReadU32();
          auto userId = my_netMsg.ref();
-         (void)propId;
-         (void)userId;
-         // auto user = my_room.userWithId(userId);
-         // auto propListPtr = user.propsPtr();
-         // auto i = 0;
-         // auto propRequestList = std::vector<i32>();
-         // propList.push_back(user.propsPtr()->at(0).id());
-         // do_fetchPropListAsync(propList);
+         auto userPtr = my_room.userPtrWithId(userId);
+         auto propsPtr = userPtr->propsPtr();
+
+         for (auto i = u32{0}; i < nProps; i++) {
+            auto propId = my_netMsg.streamReadI32();
+            auto propCrc = my_netMsg.streamReadI32();
+            propsPtr->at(i).setId(propId);
+            propsPtr->at(i).setCrc(propCrc);
+         }
+
+         // auto fetchPropIds = std::vector<i32>();
+         // fetchPropIds.push_back(propsPtr->at(0).id());
+         do_fetchPropsAsync(*propsPtr);
 
          emit viewNeedsUpdatingEvent();
 
          return 1;
       }
 
-      int Client::do_receiveUserDescription(void)
+      i32 Client::do_receiveUserDescription(void)
       {
          my_logger.appendDebugMessage("> UserDescription");
 
-         // stub
+         auto userId = my_netMsg.ref();
+         auto userPtr = my_room.userPtrWithId(userId);
+         userPtr->setFace(my_netMsg.streamReadI16());
+         userPtr->setColor(my_netMsg.streamReadI16());
+         auto propsPtr = userPtr->propsPtr();
+         auto nProps = my_netMsg.streamReadU32();
+         for (auto i = u32{0}; i < nProps; i++) {
+            auto propId = my_netMsg.streamReadI32();
+            auto propCrc = my_netMsg.streamReadI32();
+            userPtr->propsPtr()->at(i).setId(propId);
+            userPtr->propsPtr()->at(i).setCrc(propCrc);
+         }
+
+         userPtr->setPropCount(nProps);
+
+         do_fetchPropsAsync(*propsPtr);
+
          return 1;
       }
 
-      int Client::do_receiveUserRename(void)
+      i32 Client::do_receiveUserRename(void)
       {
          my_logger.appendDebugMessage("> UserRename");
 
@@ -1507,7 +1545,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveUserLeaving(void)
+      i32 Client::do_receiveUserLeaving(void)
       {
          my_logger.appendDebugMessage("> UserLeaving");
 
@@ -1533,7 +1571,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveUserLoggedOnAndMax(void)
+      i32 Client::do_receiveUserLoggedOnAndMax(void)
       {
          my_logger.appendDebugMessage("> UserLoggedOnAndMax");
 
@@ -1553,7 +1591,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveUserStatus(void)
+      i32 Client::do_receiveUserStatus(void)
       {
          my_logger.appendDebugMessage("> UserStatus");
 
@@ -1561,7 +1599,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveRoomList(void)
+      i32 Client::do_receiveRoomList(void)
       {
          my_logger.appendDebugMessage("> RoomList");
 
@@ -1589,7 +1627,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveUserList(void)
+      i32 Client::do_receiveUserList(void)
       {
          my_logger.appendDebugMessage("> UserList");
 
@@ -1615,7 +1653,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveSpotMove(void)
+      i32 Client::do_receiveSpotMove(void)
       {
          my_logger.appendDebugMessage("> SpotMove");
 
@@ -1623,7 +1661,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveSpotState(void)
+      i32 Client::do_receiveSpotState(void)
       {
          my_logger.appendDebugMessage("> SpotState");
 
@@ -1631,7 +1669,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveTalk(void)
+      i32 Client::do_receiveTalk(void)
       {
          my_logger.appendDebugMessage("> Talk");
 
@@ -1647,7 +1685,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveWhisper(void)
+      i32 Client::do_receiveWhisper(void)
       {
          my_logger.appendDebugMessage("> Whisper");
 
@@ -1677,7 +1715,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveXTalk(void)
+      i32 Client::do_receiveXTalk(void)
       {
          my_logger.appendDebugMessage("> XTalk");
 
@@ -1702,7 +1740,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_receiveXWhisper(void)
+      i32 Client::do_receiveXWhisper(void)
       {
          my_logger.appendDebugMessage("> XWhisper");
 
@@ -1729,7 +1767,7 @@ namespace seville
          return 1;
       }
 
-      int Client::do_routeReceivedNetMsg(void)
+      i32 Client::do_routeReceivedNetMsg(void)
       {
          auto result = 0;
          auto netMsgIdTmp = my_netMsg.id(); //u32At(NetMsg::kIdOffset);
@@ -1748,7 +1786,7 @@ namespace seville
 //         if (size < NetMsg::kHeaderSize) {
 //            my_logger.appendDebugMessage("Received NetMsg too small!");
 //            qCDebug(seville_log)
-//                  << "Received NetMsg that is too small to interpret";
+//                  << "Received NetMsg that is too small to i32erpret";
 //            qCDebug(seville_log)
 //                  << "kind: "
 //                  << QString("0x%1").arg(my_msgId, 2, 16, QChar('0'));
@@ -1763,7 +1801,7 @@ namespace seville
 //         else if (NetMsg::kMaximumSize < size) {
 //            my_logger.appendDebugMessage("Received NetMsg too large!");
 //            qCDebug(seville_log)
-//                  << "Received NetMsg that is too large to interpret";
+//                  << "Received NetMsg that is too large to i32erpret";
 //            qCDebug(seville_log)
 //                  << "kind: "
 //                  << QString("0x%1").arg(my_msgId, 2, 16, QChar('0'));
@@ -1924,7 +1962,7 @@ namespace seville
          return result;
       }
 
-      int Client::do_sendLogon(void)
+      i32 Client::do_sendLogon(void)
       {
          auto shouldSwapEndianness = do_determineShouldSwapEndianness();
          auto netMsg = NetMsg(shouldSwapEndianness);
@@ -1966,7 +2004,7 @@ namespace seville
          //return my_socket.flush();
       }
 
-      int Client::do_sendAuthenticate(
+      i32 Client::do_sendAuthenticate(
             const QString& username, const QString& password)
       {
          // TODO stub
@@ -1988,7 +2026,7 @@ namespace seville
          //return my_socket.flush();
       }
 
-      int Client::do_sendTalk(const QString& text)
+      i32 Client::do_sendTalk(const QString& text)
       {
          auto talkMsg = NetMsg(do_determineShouldSwapEndianness());
 
@@ -2004,7 +2042,7 @@ namespace seville
          //return my_socket.flush();
       }
 
-      int Client::do_sendXTalk(const QString& text)
+      i32 Client::do_sendXTalk(const QString& text)
       {
          auto xTalkMsg = NetMsg(do_determineShouldSwapEndianness());
 
@@ -2013,8 +2051,8 @@ namespace seville
          xTalkMsg.setBodyLen(len);
          xTalkMsg.setRef(my_userId);
 
-         auto plaintext = text.toUtf8();
-         auto ciphertext = my_cipher.encipher(plaintext);
+         auto plai32ext = text.toUtf8();
+         auto ciphertext = my_cipher.encipher(plai32ext);
          xTalkMsg.appendU16(len);
          xTalkMsg.append(ciphertext);
          xTalkMsg.append('\0');
@@ -2024,7 +2062,7 @@ namespace seville
          //return my_socket.flush();
       }
 
-      int Client::do_sendXWhisper(const u32 userId, const QString& text)
+      i32 Client::do_sendXWhisper(const u32 userId, const QString& text)
       {
          auto msg = NetMsg(do_determineShouldSwapEndianness());
 
@@ -2035,8 +2073,8 @@ namespace seville
          msg.setBodyLen(len);
          msg.setRef(my_userId);
 
-         auto plaintext = text.toUtf8();
-         auto ciphertext = my_cipher.encipher(plaintext);
+         auto plai32ext = text.toUtf8();
+         auto ciphertext = my_cipher.encipher(plai32ext);
          msg.appendU32(userId);
          msg.appendU16(textLen);
          msg.append(ciphertext);
@@ -2047,7 +2085,7 @@ namespace seville
          //return my_socket.flush();
       }
 
-      int Client::do_sendPing(void)
+      i32 Client::do_sendPing(void)
       {
          auto pingMsg = palace::NetMsg(do_determineShouldSwapEndianness());
 
@@ -2061,7 +2099,7 @@ namespace seville
          //return my_socket.flush();
       }
 
-      int Client::do_sendPong(void)
+      i32 Client::do_sendPong(void)
       {
          auto pongMsg = palace::NetMsg(do_determineShouldSwapEndianness());
 
@@ -2075,7 +2113,7 @@ namespace seville
          //return my_socket.flush();
       }
 
-      int Client::do_sendGotoRoom(u16 roomId)
+      i32 Client::do_sendGotoRoom(u16 roomId)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2095,7 +2133,7 @@ namespace seville
          //return my_socket.flush();
       }
 
-      int Client::do_sendMove(i16 x, i16 y)
+      i32 Client::do_sendMove(i16 x, i16 y)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2114,7 +2152,7 @@ namespace seville
          //return my_socket.flush();
       }
 
-      int Client::do_sendRequestRoomList(void)
+      i32 Client::do_sendRequestRoomList(void)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2128,7 +2166,7 @@ namespace seville
          return 0 < bytesWritten;
       }
 
-      int Client::do_sendRequestUserList(void)
+      i32 Client::do_sendRequestUserList(void)
       {
          if (my_connectionState != ConnectionState::kConnectedState)
             return -1;
@@ -2207,7 +2245,7 @@ namespace seville
          return 0 < writeByteCount;
       }
 
-      void Client::do_fetchPropListAsync(const std::vector<i32>& propIdList)
+      void Client::do_fetchPropsAsync(const std::vector<Prop>& props)
       {
          my_logger.appendDebugMessage(
                   "Requesting prop list for ids...");
@@ -2215,10 +2253,10 @@ namespace seville
          auto propListUri = my_server.httpPropListLocation();
          auto json = QJsonObject();
          auto propIdArray = QJsonArray();
-         for (const auto& propId: propIdList) {
-            my_logger.appendDebugMessage(QString("%1").arg(propId));
+         for (auto prop: props) {
+            my_logger.appendDebugMessage(QString("%1").arg(prop.id()));
             auto propIdObject = QJsonObject();
-            propIdObject["id"] = propId;
+            propIdObject["id"] = prop.id();
             propIdArray.append(propIdObject);
          }
          json["props"] = propIdArray;
@@ -2274,8 +2312,7 @@ namespace seville
 
          do_clear();
 
-         //my_logger.setMode(LogMode::kDebugMode);
-         //my_logger_.setIsDebugMode(true);
+         // my_logger.setMode(LogMode::kDebugMode);
 
          // TODO use a linked list or deque to communicate between threads
          // or just use a big buffer, as below.

@@ -159,6 +159,9 @@ namespace seville
             palaceClientWidgetPtr = new PalaceClientWidget(this);
 
          // auto clientWidgetPtr = new PalaceClientWidget(this);
+         connect(palaceClientWidgetPtr,
+                 &PalaceClientWidget::serverNameWasSetEvent,
+                 this, &seville::view::TabWidget::on_serverNameWasSet);
 
          addTab(palaceClientWidgetPtr, tr("New Connection"));
                       // .arg(QString::number(this->count())));
@@ -174,20 +177,25 @@ namespace seville
 
       void TabWidget::do_closeTab(int index)
       {
-         auto clientWidgetPtr =
+         auto palaceClientWidgetPtr =
                static_cast<PalaceClientWidget*>(widget(index));
 
          // disconnect(
          //     clientWidgetPtr, &PalaceClientWidget::widgetDidResizeEvent,
          //     this, &TabWidget::on_clientTabWidgetDidResize);
 
+         if (palaceClientWidgetPtr != nullptr) {
+            disconnect(palaceClientWidgetPtr,
+                       &PalaceClientWidget::serverNameWasSetEvent,
+                       this, &seville::view::TabWidget::on_serverNameWasSet);
+         }
+
          removeTab(index);
-         delete clientWidgetPtr;
+         delete palaceClientWidgetPtr;
 
          if (count() <= 0) {
             // QApplication::quit();
-            do_addNewTab(new view::PalaceClientWidget(this));
-         }
+            do_addNewTab(new view::PalaceClientWidget(this));         }
       }
 
       void TabWidget::do_setupSizing(void)
@@ -203,6 +211,13 @@ namespace seville
          do_setupEvents();
          do_addNewTab(contentWidgetPtr);
          //my_currentPalaceClientPtr = this->
+      }
+
+      void TabWidget::on_serverNameWasSet(
+            QWidget* senderPtr, const QString& value)
+      {
+         auto index = indexOf(senderPtr);
+         setTabText(index, value);
       }
 
       void TabWidget::on_tabBarDoubleClicked(void)

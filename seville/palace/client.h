@@ -136,26 +136,27 @@ namespace seville
 
       public:
          static const char* kIdent;
-         static const int kIdentLen = 6;
+         static const i32 kIdentLen = 6;
 
+         static const i32 kDefaultPingInterval = 60 * 1000;
          // static const u32 kNumPropCells = 9;
          static const u32 kNetMsgTTLMax = 100;
-         static const int kDefaultServerPort = 9998;
+         static const i32 kDefaultServerPort = 9998;
 
-         static constexpr int kIntervalTimeoutForTransferInMs = 30 * 1000;
-         static constexpr int kIntervalToTimeoutForPongInMs = 60 * 1000;
-         static constexpr int kIntervalToPingInMs = 5 * 1000;
+         static constexpr i32 kIntervalTimeoutForTransferInMs = 30 * 1000;
+         static constexpr i32 kIntervalToTimeoutForPongInMs = 60 * 1000;
+         static constexpr i32 kIntervalToPingInMs = 5 * 1000;
 
          static const u32 kMagicFromPChat = 0x00011940;
          //static const QString kIdent = "PC4237"
-         static const int kMaxSizeOfUsernameSize = 31;
-         static const int kMaxSizeOfWizpassSize = 31;
-         static const int kSizeOfIdentSize = 6;
-         static const int kDefaultSizeOfChunkReadSize = 100;
-         static const int kMinSizeOfShortestChunkReadSize = 1;
+         static const i32 kMaxSizeOfUsernameSize = 31;
+         static const i32 kMaxSizeOfWizpassSize = 31;
+         static const i32 kSizeOfIdentSize = 6;
+         static const i32 kDefaultSizeOfChunkReadSize = 100;
+         static const i32 kMinSizeOfShortestChunkReadSize = 1;
 
-         static const int kNumFaces = 13;
-         static const int kNumFaceColors = 17;
+         static const i32 kNumFaces = 13;
+         static const i32 kNumFaceColors = 17;
 
          explicit Client(QObject* parentObjectPtr = nullptr);
          virtual ~Client(void);
@@ -226,9 +227,9 @@ namespace seville
 
          inline void connectToHost(
                QString host,
-               int port = 9998,
+               i32 port = 9998,
                QString username = "Seville User",
-               int initialRoom = 0) {
+               i32 initialRoom = 0) {
             do_disconnectFromHost();
             do_connectToHost(host, port, username, initialRoom);
          }
@@ -236,12 +237,12 @@ namespace seville
          inline void connectToHost(
                QUrl url,
                QString username = "Seville User",
-               int initialRoom = 0) {
+               i32 initialRoom = 0) {
             do_disconnectFromHost();
             do_connectToHost(url.host(), url.port(), username, initialRoom);
          }
 
-         inline void connectToHost(QUrl url, int initialRoom = 0) {
+         inline void connectToHost(QUrl url, i32 initialRoom = 0) {
             do_disconnectFromHost();
             do_connectToHost(
                      url.host(), url.port(), url.userName(), initialRoom);
@@ -280,6 +281,7 @@ namespace seville
          void backgroundImageDidLoadEvent(void);
          void connectionStateDidChangeEvent(ConnectionState);
          void viewNeedsUpdatingEvent(void);
+         void serverNameWasSetEvent(const QString& value);
 
       public slots:
          void on_networkAccessManagerDidFinish(QNetworkReply* replyPtr);
@@ -290,7 +292,7 @@ namespace seville
       private:
          Log my_logger;
          QNetworkAccessManager my_networkAccessManager;
-         int my_transferTimerId;
+         i32 my_transferTimerId;
          QTimer my_pingTimer;
          QTimer my_netmsgReceiveTimer;
          QTime my_pongTime;
@@ -300,13 +302,13 @@ namespace seville
          QString my_username;
          QString my_wizpass;
          QString my_host;
-         quint16 my_port;
+         u16 my_port;
          Server my_server;
          i32 my_userId;
          Room my_room;
          Cipher my_cipher;
          QTimer my_timer;
-         //int my_transfer_timer_id;
+         //i32 my_transfer_timer_id;
          NetMsg my_netMsg;
          u32 my_netMsgTTLCount;
          u32 my_idCrc;
@@ -321,12 +323,12 @@ namespace seville
 //         u32 my_regCounter; //  = 0xcf07309c;
 //         u32 my_regCrc; //      = 0x5905f923;
 
-         //      int Client::getKMillisecondPongTimeout()
+         //      i32 Client::getKMillisecondPongTimeout()
          //      {
          //         return kIntervalToTimeoutForPongInMs;
          //      }
 
-         //      void Client::setKMillisecondPongTimeout(int value)
+         //      void Client::setKMillisecondPongTimeout(i32 value)
          //      {
          //         kIntervalToTimeoutForPongInMs = value;
          //      }
@@ -334,7 +336,7 @@ namespace seville
          void do_setupEvents(void);
 
          void do_fetchBackgroundAsync(const QString& url);
-         void do_fetchPropListAsync(const std::vector<i32>& propIdList);
+         void do_fetchPropsAsync(const std::vector<Prop>& props);
 
          void do_clear(void);
          void do_resetReceiveTimer(void);

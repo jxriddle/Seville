@@ -13,6 +13,7 @@ namespace seville
       {
          do_setupView();
          do_setupEvents();
+         do_setupSizing();
          do_clear();
       }
 
@@ -71,8 +72,8 @@ namespace seville
          my_logTextEditPtr = new QTextEdit(this);
 
          my_logTextEditPtr->setReadOnly(true);
-         my_logTextEditPtr->setTextInteractionFlags(
-                  Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+         // my_logTextEditPtr->setTextInteractionFlags(
+         //          Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
 
          my_mainLayoutPtr->addWidget(my_logTextEditPtr);
          my_mainLayoutPtr->addWidget(my_chatLineEditPtr);
@@ -80,6 +81,11 @@ namespace seville
 
       void LogWidget::do_setupEvents(void)
       {
+      }
+
+      void LogWidget::do_setupSizing(void)
+      {
+         setMinimumWidth(300);
       }
    }
 }

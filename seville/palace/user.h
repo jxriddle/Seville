@@ -143,11 +143,11 @@ namespace seville
             return &my_props;
          }
 
-         inline i16 propNum(void) {
+         inline u32 propNum(void) {
             return my_propNum;
          }
 
-         inline void setPropNum(i16 value) {
+         inline void setPropCount(u32 value) {
             my_propNum = value;
          }
 
@@ -186,7 +186,7 @@ namespace seville
          u32 my_regCrc;
          i16 my_roomId;
          std::vector<Prop> my_props;
-         i16 my_propNum;
+         u32 my_propNum;
          i32 my_headPropFlag;
 
          //u32 my_props[kNumPropCells];

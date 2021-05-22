@@ -197,6 +197,11 @@ namespace seville
                  this,
                  &seville::view::PalaceClientWidget::
                  on_chatLineEditDidPressReturn);
+
+         connect(my_palaceClientPtr,
+                 &seville::palace::Client::serverNameWasSetEvent,
+                 this,
+                 &seville::view::PalaceClientWidget::on_serverNameWasSet);
       }
 
       void PalaceClientWidget::do_teardownEvents(void)
@@ -237,6 +242,11 @@ namespace seville
                  this,
                  &seville::view::PalaceClientWidget::
                  on_chatLineEditDidPressReturn);
+
+         disconnect(my_palaceClientPtr,
+                    &seville::palace::Client::serverNameWasSetEvent,
+                    this,
+                    &seville::view::PalaceClientWidget::on_serverNameWasSet);
       }
 
       void PalaceClientWidget::do_setupSizing(void)
@@ -486,7 +496,7 @@ namespace seville
 
             // auto nameTextRect = QRect();
             auto nameTextPoint =
-                  QPoint(usersPtr->at(i).x() + (kSmileyWidth / 2) - (width / 2.0),
+                  QPoint(usersPtr->at(i).x() + (kSmileyWidth / 2) - (width / 2),
                          usersPtr->at(i).y() + 56);
 
             // nameTextRect.setX(user.x());
@@ -546,6 +556,10 @@ namespace seville
          //auto pixmap = QPixmap::fromImage(background_image);
          //do_set_background_image_(pixmap);
       //}
+
+      void PalaceClientWidget::on_serverNameWasSet(const QString& value) {
+         emit serverNameWasSetEvent(this, value);
+      }
 
       void PalaceClientWidget::on_backgroundImageDidLoad(void)
       {

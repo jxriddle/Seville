@@ -79,6 +79,7 @@ namespace seville
 
          void do_setupView(void);
          void do_setupEvents(void);
+         void do_setupSizing(void);
          void do_clear(void);
          void do_reloadFromPalaceClient(void);
       };

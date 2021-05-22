@@ -57,6 +57,7 @@ namespace seville
       signals:
          //void widgetBackgroundDidChangeEvent(int width, int height);
          void widgetBackgroundDidChangeEvent(void);
+         void serverNameWasSetEvent(QWidget* senderPtr, const QString& value);
 
       public slots:
          //void updateGeometry(void);
@@ -71,6 +72,7 @@ namespace seville
          void on_chatLineEditDidPressReturn(void);
          //void on_currentTabDidChange(int index);
          void on_viewNeedsUpdating(void);
+         void on_serverNameWasSet(const QString& value);
 
       private:
          palace::Client* my_palaceClientPtr;

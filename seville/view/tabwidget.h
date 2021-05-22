@@ -44,6 +44,8 @@ namespace seville
             void on_tabDidClose(int index);
             void on_addNewTabRequested(void);
             void on_closeCurrentTabRequested(void);
+            void on_serverNameWasSet(
+                  QWidget* senderPtr, const QString& value);
             // auto on_plusButtonClickedEvent(void) -> void;
             // void on_clientTabWidgetDidResize(int width, int height);
             // void on_currentTabDidChange(int index);

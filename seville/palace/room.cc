@@ -43,8 +43,10 @@ namespace seville
          my_drawCommandsCount = 0;
          my_userCount = 0;
          my_loosePropCount = 0;
+         my_hotspotCount = 0;
          my_reserved = 0;
          my_backgroundImageName = "";
+         my_looseProps.clear();
          my_hotspots.clear();
          my_users.clear();
 
@@ -79,7 +81,8 @@ namespace seville
          my_roomId = room.my_roomId;
          my_roomName = room.my_roomName;
          my_userCount = room.my_userCount;
-         for (auto& user: room.my_users) {
+
+         for (auto user: room.my_users) {
             my_users.push_back(user);
          }
       }

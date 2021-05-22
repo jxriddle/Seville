@@ -13,6 +13,7 @@ namespace seville
          : QObject()
       {
          do_init();
+         do_clear();
       }
    }
 }
