@@ -37,6 +37,7 @@ SOURCES += \
     seville/palace/logentry.cc \
     seville/palace/netmsg.cc \
     seville/palace/prop.cc \
+    seville/palace/registration.cc \
     seville/palace/room.cc \
     seville/palace/server.cc \
     seville/palace/user.cc \
@@ -60,6 +61,7 @@ HEADERS += \
     seville/palace/logentry.h \
     seville/palace/netmsg.h \
     seville/palace/prop.h \
+    seville/palace/registration.h \
     seville/palace/room.h \
     seville/palace/server.h \
     seville/palace/user.h \

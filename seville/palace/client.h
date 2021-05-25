@@ -20,6 +20,7 @@
 #include "seville/palace/cipher.h"
 #include "seville/palace/log.h"
 #include "seville/palace/netmsg.h"
+#include "seville/palace/registration.h"
 
 namespace seville
 {
@@ -316,6 +317,9 @@ namespace seville
          bool my_isUserIdChanged;
          u32 my_regCrc;
          u32 my_regCounter;
+         u32 my_retryLogonFlag;
+         u32 my_regMagic;
+         Registration my_registration;
 
 //         bool my_puidChangedFlag; //    = false;
 //         u32 my_puidCounter; // = 0xf5dc385e;

@@ -1,4 +1,6 @@
-﻿#include <QImage>
+﻿#include <random>
+
+#include <QImage>
 #include <QObject>
 #include <QUrl>
 #include <QTimerEvent>
@@ -233,8 +235,6 @@ namespace seville
 
       void Client::do_clear(void)
       {
-         do_disconnectFromHost();
-
          //my_netMsgReadState = NetMsgReadState::kNetMsgReadHeaderState;
          //my_transferTimerId = 0;
          //do_setConnectionState(ConnectionState::kDisconnectedState);
@@ -257,6 +257,8 @@ namespace seville
          my_regCounter = 0xcf07309c;
          my_regCrc = 0x5905f923;
          my_netMsgTTLCount = 0;
+         my_retryLogonFlag = 0;
+         my_registration.setSeed(seed, p);
       }
 
       void Client::do_resetReceiveTimer(void)
@@ -825,6 +827,9 @@ namespace seville
       void Client::do_connectToHost(
             QString host, i32 port, QString username, i32 initialRoom)
       {
+         do_disconnectFromHost();
+         do_clear();
+
          auto condHostTcpPort = (0 == port);
          auto actualHostTcpPort = static_cast<u16>(
                   (condHostTcpPort * kDefaultServerPort) |
@@ -833,13 +838,13 @@ namespace seville
 
          auto actualInitialRoom = static_cast<u16>(initialRoom);
 
-         auto logMsg = QString("Connecting to palace://%1@%2:%3/%4")
+         auto netMsg = QString("Connecting to palace://%1@%2:%3/%4")
                .arg(username.toUtf8().data())
                .arg(host.toUtf8().data())
                .arg(actualHostTcpPort)
                .arg(actualInitialRoom);
 
-         my_logger.appendInfoMessage(logMsg);
+         my_logger.appendInfoMessage(netMsg);
 
          // my_user.setUsername(username);
          my_username = username;
@@ -863,7 +868,7 @@ namespace seville
             my_socket.disconnectFromHost();
             my_pingTimer.stop();
             do_setConnectionState(ConnectionState::kDisconnectedState);
-            do_clear();
+            // do_clear();
          }
       }
 
@@ -1997,7 +2002,8 @@ namespace seville
          netMsg.appendU32(
                   DownloadCapabilities::kPalaceAssetDownload |
                   DownloadCapabilities::kPalaceFileDownload |
-                  DownloadCapabilities::kHttpFileDownload |
+                  (!my_retryLogonFlag *
+                   DownloadCapabilities::kHttpFileDownload) |
                   DownloadCapabilities::kHttpFileExtendedDownload);
          netMsg.appendU32(EngineCapabilities2d::kPalace2dEngine);
          netMsg.appendU32(GraphicsCapabilities2d::kGif87);
