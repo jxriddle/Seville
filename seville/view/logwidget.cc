@@ -17,12 +17,12 @@ namespace seville
          do_clear();
       }
 
-      LogWidget* LogWidget::New(QWidget* parentWidgetPtr)
-      {
-         auto instance = new LogWidget(parentWidgetPtr);
+//      LogWidget* LogWidget::New(QWidget* parentWidgetPtr)
+//      {
+//         auto instance = new LogWidget(parentWidgetPtr);
 
-         return instance;
-      }
+//         return instance;
+//      }
 
       void LogWidget::on_messageLoggedEvent(
             const seville::palace::LogEntry& logEntry)

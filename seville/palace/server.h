@@ -95,11 +95,11 @@ namespace seville
          }
 
          inline QString hostname(void) const {
-            return my_host;
+            return my_hostname;
          }
 
-         inline void setHost(const QString& value) {
-            my_host = value;
+         inline void setHostname(const QString& value) {
+            my_hostname = value;
          }
 
          inline u16 port(void) const {
@@ -168,7 +168,7 @@ namespace seville
          HostByteOrder my_byteOrder;
          std::vector<Room> my_roomList;
          std::vector<User> my_userList;
-         QString my_host;
+         QString my_hostname;
          u16 my_port;
          u32 my_version;
          QString my_httpServerLocation;
@@ -181,7 +181,7 @@ namespace seville
             my_byteOrder = HostByteOrder::kUnknownEndian;
             my_roomList.clear();
             my_userList.clear();
-            my_host = "";
+            my_hostname = "";
             my_port = 9998;
             my_httpServerLocation = "";
             my_httpPropStorageLocation = "";

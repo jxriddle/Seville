@@ -24,15 +24,15 @@ namespace seville
          void backgroundDidChangeEvent(void);
 
       public:
-         static Room* New(QObject* parentObjectPtr = nullptr)
-         {
-            auto instance_ptr = new Room(parentObjectPtr);
+//         static Room* New(QObject* parentObjectPtr = nullptr)
+//         {
+//            auto instance_ptr = new Room(parentObjectPtr);
 
-            instance_ptr->do_clear();
-            instance_ptr->do_setupEvents();
+//            instance_ptr->do_clear();
+//            instance_ptr->do_setupEvents();
 
-            return instance_ptr;
-         }
+//            return instance_ptr;
+//         }
 
          Room(QObject* parentObjectPtr = nullptr);
          Room(const Room& room, QObject* parentObjectPtr = nullptr);

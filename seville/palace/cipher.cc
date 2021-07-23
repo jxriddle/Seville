@@ -12,18 +12,18 @@ namespace seville
 
       Cipher::~Cipher(void) {}
 
-      std::unique_ptr<Cipher> Cipher::New(void) //std::optional<Cipher*>
-      {
-         //auto instance = std::make_optional<Cipher*>();
-         auto instance_ptr = std::make_unique<Cipher>();
-         instance_ptr->do_init();
+//      std::unique_ptr<Cipher> Cipher::New(void) //std::optional<Cipher*>
+//      {
+//         //auto instance = std::make_optional<Cipher*>();
+//         auto instance_ptr = std::make_unique<Cipher>();
+//         instance_ptr->do_init();
 
-//         if (nullptr != instance_ptr) {
-//            instance_ptr
-//         }
+////         if (nullptr != instance_ptr) {
+////            instance_ptr
+////         }
 
-         return instance_ptr;
-      }
+//         return instance_ptr;
+//      }
 
       QByteArray Cipher::encipher(
             const QByteArray& plaintext, i32 plaintextLimit)

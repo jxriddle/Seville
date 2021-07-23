@@ -16,6 +16,7 @@
 #include <QFontMetrics>
 #include <QGraphicsPathItem>
 #include <QGraphicsDropShadowEffect>
+#include <QComboBox>
 
 #include "seville/base/sevilleapp.h"
 #include "seville/palace/log.h"
@@ -148,9 +149,17 @@ namespace seville
                //.arg("test-pattern.png");
          //qCDebug(SevilleApp()->log_category()) << filename_image;
          //qCDebug(log_seville) << image_filename;
+         auto hBoxLayoutPtr = new QHBoxLayout();
+         layout()->addItem(hBoxLayoutPtr);
+
+         my_roomUserListComboBoxPtr = new QComboBox(this);
+         my_roomUserListComboBoxPtr->setMinimumWidth(180);
+         my_roomUserListComboBoxPtr->setMaximumWidth(180);
+         // my_roomUserListComboBoxPtr->setStyleSheet("border: 1px solid red");
+         hBoxLayoutPtr->addWidget(my_roomUserListComboBoxPtr);
 
          my_chatLineEditPtr = new QLineEdit(this);
-         layout()->addWidget(my_chatLineEditPtr);
+         hBoxLayoutPtr->addWidget(my_chatLineEditPtr);
 
          //do_clearBackgroundImage();
          auto filename = QString(":/seville/assets/images/test-pattern.png");
@@ -183,6 +192,16 @@ namespace seville
                  &seville::palace::Client::viewNeedsUpdatingEvent,
                  this,
                  &seville::view::PalaceClientWidget::on_viewNeedsUpdating);
+
+         connect(my_palaceClientPtr,
+                 &seville::palace::Client::roomListWasReceivedEvent,
+                 this,
+                 &seville::view::PalaceClientWidget::on_roomListDidLoad);
+
+         connect(my_roomUserListComboBoxPtr,
+                 static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                 this,
+                 &seville::view::PalaceClientWidget::on_roomWasSelected);
 
          //auto mainWindowPtr =
          //static_cast<view::MainWindow*>(this->parent()->parent());
@@ -453,29 +472,32 @@ namespace seville
          auto usersPtr = my_palaceClientPtr->roomPtr()->usersPtr();
          auto z = usersPtr->size();
          // for (auto& user: *my_palaceClientPtr->roomPtr()->usersPtr())
+         // for (auto i = u32{0}; i < z; i++)
          for (auto i = u32{0}; i < z; i++)
          {
-            if (usersPtr->at(i).propsPtr() != nullptr &&
-                usersPtr->at(i).propsPtr()->at(0).imageLoadedFlag())
+            // auto j = i - 1;
+            auto j = i;
+            if (usersPtr->at(j).propsPtr() != nullptr &&
+                usersPtr->at(j).propsPtr()->at(0).imageLoadedFlag())
             {
-               auto propInstance = usersPtr->at(i).propsPtr()->at(0);
+               auto propInstance = usersPtr->at(j).propsPtr()->at(0);
                auto userImagePtr = propInstance.propImagePtr();
                auto propOffset = propInstance.offset();
 
-               painter.drawImage(usersPtr->at(i).x() + propOffset.x(),
-                                 usersPtr->at(i).y() + propOffset.y(),
+               painter.drawImage(usersPtr->at(j).x() + propOffset.x(),
+                                 usersPtr->at(j).y() + propOffset.y(),
                                  *userImagePtr);
             } else {
-               auto face = usersPtr->at(i).face();
-               auto color = usersPtr->at(i).color();
+               auto face = usersPtr->at(j).face();
+               auto color = usersPtr->at(j).color();
                auto rect = QRect(face * kSmileyWidth,
                                  color * kSmileyHeight,
                                  kSmileyWidth,
                                  kSmileyHeight);
 
                auto userImage = my_spritesheet.copy(rect);
-               painter.drawImage(usersPtr->at(i).x(), //  - kSmileyWidth / 2,
-                                 usersPtr->at(i).y(), // - kSmileyHeight / 2,
+               painter.drawImage(usersPtr->at(j).x(), //  - kSmileyWidth / 2,
+                                 usersPtr->at(j).y(), // - kSmileyHeight / 2,
                                  userImage);
             }
 
@@ -484,20 +506,23 @@ namespace seville
          }
 
          // for (auto& user: *my_palaceClientPtr->roomPtr()->usersPtr())
+         // for (auto i = u32{0}; i < z; i++)
          for (auto i = u32{0}; i < z; i++)
          {
+            // auto j = i - 1;
+            auto j = i;
             auto font = QFont("Sans-Serif", 10, QFont::Bold);
             // font.setWeight(3);
 
             auto fontMetrics = QFontMetrics(font);
 
             auto width = fontMetrics.boundingRect(
-                     usersPtr->at(i).username()).width() + kDropShadowWidth;
+                     usersPtr->at(j).username()).width() + kDropShadowWidth;
 
             // auto nameTextRect = QRect();
             auto nameTextPoint =
-                  QPoint(usersPtr->at(i).x() + (kSmileyWidth / 2) - (width / 2),
-                         usersPtr->at(i).y() + 56);
+                  QPoint(usersPtr->at(j).x() + (kSmileyWidth / 2) - (width / 2),
+                         usersPtr->at(j).y() + 56);
 
             // nameTextRect.setX(user.x());
             // nameTextRect.setY(user.y());
@@ -520,26 +545,26 @@ namespace seville
             painter.setPen(Qt::black);
             // painter.drawPath(painterPath);
             painter.drawText(
-                     nameTextPoint + QPoint(0, -1), usersPtr->at(i).username());
+                     nameTextPoint + QPoint(0, -1), usersPtr->at(j).username());
             painter.drawText(
-                     nameTextPoint + QPoint(-1, 0), usersPtr->at(i).username());
+                     nameTextPoint + QPoint(-1, 0), usersPtr->at(j).username());
             painter.drawText(
-                     nameTextPoint + QPoint(1, 0), usersPtr->at(i).username());
+                     nameTextPoint + QPoint(1, 0), usersPtr->at(j).username());
 
             painter.setFont(font);
             painter.setPen(Qt::black);
             // painter.drawPath(painterPath);
             painter.drawText(
-                     nameTextPoint + QPoint(0, 1), usersPtr->at(i).username());
+                     nameTextPoint + QPoint(0, 1), usersPtr->at(j).username());
 
             // draw name
             // painter.setPen(Qt::Pen
             painter.setFont(font);
-            if (0 <= usersPtr->at(i).color() &&
-                usersPtr->at(i).color() < kNumNameColors)
-              painter.setPen(kNameColors[usersPtr->at(i).color()]);
+            if (0 <= usersPtr->at(j).color() &&
+                usersPtr->at(j).color() < kNumNameColors)
+              painter.setPen(kNameColors[usersPtr->at(j).color()]);
 
-            painter.drawText(nameTextPoint, usersPtr->at(i).username());
+            painter.drawText(nameTextPoint, usersPtr->at(j).username());
          }
 
          // update();
@@ -595,6 +620,24 @@ namespace seville
       void PalaceClientWidget::on_viewNeedsUpdating(void)
       {
          update();
+      }
+
+      void PalaceClientWidget::on_roomListDidLoad(void)
+      {
+         my_roomUserListComboBoxPtr->clear();
+         auto roomListPtr = my_palaceClientPtr->serverPtr()->roomListPtr();
+         for (auto& room: *roomListPtr) {
+            my_roomUserListComboBoxPtr->addItem(room.roomName(), room.id());
+         }
+      }
+
+      void PalaceClientWidget::on_roomWasSelected(int index)
+      {
+         auto room_id_variant = my_roomUserListComboBoxPtr->itemData(index);
+         auto room_id = room_id_variant.toInt();
+         if (0 <= room_id && room_id <= 65535) {
+            my_palaceClientPtr->gotoRoom(room_id);
+         }
       }
    }
 }

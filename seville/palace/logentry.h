@@ -21,14 +21,14 @@ namespace seville
       class LogEntry
       {
       public:
-         static std::unique_ptr<LogEntry> New(
-               LogEntryKind logEntryKind = LogEntryKind::kChatKind,
-               const QString& message = "",
-               const QString& fromUsername = "",
-               const QString& toUsername = ""
-            );
+//         static std::unique_ptr<LogEntry> New(
+//               LogEntryKind logEntryKind = LogEntryKind::kChatKind,
+//               const QString& message = "",
+//               const QString& fromUsername = "",
+//               const QString& toUsername = ""
+//            );
 
-         //LogMessage(void);
+         // LogMessage(void);
 
          LogEntry(const LogEntry& other);
 
@@ -71,7 +71,8 @@ namespace seville
          }
 
       private:
-         std::unique_ptr<std::vector<LogEntry>> my_messagesUniquePtr;
+         // std::unique_ptr<std::vector<LogEntry>> my_messagesUniquePtr;
+         std::vector<LogEntry> my_messages;
          bool my_debugModeFlag;
          LogEntryKind my_logEntryKind;
          QString my_message;

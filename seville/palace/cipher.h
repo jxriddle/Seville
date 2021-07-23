@@ -21,8 +21,8 @@ namespace seville
          explicit Cipher(void); // = delete;
          virtual ~Cipher(void);
 
-         static std::unique_ptr<Cipher> New(void);
-         //std::optional<Cipher*>;
+         // static std::unique_ptr<Cipher> New(void);
+         // std::optional<Cipher*>;
 
          QByteArray encipher(
                const QByteArray& plaintext,

@@ -67,18 +67,18 @@ namespace seville
          else if (nBytesToCompleteHeader < 0)
             return 0;
 
-         auto nBytesAvailable = my_socket.bytesAvailable();
+         auto nBytesAvailable = my_socketPtr->bytesAvailable();
          auto isPartialRead = nBytesAvailable < nBytesToCompleteHeader;
          auto nBytesToRead =
                (isPartialRead * nBytesAvailable) |
                (!isPartialRead * nBytesToCompleteHeader);
 
-         //auto header = my_socket.read(nBytesToRead);
+         //auto header = my_socketPtr->read(nBytesToRead);
          //QDataStream headerStream(header);
          //my_netMsg.setHeader(header);
          //my_netMsg.setStreamCursorPosition(0);
          //my_netMsg.streamReadU32();
-         my_netMsg.append(my_socket.read(nBytesToRead));
+         my_netMsg.append(my_socketPtr->read(nBytesToRead));
 
          auto netMsgHeaderSize = my_netMsg.size();
 
@@ -106,14 +106,14 @@ namespace seville
          else if (nBytesToCompleteContent < 0)
             return 0;
 
-         auto nBytesAvailable = my_socket.bytesAvailable();
+         auto nBytesAvailable = my_socketPtr->bytesAvailable();
          auto isPartialRead = nBytesAvailable < nBytesToCompleteContent;
          auto nBytesToRead =
                (isPartialRead * nBytesAvailable) |
                (!isPartialRead * nBytesToCompleteContent);
 
          // maybe reads should be chunked?
-         my_netMsg.append(my_socket.read(nBytesToRead));
+         my_netMsg.append(my_socketPtr->read(nBytesToRead));
          //my_netMsg.appendContent()
 
          //auto sizeN = this->size();
@@ -134,69 +134,6 @@ namespace seville
                nNet::MsgBytesReadTotal - Net::Msg::kHeaderSize;
          return nPayloadBytesReadTotal == nNet::MsgBytesExpected;
          */
-      }
-
-      void Client::do_setupEvents(void)
-      {
-         // wire up events
-         connect(&my_socket, &QTcpSocket::readyRead, //&QIODevice::readyRead,
-                 this, &seville::palace::Client::on_readyReadDidOccur);
-                 //this, [this](void) {
-               //do_readSocket();
-            //});
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-         connect(
-            &my_socket,QOverload<QAbstractSocket::SocketError>
-                  ::of(&QAbstractSocket::error),
-            this, &Client::on_socketErrorDidOccur);
-#else
-         connect(
-            &my_socket, QOverload<QAbstractSocket::SocketError>::of(
-                     &QAbstractSocket::errorOccurred),
-                  this, &Client::on_socketErrorDidOccur);
-#endif
-
-                  //this, [this](QAbstractSocket::SocketError error) {
-                  //&Client::on_socketError
-               //QAbstractSocket::SocketError::
-
-//            connect(
-//                  &my_socket_,
-//                  &QTcpSocket::errorOccurred,
-//                  this,
-//                     [this](QAbstractSocket::SocketError socket_error) {
-//               my_logger_.error("Socket error");
-//               qCDebug(log_seville) << "ERROR: Socket Error";
-//            });
-
-         connect(&my_networkAccessManager,
-                 &QNetworkAccessManager::finished,
-                 this,
-                 &seville::palace::Client::on_networkAccessManagerDidFinish);
-
-         // connect(&my_propListNetworkAccessManager,
-         //         &QNetworkAccessManager::finished,
-         //         this, &seville::palace::Client::on_propListDidFetchAsync);
-
-         // connect(&my_propNetworkAccessManager,
-         //         &QNetworkAccessManager::finished,
-         //         this, &seville::palace::Client::on_propDidFetchAsync);
-
-//            connect(
-//               &my_logger, &Logger::messageLogged,
-//               this, [=](
-//                        Logger::MessageKind kind,
-//                        const QString& message,
-//                        const QString* fromUsername,
-//                        const QString* toUsername
-//                     )
-//               {
-//                  do_logMessage(kind, message, fromUsername, toUsername);
-//               }
-//            );
-         connect(&my_pingTimer, &QTimer::timeout,
-                 this, &seville::palace::Client::do_sendPing);
       }
 
       //, const QMap<QString, QString>& mapOfHeaders)
@@ -245,20 +182,23 @@ namespace seville
 //         my_puidCrc = 0xc144c580;
 //         my_regCounter = 0xcf07309c;
 //         my_regCrc = 0x5905f923;
-         my_netMsg.clear();
+//         my_netMsg.clear();
          my_server.clear();
          // my_user.clear();
          my_room.clear();
          my_cipher.clear();
 
          my_isUserIdChanged = false;
+
          my_idCounter = 0xf5dc385e;
          my_idCrc = 0xc144c580;
          my_regCounter = 0xcf07309c;
          my_regCrc = 0x5905f923;
+
          my_netMsgTTLCount = 0;
-         my_retryLogonFlag = 0;
-         my_registration.setSeed(seed, p);
+         my_shouldRetryLogonFlag = 1;
+
+         my_registration.clear();
       }
 
       void Client::do_resetReceiveTimer(void)
@@ -506,12 +446,12 @@ namespace seville
 
       void Client::on_readyReadDidOccur(void)
       {
-         //while (my_socket.bytesAvailable())
+         //while (my_socketPtr->bytesAvailable())
          do_readSocket();
 
 //         my_logger.appendDebugMessage(
 //                  QString("%1 bytes remaining to read from socket")
-//                  .arg(my_socket.bytesAvailable()));
+//                  .arg(my_socketPtr->bytesAvailable()));
       }
 
       void Client::do_readSocket(void)
@@ -526,11 +466,11 @@ namespace seville
 
          //while (do_readNetMsgHeaderFromSocket())
          //auto netMsg =
-
-         while (0 < my_socket.bytesAvailable())
+         while (my_socketPtr != nullptr &&
+                0 < my_socketPtr->bytesAvailable())
          {
             if (my_netMsg.size() < NetMsg::kHeaderSize) {
-               if (my_socket.bytesAvailable() < NetMsg::kHeaderSize) {
+               if (my_socketPtr->bytesAvailable() < NetMsg::kHeaderSize) {
                   break;
                }
 
@@ -543,7 +483,7 @@ namespace seville
                break;
 
             auto netMsgLen = my_netMsg.bodyLen();
-            if (my_socket.bytesAvailable() < netMsgLen)
+            if (my_socketPtr->bytesAvailable() < netMsgLen)
                break;
 
             if (!do_readNetMsgContentFromSocket())
@@ -584,7 +524,7 @@ namespace seville
                // my_user.setId(netMsgRef);
                my_userId = netMsgRef;
 
-               if (do_sendLogon() < 0)
+               if (do_sendLogon() <= 0)
                {
                   my_logger.appendErrorMessage("Error sending logon");
                   return;
@@ -592,7 +532,7 @@ namespace seville
 
                do_setConnectionState(ConnectionState::kConnectedState);
                my_logger.appendInfoMessage(
-                        QString("Connected to %1").arg(my_server.hostname()));
+                        QString("Connected to %1.").arg(my_server.hostname()));
 
                my_netMsg.clear();
 
@@ -602,11 +542,22 @@ namespace seville
                      NetMsg::kHeaderSize <= my_netMsg.size() &&
                      netMsgId == NetMsg::kConnectionErrorKind)
             {
-               do_setConnectionState(ConnectionState::kDisconnectedState);
-               my_logger.appendErrorMessage("Disconnected by server");
+               if (my_shouldRetryLogonFlag) {
+                  my_shouldRetryLogonFlag = 0;
+                  do_disconnectFromHost();
+                  do_connectToHost(my_server.hostname(), my_server.port());
+               } else {
+                  do_disconnectFromHost();
+                  my_logger.appendErrorMessage("Disconnected by server.");
+                  if (0 < my_netMsg.contentSize()) {
+                     auto logErrorMessage =
+                           my_netMsg.streamReadFixedQString(netMsgLen);
+                     my_logger.appendErrorMessage(logErrorMessage);
+                  }
+                  // do_clear();
+               }
 
                my_netMsg.clear();
-               clear();
             }
             else if (my_connectionState == ConnectionState::kConnectedState)
             {
@@ -825,10 +776,12 @@ namespace seville
       }
 
       void Client::do_connectToHost(
-            QString host, i32 port, QString username, i32 initialRoom)
+            QString hostname, i32 port, QString username, i32 initialRoom)
       {
          do_disconnectFromHost();
-         do_clear();
+
+         my_socketPtr = new QTcpSocket();
+         do_setupEvents();
 
          auto condHostTcpPort = (0 == port);
          auto actualHostTcpPort = static_cast<u16>(
@@ -840,7 +793,7 @@ namespace seville
 
          auto netMsg = QString("Connecting to palace://%1@%2:%3/%4")
                .arg(username.toUtf8().data())
-               .arg(host.toUtf8().data())
+               .arg(hostname.toUtf8().data())
                .arg(actualHostTcpPort)
                .arg(actualInitialRoom);
 
@@ -848,7 +801,7 @@ namespace seville
 
          // my_user.setUsername(username);
          my_username = username;
-         my_server.setHost(host);
+         my_server.setHostname(hostname);
          my_server.setPort(actualHostTcpPort);
          my_room.setId(actualInitialRoom);
 
@@ -856,7 +809,7 @@ namespace seville
          do_setConnectionState(ConnectionState::kHandshakingState);
          emit connectionStateDidChangeEvent(ConnectionState::kHandshakingState);
 
-         my_socket.connectToHost(host, actualHostTcpPort);
+         my_socketPtr->connectToHost(hostname, actualHostTcpPort);
          my_pingTimer.setInterval(kDefaultPingInterval);
          my_pingTimer.start();
       }
@@ -864,11 +817,13 @@ namespace seville
       void Client::do_disconnectFromHost(void)
       {
          if (my_connectionState != ConnectionState::kDisconnectedState) {
-            //my_logger.appendInfoMessage("Disconnected.");
-            my_socket.disconnectFromHost();
+            my_socketPtr->disconnectFromHost();
             my_pingTimer.stop();
             do_setConnectionState(ConnectionState::kDisconnectedState);
-            // do_clear();
+            do_teardownEvents();
+
+            my_socketPtr->deleteLater();
+            my_socketPtr = nullptr;
          }
       }
 
@@ -969,7 +924,7 @@ namespace seville
 
       bool Client::do_determineIsConnected(void) const
       {
-         return my_socket.state() != QTcpSocket::ConnectedState ||
+         return my_socketPtr->state() != QTcpSocket::ConnectedState ||
                my_connectionState != ConnectionState::kConnectedState;
       }
 
@@ -993,8 +948,7 @@ namespace seville
 
          if (shouldSwap) {
             return NetMsgOptions::kEndianSwap;
-         }
-         else {
+         } else {
             return NetMsgOptions::kNoEndianSwap;
          }
       }
@@ -1086,7 +1040,6 @@ namespace seville
          my_logger.appendDebugMessage("> ConnectionError");
 
          do_disconnectFromHost();
-         my_logger.appendInfoMessage("Disconnected.");
 
          return 1;
       }
@@ -1633,6 +1586,8 @@ namespace seville
             roomListPtr->push_back(room);
          }
 
+         emit roomListWasReceivedEvent();
+
          return 1;
       }
 
@@ -1658,6 +1613,8 @@ namespace seville
 
             userListPtr->push_back(user);
          }
+
+         emit userListWasReceivedEvent();
 
          return 1;
       }
@@ -1982,6 +1939,8 @@ namespace seville
 
          netMsg.appendU32(my_regCrc);
          netMsg.appendU32(my_regCounter);
+         // netMsg.appendU32(my_registration.counter());
+         // netMsg.appendU32(my_registration.crc());
          netMsg.appendFixedPascalQString(
                   my_username, NetMsg::kLogonMaximumUsernameSize);
          netMsg.appendFixedPascalQString(
@@ -1990,6 +1949,8 @@ namespace seville
                   FlagAuxOptions::kAuthenticate | FlagAuxOptions::kWin32);
          netMsg.appendU32(my_idCounter);
          netMsg.appendU32(my_idCrc);
+         // netMsg.appendU32(my_registration.puidCounter());
+         // netMsg.appendU32(my_registration.puidCrc());
          netMsg.appendU32(kMagicFromPChat);
          netMsg.appendU32(kMagicFromPChat);
          netMsg.appendU32(kMagicFromPChat);
@@ -2002,16 +1963,16 @@ namespace seville
          netMsg.appendU32(
                   DownloadCapabilities::kPalaceAssetDownload |
                   DownloadCapabilities::kPalaceFileDownload |
-                  (!my_retryLogonFlag *
+                  (my_shouldRetryLogonFlag *
                    DownloadCapabilities::kHttpFileDownload) |
                   DownloadCapabilities::kHttpFileExtendedDownload);
          netMsg.appendU32(EngineCapabilities2d::kPalace2dEngine);
          netMsg.appendU32(GraphicsCapabilities2d::kGif87);
          netMsg.appendU32(GraphicsCapabilities3d::kNo3dGraphics);
 
-         auto bytesWritten = my_socket.write(netMsg);
+         auto bytesWritten = my_socketPtr->write(netMsg);
          return 0 < bytesWritten;
-         //return my_socket.flush();
+         //return my_socketPtr->flush();
       }
 
       i32 Client::do_sendAuthenticate(
@@ -2031,9 +1992,9 @@ namespace seville
          authMsg.setBodyLen(0);
          authMsg.setRef(NetMsg::kNoRef);
 
-         auto bytesWritten = my_socket.write(authMsg);
+         auto bytesWritten = my_socketPtr->write(authMsg);
          return 0 < bytesWritten;
-         //return my_socket.flush();
+         //return my_socketPtr->flush();
       }
 
       i32 Client::do_sendTalk(const QString& text)
@@ -2047,9 +2008,9 @@ namespace seville
          talkMsg.append(text.toUtf8());
          talkMsg.append('\0');
 
-         auto bytesWritten = my_socket.write(talkMsg);
+         auto bytesWritten = my_socketPtr->write(talkMsg);
          return 0 < bytesWritten;
-         //return my_socket.flush();
+         //return my_socketPtr->flush();
       }
 
       i32 Client::do_sendXTalk(const QString& text)
@@ -2067,9 +2028,9 @@ namespace seville
          xTalkMsg.append(ciphertext);
          xTalkMsg.append('\0');
 
-         auto bytesWritten = my_socket.write(xTalkMsg);
+         auto bytesWritten = my_socketPtr->write(xTalkMsg);
          return 0 < bytesWritten;
-         //return my_socket.flush();
+         //return my_socketPtr->flush();
       }
 
       i32 Client::do_sendXWhisper(const u32 userId, const QString& text)
@@ -2090,9 +2051,9 @@ namespace seville
          msg.append(ciphertext);
          msg.append('\0');
 
-         auto bytesWritten = my_socket.write(msg);
+         auto bytesWritten = my_socketPtr->write(msg);
          return 0 < bytesWritten;
-         //return my_socket.flush();
+         //return my_socketPtr->flush();
       }
 
       i32 Client::do_sendPing(void)
@@ -2104,9 +2065,9 @@ namespace seville
          pingMsg.setRef(NetMsg::kNoRef);
 
          my_logger.appendDebugMessage(QString("Ping!"));
-         auto bytesWritten = my_socket.write(pingMsg);
+         auto bytesWritten = my_socketPtr->write(pingMsg);
          return 0 < bytesWritten;
-         //return my_socket.flush();
+         //return my_socketPtr->flush();
       }
 
       i32 Client::do_sendPong(void)
@@ -2118,9 +2079,9 @@ namespace seville
          pongMsg.setRef(NetMsg::kNoRef);
 
          my_logger.appendDebugMessage(QString("Pong!"));
-         auto bytesWritten = my_socket.write(pongMsg);
+         auto bytesWritten = my_socketPtr->write(pongMsg);
          return 0 < bytesWritten;
-         //return my_socket.flush();
+         //return my_socketPtr->flush();
       }
 
       i32 Client::do_sendGotoRoom(u16 roomId)
@@ -2138,9 +2099,9 @@ namespace seville
 
          gotoroomMsg.appendU16(roomId);
 
-         auto bytesWritten = my_socket.write(gotoroomMsg);
+         auto bytesWritten = my_socketPtr->write(gotoroomMsg);
          return 0 < bytesWritten;
-         //return my_socket.flush();
+         //return my_socketPtr->flush();
       }
 
       i32 Client::do_sendMove(i16 x, i16 y)
@@ -2157,9 +2118,9 @@ namespace seville
          moveMsg.appendI16(x);
 
          // emit userMove signal to invalidate view
-         auto bytesWritten = my_socket.write(moveMsg);
+         auto bytesWritten = my_socketPtr->write(moveMsg);
          return 0 < bytesWritten;
-         //return my_socket.flush();
+         //return my_socketPtr->flush();
       }
 
       i32 Client::do_sendRequestRoomList(void)
@@ -2172,7 +2133,7 @@ namespace seville
          msg.setBodyLen(NetMsg::kNoLen);
          msg.setRef(NetMsg::kNoRef);
 
-         auto bytesWritten = my_socket.write(msg);
+         auto bytesWritten = my_socketPtr->write(msg);
          return 0 < bytesWritten;
       }
 
@@ -2186,7 +2147,7 @@ namespace seville
          msg.setBodyLen(NetMsg::kNoLen);
          msg.setRef(NetMsg::kNoRef);
 
-         auto bytesWritten = my_socket.write(msg);
+         auto bytesWritten = my_socketPtr->write(msg);
          return 0 < bytesWritten;
       }
 
@@ -2205,8 +2166,8 @@ namespace seville
          serverUserListMsg.setBodyLen(NetMsg::kNoLen);
          serverUserListMsg.setRef(NetMsg::kNoRef);
 
-         auto writeByteCount = my_socket.write(serverRoomListMsg);
-         writeByteCount &= my_socket.write(serverUserListMsg);
+         auto writeByteCount = my_socketPtr->write(serverRoomListMsg);
+         writeByteCount &= my_socketPtr->write(serverUserListMsg);
 
          return 0 < writeByteCount;
       }
@@ -2229,7 +2190,7 @@ namespace seville
 
          emit viewNeedsUpdatingEvent();
 
-         auto writeByteCount = my_socket.write(msg);
+         auto writeByteCount = my_socketPtr->write(msg);
          return 0 < writeByteCount;
       }
 
@@ -2251,7 +2212,7 @@ namespace seville
 
          emit viewNeedsUpdatingEvent();
 
-         auto writeByteCount = my_socket.write(msg);
+         auto writeByteCount = my_socketPtr->write(msg);
          return 0 < writeByteCount;
       }
 
@@ -2280,18 +2241,81 @@ namespace seville
          my_networkAccessManager.post(request, jsonDoc.toJson());
       }
 
+      void Client::do_setupEvents(void)
+      {
+         // wire up events
+         connect(my_socketPtr, &QTcpSocket::readyRead, //&QIODevice::readyRead,
+                 this, &seville::palace::Client::on_readyReadDidOccur);
+                 //this, [this](void) {
+               //do_readSocket();
+            //});
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+         connect(
+            my_socketPtr,QOverload<QAbstractSocket::SocketError>
+                  ::of(&QAbstractSocket::error),
+            this, &Client::on_socketErrorDidOccur);
+#else
+         connect(
+            my_socketPtr, QOverload<QAbstractSocket::SocketError>::of(
+                     &QAbstractSocket::errorOccurred),
+                  this, &Client::on_socketErrorDidOccur);
+#endif
+
+                  //this, [this](QAbstractSocket::SocketError error) {
+                  //&Client::on_socketError
+               //QAbstractSocket::SocketError::
+
+//            connect(
+//                  my_socketPtr_,
+//                  &QTcpSocket::errorOccurred,
+//                  this,
+//                     [this](QAbstractSocket::SocketError socket_error) {
+//               my_logger_.error("Socket error");
+//               qCDebug(log_seville) << "ERROR: Socket Error";
+//            });
+
+         connect(&my_networkAccessManager,
+                 &QNetworkAccessManager::finished,
+                 this,
+                 &seville::palace::Client::on_networkAccessManagerDidFinish);
+
+         // connect(&my_propListNetworkAccessManager,
+         //         &QNetworkAccessManager::finished,
+         //         this, &seville::palace::Client::on_propListDidFetchAsync);
+
+         // connect(&my_propNetworkAccessManager,
+         //         &QNetworkAccessManager::finished,
+         //         this, &seville::palace::Client::on_propDidFetchAsync);
+
+//            connect(
+//               &my_logger, &Logger::messageLogged,
+//               this, [=](
+//                        Logger::MessageKind kind,
+//                        const QString& message,
+//                        const QString* fromUsername,
+//                        const QString* toUsername
+//                     )
+//               {
+//                  do_logMessage(kind, message, fromUsername, toUsername);
+//               }
+//            );
+         connect(&my_pingTimer, &QTimer::timeout,
+                 this, &seville::palace::Client::do_sendPing);
+      }
+
       void Client::do_teardownEvents(void)
       {
-         disconnect(&my_socket, &QTcpSocket::readyRead,
+         disconnect(my_socketPtr, &QTcpSocket::readyRead,
                     this, &seville::palace::Client::on_readyReadDidOccur);
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
          disconnect(
-            &my_socket,QOverload<QAbstractSocket::SocketError>
+            my_socketPtr,QOverload<QAbstractSocket::SocketError>
                   ::of(&QAbstractSocket::error),
             this, &Client::on_socketErrorDidOccur);
 #else
-         disconnect(&my_socket, QOverload<QAbstractSocket::SocketError>::of(
+         disconnect(my_socketPtr, QOverload<QAbstractSocket::SocketError>::of(
                     &QAbstractSocket::errorOccurred),
                     this, &Client::on_socketErrorDidOccur);
 #endif
@@ -2311,22 +2335,20 @@ namespace seville
 
       void Client::do_deinit(void)
       {
-         do_teardownEvents();
-
          do_disconnectFromHost();
       }
 
       void Client::do_init(void)
       {
-         do_setupEvents();
-
+         // my_socketPtr = new QTcpSocket();
+         // do_setupEvents();
          do_clear();
 
          // my_logger.setMode(LogMode::kDebugMode);
 
          // TODO use a linked list or deque to communicate between threads
          // or just use a big buffer, as below.
-         //my_socket.setReadBufferSize(1e7);
+         //my_socketPtr->setReadBufferSize(1e7);
       }
    }
 }

@@ -21,8 +21,8 @@ namespace seville
       Q_OBJECT
 
       public:
-         static std::unique_ptr<ConnectDialog>New(
-               QWidget* parentWidgetPtr = nullptr);
+//         static std::unique_ptr<ConnectDialog>New(
+//               QWidget* parentWidgetPtr = nullptr);
 
          explicit ConnectDialog(QWidget* parentWidgetPtr = nullptr);
          //virtual ~ConnectDialog(void);

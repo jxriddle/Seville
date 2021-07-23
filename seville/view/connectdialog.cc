@@ -19,21 +19,21 @@ namespace seville
          do_setupEvents();
       }
 
-      std::unique_ptr<ConnectDialog> ConnectDialog::New(
-            QWidget* parentWidgetPtr)
-      {
-         auto instance = std::make_unique<ConnectDialog>(parentWidgetPtr);
-         //std::make_optional<ConnectDialog*>();
+//      std::unique_ptr<ConnectDialog> ConnectDialog::New(
+//            QWidget* parentWidgetPtr)
+//      {
+//         auto instance = std::make_unique<ConnectDialog>(parentWidgetPtr);
+//         //std::make_optional<ConnectDialog*>();
 
-         //if (object.has_value()) {
-            //object.value()->ok_setupView();
-            //object.value()->ok_setupEvents();
-         //}
-         //instance->do_setup_view_();
-         //instance->do_setup_events_();
+//         //if (object.has_value()) {
+//            //object.value()->ok_setupView();
+//            //object.value()->ok_setupEvents();
+//         //}
+//         //instance->do_setup_view_();
+//         //instance->do_setup_events_();
 
-         return instance;
-      }
+//         return instance;
+//      }
 
       void ConnectDialog::do_setupView(void)
       {

@@ -20,9 +20,9 @@ namespace seville
 
       public:
          explicit LogWidget(QWidget* parentWidgetPtr = nullptr);
-         //virtual ~LogWidget();
+         // virtual ~LogWidget();
 
-         static LogWidget* New(QWidget* parentWidgetPtr = nullptr);
+         // static LogWidget* New(QWidget* parentWidgetPtr = nullptr);
 
          inline palace::Client* palaceClientPtr(void) {
             return my_palaceClientPtr;

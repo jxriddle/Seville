@@ -2,6 +2,7 @@
 #define SEVILLE_PALACE_CLIENT_H_
 
 #include <string>
+#include <random>
 
 #include <QObject>
 #include <QImage>
@@ -278,11 +279,20 @@ namespace seville
             emit viewNeedsUpdatingEvent();
          }
 
+         inline void gotoRoom(u16 room_id) {
+            my_logger.appendDebugMessage(
+                     QString("GotoRoom %1").arg(room_id));
+
+            do_sendGotoRoom(room_id);
+         }
+
       signals:
          void backgroundImageDidLoadEvent(void);
          void connectionStateDidChangeEvent(ConnectionState);
          void viewNeedsUpdatingEvent(void);
          void serverNameWasSetEvent(const QString& value);
+         void roomListWasReceivedEvent(void);
+         void userListWasReceivedEvent(void);
 
       public slots:
          void on_networkAccessManagerDidFinish(QNetworkReply* replyPtr);
@@ -293,19 +303,20 @@ namespace seville
       private:
          Log my_logger;
          QNetworkAccessManager my_networkAccessManager;
+         QTcpSocket* my_socketPtr;
          i32 my_transferTimerId;
          QTimer my_pingTimer;
          QTimer my_netmsgReceiveTimer;
          QTime my_pongTime;
          HostByteOrder my_byteOrder;
          ConnectionState my_connectionState;
-         QTcpSocket my_socket;
-         QString my_username;
-         QString my_wizpass;
-         QString my_host;
-         u16 my_port;
+         // QTcpSocket my_socket;
+         // QString my_host;
+         // u16 my_port;
          Server my_server;
          i32 my_userId;
+         QString my_username;
+         QString my_wizpass;
          Room my_room;
          Cipher my_cipher;
          QTimer my_timer;
@@ -317,9 +328,10 @@ namespace seville
          bool my_isUserIdChanged;
          u32 my_regCrc;
          u32 my_regCounter;
-         u32 my_retryLogonFlag;
+         u32 my_shouldRetryLogonFlag;
          u32 my_regMagic;
          Registration my_registration;
+         std::random_device my_randDev;
 
 //         bool my_puidChangedFlag; //    = false;
 //         u32 my_puidCounter; // = 0xf5dc385e;

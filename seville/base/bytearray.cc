@@ -10,11 +10,9 @@ namespace seville
       do_clear();
    }
 
-   std::unique_ptr<ByteArray> ByteArray::New(void)
-   {
-      auto instance = std::make_unique<ByteArray>();
-
-
-      return instance;
-   }
+//   std::unique_ptr<ByteArray> ByteArray::New(void)
+//   {
+//      auto instance = std::make_unique<ByteArray>();
+//      return instance;
+//   }
 }

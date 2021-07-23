@@ -37,7 +37,6 @@ SOURCES += \
     seville/palace/logentry.cc \
     seville/palace/netmsg.cc \
     seville/palace/prop.cc \
-    seville/palace/registration.cc \
     seville/palace/room.cc \
     seville/palace/server.cc \
     seville/palace/user.cc \

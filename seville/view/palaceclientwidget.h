@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
 #include <QGraphicsView>
+#include <QComboBox>
 
 #include "seville/palace/client.h"
 //#include "seville/view/mainwindow.h"
@@ -76,6 +77,8 @@ namespace seville
          //void on_currentTabDidChange(int index);
          void on_viewNeedsUpdating(void);
          void on_serverNameWasSet(const QString& value);
+         void on_roomListDidLoad(void);
+         void on_roomWasSelected(int index);
 
       private:
          palace::Client* my_palaceClientPtr;
@@ -85,6 +88,7 @@ namespace seville
          QVBoxLayout* my_mainLayoutPtr;
          QLineEdit* my_lineEditAddressPtr;
          QLineEdit* my_chatLineEditPtr;
+         QComboBox* my_roomUserListComboBoxPtr;
 
          double my_scaleFactor;
          // QPixmap my_backgroundImage;

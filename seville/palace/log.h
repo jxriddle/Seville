@@ -34,7 +34,7 @@ namespace seville
 
          //virtual ~Logger(void);
 
-         static Log* New(void);
+         // static Log* New(void);
 
          inline LogMode mode(void) const {
             return my_mode;
@@ -45,7 +45,8 @@ namespace seville
          }
 
          inline std::vector<LogEntry>* logEntriesPtr(void) {
-            return my_logEntriesUniquePtr.get();
+            // return my_logEntriesUniquePtr.get();
+            return &my_logEntries;
          }
 
 //         inline auto takeLogEntriesPtr(void) ->
@@ -143,7 +144,8 @@ namespace seville
 
       private:
          LogMode my_mode;
-         std::unique_ptr<std::vector<LogEntry>> my_logEntriesUniquePtr;
+         // std::unique_ptr<std::vector<LogEntry>> my_logEntriesUniquePtr;
+         std::vector<LogEntry> my_logEntries;
 
          void do_appendLogEntry(const LogEntry& message);
          // auto do_log_message_unique_ptr_(

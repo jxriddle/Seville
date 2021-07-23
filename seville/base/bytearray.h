@@ -16,10 +16,10 @@ namespace seville
    {
    public:
       ByteArray(void);
-      //ByteArray(QByteArray& ref);
+      // ByteArray(QByteArray& ref);
 
-      static std::unique_ptr<ByteArray> New(void);
-      //std::optional<ByteArray*>;
+      // static std::unique_ptr<ByteArray> New(void);
+      // std::optional<ByteArray*>;
 
       static inline i64 SwapI64(i64 value) {
          auto result =
