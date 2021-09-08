@@ -60,7 +60,7 @@ namespace seville
          void widgetBackgroundDidChangeEvent(void);
          void serverNameWasSetEvent(QWidget* senderPtr, const QString& value);
          void connectionStateDidChangeEvent(
-               QWidget* senderPtr,
+               //QWidget* senderPtr,
                const palace::ConnectionState connectionState);
 
       public slots:

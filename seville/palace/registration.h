@@ -172,6 +172,8 @@ namespace seville
          }
 
          void do_setSeed(u32 reg, u32 puid) {
+             // TODO
+             (void)reg;
             my_regCrc = do_computeLicenseCrc(my_regCounter);
             my_regCounter = (my_regCounter ^ kCounterMagic) ^ my_regCrc;
             my_puidCrc = do_computeLicenseCrc(puid);

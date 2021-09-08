@@ -466,7 +466,7 @@ namespace seville
 
          //while (do_readNetMsgHeaderFromSocket())
          //auto netMsg =
-         while (my_socketPtr != nullptr &&
+         while (//my_socketPtr != nullptr &&
                 0 < my_socketPtr->bytesAvailable())
          {
             if (my_netMsg.size() < NetMsg::kHeaderSize) {
@@ -589,7 +589,7 @@ namespace seville
 
          my_connectionState = connectionState;
 
-         // emit connectionStateDidChangeEvent(connectionState);
+         emit connectionStateDidChangeEvent(connectionState);
       }
 
       i32 Client::do_parseCommand(const QString& text)
@@ -780,7 +780,10 @@ namespace seville
       {
          do_disconnectFromHost();
 
-         my_socketPtr = new QTcpSocket();
+         // TODO
+         if (my_socketPtr == nullptr)
+            my_socketPtr = new QTcpSocket();
+
          do_setupEvents();
 
          auto condHostTcpPort = (0 == port);
@@ -807,7 +810,7 @@ namespace seville
 
          my_logger.appendDebugMessage("Handshaking");
          do_setConnectionState(ConnectionState::kHandshakingState);
-         emit connectionStateDidChangeEvent(ConnectionState::kHandshakingState);
+         //emit connectionStateDidChangeEvent(ConnectionState::kHandshakingState);
 
          my_socketPtr->connectToHost(hostname, actualHostTcpPort);
          my_pingTimer.setInterval(kDefaultPingInterval);
@@ -817,13 +820,14 @@ namespace seville
       void Client::do_disconnectFromHost(void)
       {
          if (my_connectionState != ConnectionState::kDisconnectedState) {
-            my_socketPtr->disconnectFromHost();
             my_pingTimer.stop();
             do_setConnectionState(ConnectionState::kDisconnectedState);
             do_teardownEvents();
-
-            my_socketPtr->deleteLater();
-            my_socketPtr = nullptr;
+            if (my_socketPtr != nullptr) {
+               my_socketPtr->disconnectFromHost();
+               my_socketPtr->deleteLater();
+               my_socketPtr = nullptr;
+            }
          }
       }
 
@@ -1513,9 +1517,13 @@ namespace seville
 
          auto userId = my_netMsg.ref();
          auto user = my_room.userWithId(userId);
+         // if (my_room.userIdInRoom(userId))
+         // auto user = my_server.userWithId(userId);
 
-         my_logger.appendInfoMessage(
-                  QString("%1 has signed off.").arg(user.username()));
+         if (0 < user.id()) {
+             my_logger.appendInfoMessage(
+                      QString("%1 has signed off.").arg(user.username()));
+         }
 
          user = my_server.userWithId(userId);
          my_server.removeUserWithId(userId);
@@ -2340,7 +2348,7 @@ namespace seville
 
       void Client::do_init(void)
       {
-         // my_socketPtr = new QTcpSocket();
+         my_socketPtr = new QTcpSocket();
          // do_setupEvents();
          do_clear();
 

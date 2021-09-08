@@ -44,8 +44,8 @@ SOURCES += \
     seville/view/connectdialog.cc \
     seville/view/logwidget.cc \
     seville/view/palaceclientwidget.cc \
-    seville/view/tabwidget.cc \
-    seville/view/mainwindow.cc
+    seville/view/mainwindow.cc \
+    seville/view/tabwidget.cc
 
 HEADERS += \
     seville/base/logcategories.h \
@@ -68,8 +68,8 @@ HEADERS += \
     seville/view/connectdialog.h \
     seville/view/logwidget.h \
     seville/view/palaceclientwidget.h \
-    seville/view/tabwidget.h \
-    seville/view/mainwindow.h
+    seville/view/mainwindow.h \
+    seville/view/tabwidget.h
 
 DISTFILES +=
 

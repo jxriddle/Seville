@@ -28,9 +28,9 @@ namespace seville
             return my_palaceClientPtr;
          }
 
-         inline void setPalaceClientPtr(palace::Client* value) {
+         inline void setPalaceClientPtr(palace::Client* palaceClientPtr) {
             auto previousPalaceClientPtr = my_palaceClientPtr;
-            my_palaceClientPtr = value;
+            my_palaceClientPtr = palaceClientPtr;
 
             if (nullptr != previousPalaceClientPtr) {
                disconnect(

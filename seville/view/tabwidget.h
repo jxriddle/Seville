@@ -29,7 +29,8 @@ namespace seville
             void addNewTab(QWidget* contentWidgetPtr = nullptr);
             void closeCurrentTab(void);
             void removeTab(int index);
-            palace::Client* currentPalaceClientPtr(void);
+            // view::PalaceClientWidget* currentPalaceClientWidgetPtr(void);
+            // palace::Client* currentPalaceClientPtr(void);
             // auto setBackground(void);
             void clear(void);
 
@@ -51,6 +52,10 @@ namespace seville
             // void on_currentTabDidChange(int index);
             // void on_widgetBackgroundDidChange(void);
             void on_tabBarDoubleClicked(void);
+
+      protected:
+            void mouseReleaseEvent(QMouseEvent *event);
+            void mouseDoubleClickEvent(QMouseEvent* event);
 
          private:
             //AppTabBar my_appTabBar;

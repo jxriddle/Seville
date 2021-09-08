@@ -50,7 +50,7 @@ namespace seville
          do_clear();
          auto loggerPtr = my_palaceClientPtr->loggerPtr();
          auto logEntriesPtr = loggerPtr->logEntriesPtr();
-         for (auto& logEntry: *logEntriesPtr) {
+         for (auto logEntry: *logEntriesPtr) {
             my_logTextEditPtr->append(logEntry.message());
          }
       }

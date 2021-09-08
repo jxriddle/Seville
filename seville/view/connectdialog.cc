@@ -45,16 +45,6 @@ namespace seville
          // Layout
          my_mainLayoutPtr = new QGridLayout(this);
 
-         // ButtonBox
-         my_mainButtonBoxPtr = new QDialogButtonBox(this);
-
-         // PushButtons
-         my_cancelPushButtonPtr = new QPushButton(tr("&Cancel"), this);
-
-         my_connectPushButtonPtr = new QPushButton(tr("C&onnect"), this);
-         my_connectPushButtonPtr->setDefault(true);
-         my_connectPushButtonPtr->setEnabled(true);
-
          // LineEdit
          my_urlLineEditPtr = new QLineEdit(this);
 
@@ -66,6 +56,16 @@ namespace seville
 
          my_usernameLabelPtr = new QLabel(tr("&Username"), this);
          my_usernameLabelPtr->setBuddy(my_usernameLineEditPtr);
+
+         // ButtonBox
+         my_mainButtonBoxPtr = new QDialogButtonBox(this);
+
+         // PushButtons
+         my_cancelPushButtonPtr = new QPushButton(tr("&Cancel"), this);
+
+         my_connectPushButtonPtr = new QPushButton(tr("C&onnect"), this);
+         my_connectPushButtonPtr->setDefault(true);
+         my_connectPushButtonPtr->setEnabled(true);
 
          // Arrangement
          my_mainButtonBoxPtr->addButton(

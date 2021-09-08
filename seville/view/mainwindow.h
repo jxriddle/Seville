@@ -66,16 +66,18 @@ namespace seville
          void on_quitAppWasRequested(void);
          void on_aboutAppWasRequested(void);
          void on_logWindowWasToggled(void);
-         void on_newTabRequested(void);
-         void on_closeTabRequested(void);
+         void on_newTabWasRequested(void);
+         void on_closeTabWasRequested(void);
          // void on_client_widget_background_did_change(void);
          // void on_clientWidgetDidResize(int width, int height);
-         void on_connectionStateDidChange(
-               QWidget* sender, const palace::ConnectionState connectionState);
+         void on_currentClientConnectionStateDidChange(
+               //QWidget* sender,
+                const palace::ConnectionState connectionState);
+         void on_currentClientWidgetBackgroundImageDidLoad(void);
          void on_tabWasAddedWithClientWidgetPtr(
                seville::view::PalaceClientWidget* palaceClientWidgetPtr);
-         void on_tabWasRemovedWithClientWidgetPtr(
-               seville::view::PalaceClientWidget* palaceClientWidgetPtr);
+         // void on_tabWasRemovedWithClientWidgetPtr(
+         //       seville::view::PalaceClientWidget* palaceClientWidgetPtr);
          // void on_viewNeedsUpdating(void);
 
       protected:
@@ -121,6 +123,7 @@ namespace seville
 
          void do_updateMenus(void);
          void do_updateView(void);
+         PalaceClientWidget* do_currentPalaceClientWidgetPtr(void);
 
          void do_init(void);
          void do_deinit(void);

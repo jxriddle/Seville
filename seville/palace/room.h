@@ -48,7 +48,9 @@ namespace seville
                }
             }
 
-            return User();
+            auto user = User();
+            user.setId(-1);
+            return user;
          }
 
          inline User* userPtrWithId(i32 userId) {
@@ -59,6 +61,16 @@ namespace seville
             }
 
             return nullptr;
+         }
+
+         inline bool userWithIdInRoom(i32 userId) {
+             for (auto& user: my_users) {
+                 if (user.id() == userId) {
+                     return true;
+                 }
+             }
+
+             return false;
          }
 
          inline void removeUserWithId(i32 userId) {
