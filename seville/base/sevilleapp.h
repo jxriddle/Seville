@@ -11,31 +11,31 @@
 
 namespace seville
 {
-   Q_DECLARE_LOGGING_CATEGORY(seville_log)
+    Q_DECLARE_LOGGING_CATEGORY(seville_log)
 
-   namespace view
-   {
-      class MainWindow;
-   }
+    namespace view
+    {
+        class MainWindow;
+    }
 
-   class SevilleApp
-   {
-   public:
-      //extern const QLoggingCategory &name();
-      const char kAppVersion[64] = "1.0";
-      //const char kLogCategoryName[12] = "log_seville";
+    class SevilleApp
+    {
+    public:
+        //extern const QLoggingCategory &name();
+        const char kAppVersion[64] = "1.0";
+        //const char kLogCategoryName[12] = "log_seville";
 
-      SevilleApp(void) noexcept;
+        SevilleApp(void) noexcept;
 
-      int main(int argc, char* argv[]);
+        int main(int argc, char* argv[]);
 
-   //   view::MainWindow* mainWindowPtr(void);
+    //   view::MainWindow* mainWindowPtr(void);
 
-   //private:
-   //   view::MainWindow* my_mainWindowPtr;
-   };
+    //private:
+    //   view::MainWindow* my_mainWindowPtr;
+    };
 
-   extern SevilleApp app;
+    extern SevilleApp app;
 }
 
 #endif   // SEVILLE_APP_H_

@@ -3,37 +3,38 @@
 
 namespace seville
 {
-   namespace palace
-   {
-      Log::Log(void)
-      {
-         do_init();
-      }
+    namespace palace
+    {
+        Log::Log(void)
+        {
+            do_init();
+        }
 
-      // Logger::~Logger(void) {}
+        // Logger::~Logger(void) {}
 
-//      Log* Log::New(void)
-//      {
-//         auto instance = new Log();
+        //      Log* Log::New(void)
+        //      {
+        //         auto instance = new Log();
 
-//         instance->my_logEntriesUniquePtr =
-//               std::make_unique<std::vector<LogEntry>>();
-//         instance->my_mode = LogMode::kDefaultMode;
+        //         instance->my_logEntriesUniquePtr =
+        //               std::make_unique<std::vector<LogEntry>>();
+        //         instance->my_mode = LogMode::kDefaultMode;
 
-//         return instance;
-//      }
+        //         return instance;
+        //      }
 
-      void Log::do_init(LogMode mode)
-      {
-         // my_logEntriesUniquePtr = std::make_unique<std::vector<LogEntry>>();
-         my_mode = mode;
-      }
+        void Log::do_init(LogMode mode)
+        {
+            // my_logEntriesUniquePtr = std::make_unique<std::vector<LogEntry>>();
+            my_mode = mode;
+        }
 
-      void Log::do_appendLogEntry(const LogEntry& logEntry)
-      {
-         // my_logEntriesUniquePtr->push_back(logEntry);
-         emit logEntryWasAppendedEvent(logEntry);
-      }
+        void Log::do_appendLogEntry(const LogEntry& logEntry)
+        {
+            my_logEntries.push_back(logEntry);
+            // my_logEntriesUniquePtr->push_back(logEntry);
+            emit logEntryWasAppendedEvent(logEntry);
+        }
 
 //      auto LoggerObject::do_log_message_unique_ptr_(
 //            std::unique_ptr<LogMessageObject> message_unique_ptr) -> void

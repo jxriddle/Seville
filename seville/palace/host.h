@@ -5,32 +5,32 @@
 
 namespace seville
 {
-   namespace palace
-   {
-      enum HostByteOrder {
-         kUnknownEndian,
-         kBigEndian,
-         kLittleEndian
-      };
+    namespace palace
+    {
+        class Host
+        {
+        public:
+            enum ByteOrder {
+                kUnknownEndian,
+                kBigEndian,
+                kLittleEndian
+            };
 
-      class Host
-      {
-      public:
-         Host(void);
-         virtual ~Host(void);
+            Host(void);
+            virtual ~Host(void);
 
-         static bool IsBigEndian(void);
+            static bool IsBigEndian(void);
 
-         static qint16 SwapI16(const qint16 unswapped);
-         static quint16 SwapU16(const quint16 unswapped);
-         static qint32 SwapI32(const qint32 unswapped);
-         static quint32 SwapU32(const quint32 unswapped);
+            static qint16 SwapI16(const qint16 unswapped);
+            static quint16 SwapU16(const quint16 unswapped);
+            static qint32 SwapI32(const qint32 unswapped);
+            static quint32 SwapU32(const quint32 unswapped);
 
-      private:
-         static quint16 do_swap_word(const quint16 unswapped);
-         static quint32 do_swap_dword(const quint32 unswapped);
-      };
-   }
+        private:
+            static quint16 do_swap_word(const quint16 unswapped);
+            static quint32 do_swap_dword(const quint32 unswapped);
+        };
+    }
 }
 
 #endif  // SEVILLE_PALACE_HOST_H_

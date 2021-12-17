@@ -12,24 +12,24 @@
 
 namespace seville
 {
-   namespace view
-   {
-      class AboutDialog : public QDialog
-      {
-      Q_OBJECT
+    namespace view
+    {
+        class AboutDialog : public QDialog
+        {
+        Q_OBJECT
 
-      public:
-         explicit AboutDialog(QWidget* parentWidgetPtr = nullptr);
-         virtual ~AboutDialog(void);
+        public:
+            explicit AboutDialog(QWidget* parentWidgetPtr = nullptr);
+            virtual ~AboutDialog(void);
 
-      public slots:
-         void on_okButtonWasClickedEvent(void);
+        public slots:
+           void on_okButtonWasClickedEvent(void);
 
-      private:
-         void do_setupView(void);
-         void do_init(void);
-      };
-   }
+        private:
+           void do_setupView(void);
+           void do_init(void);
+        };
+    }
 }
 
 #endif  // SEVILLE_VIEW_ABOUT_DIALOG_H_

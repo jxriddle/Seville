@@ -14,57 +14,57 @@
 
 namespace seville
 {
-   namespace view
-   {
-      class ConnectDialog : public QDialog
-      {
-      Q_OBJECT
+    namespace view
+    {
+        class ConnectDialog : public QDialog
+        {
+        Q_OBJECT
 
-      public:
-//         static std::unique_ptr<ConnectDialog>New(
-//               QWidget* parentWidgetPtr = nullptr);
+        public:
+        //         static std::unique_ptr<ConnectDialog>New(
+        //               QWidget* parentWidgetPtr = nullptr);
 
-         explicit ConnectDialog(QWidget* parentWidgetPtr = nullptr);
-         //virtual ~ConnectDialog(void);
+            explicit ConnectDialog(QWidget* parentWidgetPtr = nullptr);
+            //virtual ~ConnectDialog(void);
 
-         inline QString address(void) {
-            return my_urlLineEditPtr->text();
-         }
+            inline QString address(void) {
+                return my_urlLineEditPtr->text();
+            }
 
-         inline QString host(void) {
-            QStringList sl = my_urlLineEditPtr->text().split(':');
-            return sl.first();
-         }
+            inline QString host(void) {
+                QStringList sl = my_urlLineEditPtr->text().split(':');
+                return sl.first();
+            }
 
-         inline quint16 port(void) {
-            QStringList sl = my_urlLineEditPtr->text().split(':');
-            return sl.last().toUShort();
-         }
+            inline quint16 port(void) {
+                QStringList sl = my_urlLineEditPtr->text().split(':');
+                return sl.last().toUShort();
+            }
 
-         inline QString username(void) {
-            return my_usernameLineEditPtr->text();
-         }
+            inline QString username(void) {
+                return my_usernameLineEditPtr->text();
+            }
 
-      signals:
+        signals:
 
-      public slots:
-//       void on_pushButtonConnectClicked();
-//       void on_pushButtonCancelClicked();
+        public slots:
+        //       void on_pushButtonConnectClicked();
+        //       void on_pushButtonCancelClicked();
 
-      private:
-         QGridLayout* my_mainLayoutPtr;
-         QLabel* my_usernameLabelPtr;
-         QLineEdit* my_usernameLineEditPtr;
-         QLabel* my_urlLabelPtr;
-         QLineEdit* my_urlLineEditPtr;
-         QPushButton* my_connectPushButtonPtr;
-         QPushButton* my_cancelPushButtonPtr;
-         QDialogButtonBox* my_mainButtonBoxPtr;
+        private:
+            QGridLayout* my_mainLayoutPtr;
+            QLabel* my_usernameLabelPtr;
+            QLineEdit* my_usernameLineEditPtr;
+            QLabel* my_urlLabelPtr;
+            QLineEdit* my_urlLineEditPtr;
+            QPushButton* my_connectPushButtonPtr;
+            QPushButton* my_cancelPushButtonPtr;
+            QDialogButtonBox* my_mainButtonBoxPtr;
 
-         void do_setupView(void);
-         void do_setupEvents(void);
-      };
-   }
+            void do_setupView(void);
+            void do_setupEvents(void);
+        };
+    }
 }
 
 #endif  // SEVILLE_VIEW_CONNECT_DIALOG_H_

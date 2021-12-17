@@ -2,18 +2,18 @@
 
 namespace seville
 {
-   namespace palace
-   {
-      Server::~Server(void)
-      {
-         do_deinit();
-      }
+    namespace palace
+    {
+        Server::~Server(void)
+        {
+            do_deinit();
+        }
 
-      Server::Server(void)
-         : QObject()
-      {
-         do_init();
-         do_clear();
-      }
-   }
+        Server::Server(void)
+            : QObject()
+        {
+            do_init();
+            do_clear();
+        }
+    }
 }

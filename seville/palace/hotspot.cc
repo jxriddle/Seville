@@ -4,11 +4,11 @@
 
 namespace seville
 {
-   namespace palace
-   {
-      Hotspot::Hotspot(void)
-      {
-      }
+    namespace palace
+    {
+        Hotspot::Hotspot(void)
+        {
+        }
 
 //      auto Hotspot::FromByteArray(ByteArray byteArray) -> void
 //      {

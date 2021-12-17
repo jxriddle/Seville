@@ -15,10 +15,10 @@ void msgHandler(QtMsgType type, const QMessageLogContext& context, const QString
 */
 
 namespace seville {
-   SevilleApp app;
+    SevilleApp app;
 }
 
 int main(int argc, char *argv[])
 {
-   return seville::app.main(argc, argv);
+    return seville::app.main(argc, argv);
 }

@@ -5,15 +5,15 @@
 
 namespace seville
 {
-   namespace palace
-   {
-      class Hotspot
-      {
-      public:
-         Hotspot(void);
-         //static auto FromByteArray(ByteArray byteArray) -> void;
-      };
-   } // namespace palace
+    namespace palace
+    {
+        class Hotspot
+        {
+        public:
+            Hotspot(void);
+            //static auto FromByteArray(ByteArray byteArray) -> void;
+        };
+    } // namespace palace
 } // namespace seville
 
 #endif // SEVILLE_PALACE_HOTSPOT_H_

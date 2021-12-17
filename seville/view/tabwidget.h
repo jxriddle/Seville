@@ -16,10 +16,10 @@
 
 namespace seville
 {
-   namespace view
-   {
-      class TabWidget : public QTabWidget
-      {
+    namespace view
+    {
+        class TabWidget : public QTabWidget
+        {
          Q_OBJECT
 
          public:
@@ -69,8 +69,8 @@ namespace seville
 
             void do_clear(void);
             void do_init(QWidget* contentWidgetPtr = nullptr);
-      };
-   }
+        };
+    }
 }
 
 #endif // SEVILLE_VIEW_TAB_WIDGET_H_

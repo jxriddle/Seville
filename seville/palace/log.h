@@ -16,71 +16,70 @@
 
 namespace seville
 {
-   namespace palace
-   {
-      enum LogMode: i32 {
-         kDebugMode = 0,
-         kDefaultMode = 1,
-         kProductionMode = 2,
-      };
+    namespace palace
+    {
+        enum LogMode: i32 {
+            kDebugMode = 0,
+            kDefaultMode = 1,
+            kProductionMode = 2,
+        };
 
-      class Log : public QObject
-      {
-      Q_OBJECT
+        class Log : public QObject
+        {
+        Q_OBJECT
 
-      public:
-         //Logger(bool isDebugMode = false);
-         Log(void);
+        public:
+            //Logger(bool isDebugMode = false);
+            Log(void);
 
-         //virtual ~Logger(void);
+            //virtual ~Logger(void);
 
-         // static Log* New(void);
+            // static Log* New(void);
 
-         inline LogMode mode(void) const {
+            inline LogMode mode(void) const {
             return my_mode;
-         }
+            }
 
-         inline void setMode(LogMode value) {
+            inline void setMode(LogMode value) {
             my_mode = value;
-         }
+            }
 
-         inline std::vector<LogEntry>* logEntriesPtr(void) {
+            inline std::vector<LogEntry>* logEntriesPtr(void) {
             // return my_logEntriesUniquePtr.get();
             return &my_logEntries;
-         }
+            }
 
-//         inline auto takeLogEntriesPtr(void) ->
-//               std::unique_ptr<std::vector<LogEntry>> {
-//            return std::move(my_logEntriesUniquePtr);
-//         }
+            //         inline auto takeLogEntriesPtr(void) ->
+            //               std::unique_ptr<std::vector<LogEntry>> {
+            //            return std::move(my_logEntriesUniquePtr);
+            //         }
 
-         inline void appendLogEntry(const LogEntry& message) {
-            do_appendLogEntry(message);
-         }
+            inline void appendLogEntry(const LogEntry& message) {
+                do_appendLogEntry(message);
+            }
 
-         inline void appendLogEntry(
-               LogEntryKind kind,
-               const QString& message,
-               const QString& usernameFrom,
-               const QString& usernameTo
-               ) {
-            do_appendLogEntry(
+            inline void appendLogEntry(
+                    LogEntryKind kind,
+                    const QString& message,
+                    const QString& usernameFrom,
+                    const QString& usernameTo) {
+                do_appendLogEntry(
                      LogEntry(kind, message, usernameFrom, usernameTo));
-         }
+            }
 
-         inline void appendWhisperMessage(
-               const QString& usernameFrom,
-               // const QString& usernameTo,
-               const QString& message) {
-            do_appendLogEntry(
-                     LogEntry(
-                        LogEntryKind::kWhisperKind,
-                        message,
-                        usernameFrom));
-                        // usernameTo));
-         }
+            inline void appendWhisperMessage(
+                    const QString& usernameFrom,
+                    // const QString& usernameTo,
+                    const QString& message) {
+                do_appendLogEntry(
+                            LogEntry(
+                                LogEntryKind::kWhisperKind,
+                                message,
+                                usernameFrom));
+                // usernameTo));
+            }
 
-         inline void appendChatMessage(
+            inline void appendChatMessage(
                const QString& usernameFrom,
                const QString& message) {
             do_appendLogEntry(
@@ -89,45 +88,45 @@ namespace seville
                         message,
                         usernameFrom,
                         ""));
-         }
+            }
 
-         inline void appendGlobalMessage(const QString& message) {
+            inline void appendGlobalMessage(const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kGlobalKind,
                         message,
                         "",
                         ""));
-         }
+            }
 
-         inline void appendInfoMessage(const QString& message) {
+            inline void appendInfoMessage(const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kInfoKind,
                         message,
                         "",
                         ""));
-         }
+            }
 
-         inline void appendWarningMessage(const QString& message) {
+            inline void appendWarningMessage(const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kWarningKind,
                         message,
                         "",
                         ""));
-         }
+            }
 
-         inline void appendErrorMessage(const QString& message) {
+            inline void appendErrorMessage(const QString& message) {
             do_appendLogEntry(
                      LogEntry(
                         LogEntryKind::kErrorKind,
                         message,
                         "",
                         ""));
-         }
+            }
 
-         inline void appendDebugMessage(const QString& message) {
+            inline void appendDebugMessage(const QString& message) {
             qCDebug(seville_log) << message;
             if (LogMode::kDebugMode == my_mode)
                do_appendLogEntry(
@@ -136,23 +135,23 @@ namespace seville
                            message,
                            "",
                            ""));
-         }
+            }
 
-      signals:
-         // should be a generic messageLogged method with an enum type parameter instead? eh.
-         void logEntryWasAppendedEvent(const LogEntry& logEntry);
+        signals:
+            // should be a generic messageLogged method with an enum type parameter instead? eh.
+            void logEntryWasAppendedEvent(const LogEntry& logEntry);
 
-      private:
-         LogMode my_mode;
-         // std::unique_ptr<std::vector<LogEntry>> my_logEntriesUniquePtr;
-         std::vector<LogEntry> my_logEntries;
+        private:
+            LogMode my_mode;
+            // std::unique_ptr<std::vector<LogEntry>> my_logEntriesUniquePtr;
+            std::vector<LogEntry> my_logEntries;
 
-         void do_appendLogEntry(const LogEntry& message);
-         // auto do_log_message_unique_ptr_(
+            void do_appendLogEntry(const LogEntry& message);
+            // auto do_log_message_unique_ptr_(
                 //std::unique_ptr<LogMessage> message_unique_ptr) -> void;
-         void do_init(LogMode mode = LogMode::kDefaultMode);
+            void do_init(LogMode mode = LogMode::kDefaultMode);
       };
-   }
+    }
 }
 
 #endif  // SEVILLE_PALACE_LOG_H_

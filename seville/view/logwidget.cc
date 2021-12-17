@@ -6,86 +6,100 @@
 
 namespace seville
 {
-   namespace view
-   {
-      LogWidget::LogWidget(QWidget* parentWidgetPtr)
-         : QWidget(parentWidgetPtr)
-      {
-         do_setupView();
-         do_setupEvents();
-         do_setupSizing();
-         do_clear();
-      }
+    namespace view
+    {
+        LogWidget::LogWidget(QWidget* parentWidgetPtr)
+            : QWidget(parentWidgetPtr)
+        {
+            do_setupView();
+            do_setupEvents();
+            do_setupSizing();
+            do_clear();
+        }
 
-//      LogWidget* LogWidget::New(QWidget* parentWidgetPtr)
-//      {
-//         auto instance = new LogWidget(parentWidgetPtr);
+        //      LogWidget* LogWidget::New(QWidget* parentWidgetPtr)
+        //      {
+        //         auto instance = new LogWidget(parentWidgetPtr);
 
-//         return instance;
-//      }
+        //         return instance;
+        //      }
 
-      void LogWidget::on_messageLoggedEvent(
+        void LogWidget::on_messageLoggedEvent(
             const seville::palace::LogEntry& logEntry)
-      {
-         if (logEntry.kind() == seville::palace::LogEntryKind::kChatKind) {
-            my_logTextEditPtr->append(
-                     QString("%1: %2")
-                     .arg(logEntry.fromUsername())
-                     .arg(logEntry.message()));
-         //} else if (logMessage.kind() ==
-         //           seville::palace::LogMessageKind::kInfoKind) {
-         } else if (logEntry.kind() == seville::palace::LogEntryKind::kWhisperKind) {
-            my_logTextEditPtr->append(
-                     QString("Whisper from %1: %2")
-                     .arg(logEntry.fromUsername())
-                     .arg(logEntry.message()));
-         } else {
-            my_logTextEditPtr->append(logEntry.message());
-                     //QString("(whisper) %1").arg(logEntry.message()));
-         }
-      }
+        {
+            if (logEntry.kind() == seville::palace::LogEntryKind::kChatKind) {
+                my_logTextEditPtr->append(
+                         QString("%1: %2")
+                         .arg(logEntry.fromUsername())
+                         .arg(logEntry.message()));
+                //} else if (logMessage.kind() ==
+                //           seville::palace::LogMessageKind::kInfoKind) {
+            } else if (logEntry.kind() == seville::palace::LogEntryKind::kWhisperKind) {
+                my_logTextEditPtr->append(
+                         QString("Whisper from %1: %2")
+                         .arg(logEntry.fromUsername())
+                         .arg(logEntry.message()));
+            } else {
+                my_logTextEditPtr->append(logEntry.message());
+                         //QString("(whisper) %1").arg(logEntry.message()));
+            }
+        }
 
-      void LogWidget::do_reloadFromPalaceClient(void)
-      {
-         do_clear();
-         auto loggerPtr = my_palaceClientPtr->loggerPtr();
-         auto logEntriesPtr = loggerPtr->logEntriesPtr();
-         for (auto& logEntry: *logEntriesPtr) {
-            my_logTextEditPtr->append(logEntry.message());
-         }
-      }
+        void LogWidget::do_refresh(void)
+        {
+            do_clear();
 
-      void LogWidget::do_clear(void)
-      {
-//         my_mainLayoutPtr = nullptr;
-//         my_chatLineEditPtr = nullptr;
-//         my_logTextEditPtr = nullptr;
-//         my_palaceClientPtr = nullptr;
-         my_logTextEditPtr->clear();
-      }
+            auto palaceClientPtr = my_palaceClientPtr;
+            if (palaceClientPtr == nullptr) {
+                return;
+            }
 
-      void LogWidget::do_setupView(void)
-      {
-         my_mainLayoutPtr = new QVBoxLayout(this);
+            auto loggerPtr = palaceClientPtr->loggerPtr();
+            if (loggerPtr == nullptr) {
+                return;
+            }
 
-         my_chatLineEditPtr = new QLineEdit(this);
-         my_logTextEditPtr = new QTextEdit(this);
+            auto logEntriesPtr = loggerPtr->logEntriesPtr();
+            if (logEntriesPtr == nullptr) {
+                return;
+            }
 
-         my_logTextEditPtr->setReadOnly(true);
-         // my_logTextEditPtr->setTextInteractionFlags(
-         //          Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+            for (auto& logEntry: *logEntriesPtr) {
+                my_logTextEditPtr->append(logEntry.message());
+            }
+        }
 
-         my_mainLayoutPtr->addWidget(my_logTextEditPtr);
-         my_mainLayoutPtr->addWidget(my_chatLineEditPtr);
-      }
+        void LogWidget::do_clear(void)
+        {
+            //         my_mainLayoutPtr = nullptr;
+            //         my_chatLineEditPtr = nullptr;
+            //         my_logTextEditPtr = nullptr;
+            //         my_palaceClientPtr = nullptr;
+            my_logTextEditPtr->clear();
+        }
 
-      void LogWidget::do_setupEvents(void)
-      {
-      }
+        void LogWidget::do_setupView(void)
+        {
+            my_mainLayoutPtr = new QVBoxLayout(this);
 
-      void LogWidget::do_setupSizing(void)
-      {
-         setMinimumWidth(300);
-      }
-   }
+            my_chatLineEditPtr = new QLineEdit(this);
+            my_logTextEditPtr = new QTextEdit(this);
+
+            my_logTextEditPtr->setReadOnly(true);
+            // my_logTextEditPtr->setTextInteractionFlags(
+            //          Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+
+            my_mainLayoutPtr->addWidget(my_logTextEditPtr);
+            my_mainLayoutPtr->addWidget(my_chatLineEditPtr);
+        }
+
+        void LogWidget::do_setupEvents(void)
+        {
+        }
+
+        void LogWidget::do_setupSizing(void)
+        {
+            setMinimumWidth(300);
+        }
+    }
 }
