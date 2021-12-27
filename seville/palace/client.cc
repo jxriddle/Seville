@@ -410,7 +410,7 @@ namespace seville
                 my_logger.appendErrorMessage("Socket access error");
             }
             else if (socketError ==
-                  QAbstractSocket::SocketAddressNotAvailableError) {
+                     QAbstractSocket::SocketAddressNotAvailableError) {
                 my_logger.appendErrorMessage("Socket address not available");
             }
             else if (socketError == QAbstractSocket::SocketResourceError) {
@@ -457,9 +457,9 @@ namespace seville
             //while (my_socketPtr->bytesAvailable())
             do_readSocket();
 
-            //         my_logger.appendDebugMessage(
-            //                  QString("%1 bytes remaining to read from socket")
-            //                  .arg(my_socketPtr->bytesAvailable()));
+//         my_logger.appendDebugMessage(
+//                  QString("%1 bytes remaining to read from socket")
+//                  .arg(my_socketPtr->bytesAvailable()));
         }
 
         void Client::do_readSocket(void)
@@ -598,10 +598,8 @@ namespace seville
             if (connectionState != ConnectionState::kConnectedState) {
                 my_pingTimer.stop();
             }
-
             my_connectionState = connectionState;
-
-            // emit connectionStateDidChangeEvent(connectionState);
+            emit connectionStateDidChangeEvent(connectionState);
         }
 
         i32 Client::do_parseCommand(const QString& text)
@@ -795,54 +793,41 @@ namespace seville
         {
             do_disconnectFromHost();
 
-            my_socketPtr = new QTcpSocket();
-            do_setupEvents();
-
-            auto condHostTcpPort = (0 == port);
-            auto actualHostTcpPort = static_cast<u16>(
-                        (condHostTcpPort * kDefaultServerPort) |
-                        ((!condHostTcpPort) * port)
-            );
-
-            auto actualInitialRoom = static_cast<u16>(initialRoom);
-
-            auto netMsg = QString("Connecting to palace://%1@%2:%3/%4")
-                    .arg(username.toUtf8().data())
-                    .arg(hostname.toUtf8().data())
-                    .arg(actualHostTcpPort)
-                    .arg(actualInitialRoom);
-
-            my_logger.appendInfoMessage(netMsg);
-
-            // my_user.setUsername(username);
-            my_username = username;
-            my_server.setHostname(hostname);
-            my_server.setPort(actualHostTcpPort);
-            my_room.setId(actualInitialRoom);
-
-            my_logger.appendDebugMessage("Handshaking");
-            do_setConnectionState(ConnectionState::kHandshakingState);
-            emit connectionStateDidChangeEvent(ConnectionState::kHandshakingState);
-
-            my_socketPtr->connectToHost(hostname, actualHostTcpPort);
-            my_pingTimer.setInterval(kDefaultPingInterval);
-            my_pingTimer.start();
-        }
-
-        void Client::do_disconnectFromHost(void)
-        {
-            if (my_connectionState == ConnectionState::kConnectedState ||
-                    my_connectionState == ConnectionState::kHandshakingState) {
-                my_socketPtr->disconnectFromHost();
-                my_pingTimer.stop();
-                // do_setConnectionState(ConnectionState::kDisconnectedState);
-                do_teardownEvents();
-
-                my_socketPtr->deleteLater();
-                my_socketPtr = nullptr;
+            // TODO
+            if (my_socketPtr == nullptr) {
+                my_socketPtr = new QTcpSocket();
             }
 
-            do_setConnectionState(ConnectionState::kDisconnectedState);
+            do_setupEvents();
+
+             auto condHostTcpPort = (0 == port);
+             auto actualHostTcpPort = static_cast<u16>(
+                         (condHostTcpPort * kDefaultServerPort) |
+                         ((!condHostTcpPort) * port));
+
+             auto actualInitialRoom = static_cast<u16>(initialRoom);
+
+             auto netMsg = QString("Connecting to palace://%1@%2:%3/%4")
+                     .arg(username.toUtf8().data())
+                     .arg(hostname.toUtf8().data())
+                     .arg(actualHostTcpPort)
+                     .arg(actualInitialRoom);
+
+             my_logger.appendInfoMessage(netMsg);
+
+             // my_user.setUsername(username);
+             my_username = username;
+             my_server.setHostname(hostname);
+             my_server.setPort(actualHostTcpPort);
+             my_room.setId(actualInitialRoom);
+
+             my_logger.appendDebugMessage("Handshaking");
+             do_setConnectionState(ConnectionState::kHandshakingState);
+             //emit connectionStateDidChangeEvent(ConnectionState::kHandshakingState);
+
+             my_socketPtr->connectToHost(hostname, actualHostTcpPort);
+             my_pingTimer.setInterval(kDefaultPingInterval);
+             my_pingTimer.start();
         }
 
         void Client::do_determineClientByteOrder(void)
@@ -852,7 +837,6 @@ namespace seville
             auto isBigEndian =
                     (Host::ByteOrder::kBigEndian * Client::isBigEndian());
             my_byteOrder =
-            // return
                     static_cast<Host::ByteOrder>(isLittleEndian | isBigEndian);
         }
 
@@ -871,7 +855,7 @@ namespace seville
             auto kind = my_netMsg.id();
 
             //auto littleEndianFlag = static_cast<u32>(
-            //         HostByteOrder::kLittleEndian == my_byteOrderKind);
+            //         Host::ByteOrder::kLittleEndian == my_byteOrderKind);
             //auto kind = (littleEndianFlag * Host::SwapU32(id)) |
             //            (!littleEndianFlag * id);
 
@@ -881,29 +865,45 @@ namespace seville
                     clientIsBigEndian * Host::ByteOrder::kLittleEndian;
 
             switch (kind) {
-                case NetMsg::kUnknownServerKind:
-                    my_logger.appendDebugMessage("Server has Unknown Byte Order");
-                    my_server.setByteOrder(Host::ByteOrder::kUnknownEndian);
-                    result = 0;
-                    break;
-                case NetMsg::kServerEndianMatchKind:
-                    my_logger.appendDebugMessage("Server endian matches client");
-                    my_server.setByteOrder(my_byteOrder);
-                    result = 1;
-                    break;
-                case NetMsg::kServerEndianMismatchKind:
-                    my_logger.appendDebugMessage("Server endian does not match client");
-                    my_server.setByteOrder(serverByteOrderIfServerEndianMismatch);
-                    result = 1;
-                    break;
-                default:
-                    my_logger.appendDebugMessage(
-                                "Server did not indicate its Byte Order");
-                    my_server.setByteOrder(Host::ByteOrder::kUnknownEndian);
-                    result = 0;
+            case NetMsg::kUnknownServerKind:
+                my_logger.appendDebugMessage("Server has Unknown Byte Order");
+                my_server.setByteOrder(Host::ByteOrder::kUnknownEndian);
+                result = 0;
+                break;
+            case NetMsg::kServerEndianMatchKind:
+                my_logger.appendDebugMessage("Server endian matches client");
+                my_server.setByteOrder(my_byteOrder);
+                result = 1;
+                break;
+            case NetMsg::kServerEndianMismatchKind:
+                my_logger.appendDebugMessage("Server endian does not match client");
+                my_server.setByteOrder(serverByteOrderIfServerEndianMismatch);
+                result = 1;
+                break;
+            default:
+                my_logger.appendDebugMessage(
+                            "Server did not indicate its Byte Order");
+                my_server.setByteOrder(Host::ByteOrder::kUnknownEndian);
+                result = 0;
             }
 
             return result;
+        }
+
+        void Client::do_disconnectFromHost(void)
+        {
+            if (my_connectionState == ConnectionState::kConnectedState ||
+                    my_connectionState == ConnectionState::kHandshakingState) {
+                my_socketPtr->disconnectFromHost();
+                my_pingTimer.stop();
+                // do_setConnectionState(ConnectionState::kDisconnectedState);
+                do_teardownEvents();
+
+                my_socketPtr->deleteLater();
+                my_socketPtr = nullptr;
+            }
+
+            do_setConnectionState(ConnectionState::kDisconnectedState);
         }
 
         Host::ByteOrder Client::do_clientByteOrder(void)
@@ -931,7 +931,7 @@ namespace seville
             auto kind = my_netMsg.id();
 
             //auto littleEndianFlag = static_cast<u32>(
-            //         HostByteOrder::kLittleEndian == my_byteOrderKind);
+            //         Host::ByteOrder::kLittleEndian == my_byteOrderKind);
             //auto kind = (littleEndianFlag * Host::SwapU32(id)) |
             //            (!littleEndianFlag * id);
 
@@ -1598,12 +1598,15 @@ namespace seville
         i32 Client::do_receiveUserLeaving(void)
         {
             my_logger.appendDebugMessage("> UserLeaving");
-
             auto userId = my_netMsg.ref();
             auto user = my_room.userWithId(userId);
+            // if (my_room.userIdInRoom(userId))
+            // auto user = my_server.userWithId(userId);
 
-            my_logger.appendInfoMessage(
-                  QString("%1 has signed off.").arg(user.username()));
+            if (0 < user.id()) {
+                my_logger.appendInfoMessage(
+                            QString("%1 has signed off.").arg(user.username()));
+            }
 
             user = my_server.userWithId(userId);
             my_server.removeUserWithId(userId);
@@ -2451,9 +2454,7 @@ namespace seville
 
         void Client::do_init(void)
         {
-            do_setConnectionState(ConnectionState::kDisconnectedState);
-            my_byteOrder = do_clientByteOrder();
-            // my_socketPtr = new QTcpSocket();
+            my_socketPtr = new QTcpSocket();
             // do_setupEvents();
             do_clear();
 

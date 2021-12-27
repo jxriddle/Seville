@@ -68,13 +68,13 @@ namespace seville
             void on_logWindowWasToggled(void);
             void on_newTabRequested(void);
             void on_closeTabRequested(void);
-            void on_connectionStateDidChange(
-                    QWidget* sender,
+            void on_currentClientConnectionStateDidChange(
+                    // QWidget* sender,
                     const palace::ConnectionState connectionState);
             void on_tabWasAddedWithClientWidgetPtr(
                     seville::view::PalaceClientWidget* palaceClientWidgetPtr);
-            void on_tabWasRemovedWithClientWidgetPtr(
-                    seville::view::PalaceClientWidget* palaceClientWidgetPtr);
+            // void on_tabWasRemovedWithClientWidgetPtr(
+            //         seville::view::PalaceClientWidget* palaceClientWidgetPtr);
 
         protected:
             void closeEvent(QCloseEvent* closeEventPtr) override;
@@ -118,6 +118,8 @@ namespace seville
 
             void do_updateMenus(void);
             void do_updateView(void);
+
+            PalaceClientWidget* do_currentPalaceClientWidgetPtr(void);
 
             void do_init(void);
             void do_deinit(void);

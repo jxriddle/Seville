@@ -60,7 +60,7 @@ namespace seville
             void widgetBackgroundDidChangeEvent(void);
             void serverNameWasSetEvent(QWidget* senderPtr, const QString& value);
             void connectionStateDidChangeEvent(
-                    QWidget* senderPtr,
+                    //QWidget* senderPtr,
                     const palace::ConnectionState connectionState);
 
         public slots:
@@ -97,7 +97,7 @@ namespace seville
             QImage my_spritesheet;
             // QGraphicsView *my_view;
 
-            view::MainWindow* do_mainWindowPtr(void);
+            // view::MainWindow* do_mainWindowPtr(void);
 
             void do_init(void);
             void do_deinit(void);

@@ -42,19 +42,19 @@ namespace seville
         {
         }
 
-        palace::Client* TabWidget::currentPalaceClientPtr(void)
-        {
-            auto currentPalaceClientWidgetPtr =
-                    static_cast<seville::view::PalaceClientWidget*>(currentWidget());
+//        palace::Client* TabWidget::currentPalaceClientPtr(void)
+//        {
+//            auto currentPalaceClientWidgetPtr =
+//                    static_cast<seville::view::PalaceClientWidget*>(currentWidget());
 
-            seville::palace::Client* currentPalaceClientPtr = nullptr;
-            if (currentPalaceClientWidgetPtr != nullptr) {
-                currentPalaceClientPtr =
-                      currentPalaceClientWidgetPtr->palaceClientPtr();
-            }
+//            seville::palace::Client* currentPalaceClientPtr = nullptr;
+//            if (currentPalaceClientWidgetPtr != nullptr) {
+//                currentPalaceClientPtr =
+//                      currentPalaceClientWidgetPtr->palaceClientPtr();
+//            }
 
-            return currentPalaceClientPtr;
-        }
+//            return currentPalaceClientPtr;
+//        }
 
         void TabWidget::clear(void)
         {
@@ -65,6 +65,39 @@ namespace seville
         {
             //my_currentPalaceClientPtr = nullptr;
         }
+
+//      void TabWidget::eventFilter(QObject* sender, QEvent* event)
+//      {
+//          if (sender == tabBar() && event->type() == QEvent::MouseButtonPress)
+//      }
+
+        void TabWidget::mouseReleaseEvent(QMouseEvent *event)
+        {
+            if (event->button() == Qt::MiddleButton) {
+                removeTab(tabBar()->tabAt(event->pos()));
+            }
+        }
+
+        void TabWidget::mouseDoubleClickEvent(QMouseEvent* event)
+        {
+            //QTabWidget::mousePressedEvent(event);
+            if (event->button() == Qt::LeftButton) {
+                do_addNewTab();
+            }
+        }
+
+//      palace::Client* TabWidget::currentPalaceClientPtr(void)
+//      {
+//         auto currentPalaceClientWidgetPtr =
+//               static_cast<seville::view::PalaceClientWidget*>(currentWidget());
+
+//         seville::palace::Client* currentPalaceClientPtr = nullptr;
+//         if (currentPalaceClientWidgetPtr != nullptr)
+//            currentPalaceClientPtr =
+//                  currentPalaceClientWidgetPtr->palaceClientPtr();
+
+//         return currentPalaceClientPtr;
+//      }
 
 //      auto do_mainWindowPtr(void) -> view::MainWindow*
 //      {
@@ -181,7 +214,7 @@ namespace seville
         void TabWidget::do_closeTab(int index)
         {
             auto palaceClientWidgetPtr =
-                    static_cast<PalaceClientWidget*>(widget(index));
+                    dynamic_cast<PalaceClientWidget*>(widget(index));
 
             // disconnect(
             //     clientWidgetPtr, &PalaceClientWidget::widgetDidResizeEvent,
@@ -219,7 +252,8 @@ namespace seville
         }
 
         void TabWidget::on_serverNameWasSet(
-            QWidget* senderPtr, const QString& value)
+                QWidget* senderPtr,
+                const QString& value)
         {
             auto index = indexOf(senderPtr);
             setTabText(index, value);

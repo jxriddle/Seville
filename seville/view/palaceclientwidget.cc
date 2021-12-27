@@ -29,15 +29,15 @@ namespace seville
 {
     namespace view
     {
-        view::MainWindow* PalaceClientWidget::do_mainWindowPtr(void)
-        {
-            foreach (auto w, qApp->topLevelWidgets()) {
-                if (auto mainWindowPtr = qobject_cast<view::MainWindow*>(w)) {
-                   return mainWindowPtr;
-                }
-            }
-            return nullptr;
-        }
+        // view::MainWindow* PalaceClientWidget::do_mainWindowPtr(void)
+        // {
+        //     foreach (auto w, qApp->topLevelWidgets()) {
+        //         if (auto mainWindowPtr = qobject_cast<view::MainWindow*>(w)) {
+        //            return mainWindowPtr;
+        //         }
+        //     }
+        //     return nullptr;
+        // }
 
         PalaceClientWidget::PalaceClientWidget(QWidget* parentWidgetPtr)
             : QWidget(parentWidgetPtr)
@@ -600,10 +600,10 @@ namespace seville
 
             adjustSize();
 
-            auto mainWindowPtr = do_mainWindowPtr();
-            if (mainWindowPtr != nullptr) {
-                mainWindowPtr->adjustSize();
-            }
+            // auto mainWindowPtr = do_mainWindowPtr();
+            // if (mainWindowPtr != nullptr) {
+            //     mainWindowPtr->adjustSize();
+            // }
         }
 
         void PalaceClientWidget::on_connectionStateDidChange(
@@ -611,7 +611,8 @@ namespace seville
         {
             // TODO switch
 
-            emit connectionStateDidChangeEvent(this, connectionState);
+            // emit connectionStateDidChangeEvent(this, connectionState);
+            emit connectionStateDidChangeEvent(connectionState);
         }
 
         void PalaceClientWidget::on_chatLineEditDidPressReturn(void)
@@ -643,5 +644,5 @@ namespace seville
                 my_palaceClientPtr->gotoRoom(room_id);
             }
         }
-   }
+    }
 }

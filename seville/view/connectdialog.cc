@@ -69,15 +69,17 @@ namespace seville
 
             // Arrangement
             my_mainButtonBoxPtr->addButton(
-                  my_connectPushButtonPtr, QDialogButtonBox::ActionRole);
+                        my_connectPushButtonPtr, QDialogButtonBox::ActionRole);
+
+            // Arrangement
             my_mainButtonBoxPtr->addButton(
-                  my_cancelPushButtonPtr, QDialogButtonBox::RejectRole);
+                        my_cancelPushButtonPtr, QDialogButtonBox::RejectRole);
 
-            my_mainLayoutPtr->addWidget(my_urlLabelPtr, 0, 0);
             my_mainLayoutPtr->addWidget(my_urlLineEditPtr, 0, 1);
+            my_mainLayoutPtr->addWidget(my_urlLabelPtr, 0, 0);
 
-            my_mainLayoutPtr->addWidget(my_usernameLabelPtr, 1, 0);
             my_mainLayoutPtr->addWidget(my_usernameLineEditPtr, 1, 1);
+            my_mainLayoutPtr->addWidget(my_usernameLabelPtr, 1, 0);
 
             my_mainLayoutPtr->addWidget(my_mainButtonBoxPtr, 2, 0, 1, 2);
 

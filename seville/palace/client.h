@@ -267,10 +267,14 @@ namespace seville
             }
 
             inline void move(i16 x, i16 y) {
+                auto userPtr = my_room.userPtrWithId(my_userId);
+                if (userPtr == nullptr) {
+                    return;
+                }
+
                 my_logger.appendDebugMessage(
                          QString("Movement to (%1, %2)").arg(x).arg(y));
 
-                auto userPtr = my_room.userPtrWithId(my_userId);
                 userPtr->setX(x);
                 userPtr->setY(y);
 

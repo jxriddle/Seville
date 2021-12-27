@@ -20,6 +20,38 @@ namespace seville
         {
         Q_OBJECT
 
+        private:
+            u32 my_flags;
+            u32 my_face;
+            u16 my_roomId;
+            u16 my_tmp16_;
+            i32 my_hotspotCount;
+            i32 my_imageCount;
+            i32 my_drawCommandsCount;
+            i32 my_userCount;
+            i32 my_loosePropCount;
+            i32 my_reserved;
+            i32 my_tmp32_;
+            QByteArray my_backgroundImageByteArray;
+            QString my_backgroundImageName;
+            QString my_roomName;
+            QString my_artistName;
+            QString my_password;
+            std::vector<Hotspot> my_hotspots;
+            std::vector<User> my_users;
+            std::vector<Prop> my_looseProps;
+
+            void do_setBackgroundImageByteArray(
+                    const QByteArray& backgroundImageByteArray);
+
+            void do_setupEvents(void);
+
+            void do_assign(const Room& room);
+
+            void do_clear(void);
+            void do_init(void);
+            void do_deinit(void);
+
         signals:
             void backgroundDidChangeEvent(void);
 
@@ -58,7 +90,9 @@ namespace seville
                    }
                 }
 
-                return nullptr;
+                // auto user = User();
+                // user.setId(-1);
+                return nullptr; // user;
             }
 
             inline void removeUserWithId(i32 userId) {
@@ -70,6 +104,16 @@ namespace seville
                    }
                    i++;
                 }
+            }
+
+            inline bool userWithIdInRoom(i32 userId) {
+                for (auto& user: my_users) {
+                    if (user.id() == userId) {
+                        return true;
+                    }
+                }
+
+                return false;
             }
 
             inline u16 id(void) const {
@@ -229,38 +273,6 @@ namespace seville
             inline void clear(void) {
                 do_clear();
             }
-
-        private:
-            u32 my_flags;
-            u32 my_face;
-            u16 my_roomId;
-            u16 my_tmp16_;
-            i32 my_hotspotCount;
-            i32 my_imageCount;
-            i32 my_drawCommandsCount;
-            i32 my_userCount;
-            i32 my_loosePropCount;
-            i32 my_reserved;
-            i32 my_tmp32_;
-            QByteArray my_backgroundImageByteArray;
-            QString my_backgroundImageName;
-            QString my_roomName;
-            QString my_artistName;
-            QString my_password;
-            std::vector<Hotspot> my_hotspots;
-            std::vector<User> my_users;
-            std::vector<Prop> my_looseProps;
-
-            void do_setBackgroundImageByteArray(
-                    const QByteArray& backgroundImageByteArray);
-
-            void do_setupEvents(void);
-
-            void do_assign(const Room& room);
-
-            void do_clear(void);
-            void do_init(void);
-            void do_deinit(void);
         };
     }
 }

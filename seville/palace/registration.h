@@ -14,18 +14,11 @@ namespace seville
         {
         public:
             // Test code: 9YAT-C8MM-GJVZL
-
             static const i32 kMinRegiSeed = 100000;  // 100
             //static const i32 kMaxRegiSeed = 2147483647;
             static const i32 kMaxRegiSeed = 199999;  // 2147483647
             // static const i32 kDefaultPuid = 2000000000;
             static const i32 kDefaultPuid = 0x662266FC;  // 1713530620
-            // static const i32 kRegiPuid = 1713530620;
-
-            static const i32 kWorkingPuidCounter = 0xf5dc385e;
-            static const i32 kWorkingPuidCrc = 0xc144c580;
-            static const i32 kWorkingRegCounter = 0xcf07309c;
-            static const i32 kWorkingRegCrc = 0x5905f923;
 
             static const i32 kNumBytes = 4;
             static const u32 kCounterMagic = 0x9602c9bf;
@@ -98,18 +91,9 @@ namespace seville
                 0xe69e1eb5, 0x7cdda410, 0x488609df, 0xd19678d3
             };
 
+            // Registration(u32 seed, u32 p);
             Registration(void) {
                 do_init();
-                do_clear();
-            }
-
-            void setDefault(void)
-            {
-                // my_puid = 0;
-                my_puidCounter = kWorkingPuidCounter;
-                my_puidCrc = kWorkingPuidCrc;
-                my_regCounter = kWorkingRegCounter;
-                my_regCrc = kWorkingRegCrc;
             }
 
             void setSeed(u32 seed, u32 puid)
@@ -117,11 +101,11 @@ namespace seville
                 do_setSeed(seed, puid);
             }
 
-            u32 regCrc(void) {
+            u32 crc(void) {
                 return my_regCrc;
             }
 
-            u32 regCounter(void) {
+            u32 counter(void) {
                 return my_regCounter;
             }
 
@@ -137,6 +121,10 @@ namespace seville
                 auto codeString = value.toUpper();
             }
 
+            void clear(void) {
+                do_clear();
+            }
+
             void setShouldSwapEndiannessFlag(bool value) {
                 my_shouldSwapEndiannessFlag = value;
             }
@@ -145,12 +133,9 @@ namespace seville
                 return my_shouldSwapEndiannessFlag;
             }
 
-            void generate(void) {
-                do_generate();
-            }
+            void setDefault(void) {
+                my_puid = kDefaultPuid;
 
-            void clear(void) {
-                do_clear();
             }
 
         private:
@@ -161,67 +146,55 @@ namespace seville
             i32 my_puidCrc;
             i32 my_puidCounter;
             bool my_shouldSwapEndiannessFlag;
-            // Host::ByteOrder my_byteOrder;
 
-            u32 do_computeLicenseCounter(i32 seed, i32 crc)
+            u32 do_computeLicenseCounter(u32 seed, u32 crc)
             {
                 return (seed ^ kCounterMagic) ^ crc;
             }
 
-            u32 do_computeLicenseCrc(i32 counter)
+            u32 do_computeLicenseCrc(u32 seed)
             {
-                auto value = i32(counter);
-                if (my_shouldSwapEndiannessFlag) {
-                    value = Host::SwapI32(value);
-                }
-
                 auto crc = kCrcMagic;
-                auto bytePtr = (unsigned char*)(&counter);
-
-                crc = ((crc << 1) | ((crc & 0x80000000L)? 1 : 0)) ^ my_crcMask[bytePtr[0]];
-                crc = ((crc << 1) | ((crc & 0x80000000L)? 1 : 0)) ^ my_crcMask[bytePtr[1]];
-                crc = ((crc << 1) | ((crc & 0x80000000L)? 1 : 0)) ^ my_crcMask[bytePtr[2]];
-                crc = ((crc << 1) | ((crc & 0x80000000L)? 1 : 0)) ^ my_crcMask[bytePtr[3]];
-
+                // for (auto i = kNumBytes - 1; 0 <= i; i--) {
+                // auto val = seed;
+                for (auto i = kNumBytes - 1; 0 <= i; i--) {
+                    // auto currentByte = val & 0xff;
+                    crc = ((crc << 1) | ((crc & 0x80000000) ? 1 : 0)) ^
+                            my_crcMask[(seed >> (i*8)) & 0xff];
+                    // val = val >> 8;
+                }
                 return crc;
             }
 
             void do_clear(void) {
                 // do_generate();
-                my_puidCounter = kWorkingPuidCounter;
-                my_puidCrc = kWorkingPuidCrc;
-                my_regCounter = kWorkingRegCounter;
-                my_regCrc = kWorkingRegCrc;
-                my_shouldSwapEndiannessFlag = false;
             }
 
             void do_generate(void) {
                 auto mt19937 = std::mt19937(my_randDev());
                 auto distribution =
-                        std::uniform_int_distribution<int>(
-                            kMinRegiSeed, kMaxRegiSeed);
+                        std::uniform_int_distribution(kMinRegiSeed, kMaxRegiSeed);
+                my_regCounter = distribution(mt19937);
+                my_puid = distribution(mt19937);
+                // my_registration.setSeed(seed, kDefaultPuid);
 
-                auto seed = distribution(mt19937);
-                // my_puid = distribution(mt19937);
-                my_puid = kDefaultPuid;
-                do_setSeed(seed, my_puid);
-
-                // my_regCrc = do_computeLicenseCrc(my_regCounter); // kCrcMagic;
-                // my_regCounter = do_computeLicenseCounter(my_regCounter, my_regCrc);
-                // my_puidCrc = do_computeLicenseCrc(my_puid);
-                // my_puidCounter = my_puid ^ my_puidCrc;
+                my_regCrc = do_computeLicenseCrc(my_regCounter); // kCrcMagic;
+                my_regCounter = do_computeLicenseCounter(my_regCounter, my_regCrc);
+                my_puidCrc = do_computeLicenseCrc(my_puid);
+                my_puidCounter = my_puid ^ my_puidCrc;
             }
 
-            void do_setSeed(u32 seed, u32 puid) {
-                my_regCrc = do_computeLicenseCrc(seed);
-                my_regCounter = (seed ^ kCounterMagic) ^ my_regCrc;
+            void do_setSeed(u32 reg, u32 puid) {
+                // TODO
+                (void)reg;
+                my_regCrc = do_computeLicenseCrc(my_regCounter);
+                my_regCounter = (my_regCounter ^ kCounterMagic) ^ my_regCrc;
                 my_puidCrc = do_computeLicenseCrc(puid);
                 my_puidCounter = puid ^ my_puidCrc;
             }
 
-            void do_init(bool shouldSwapEndiannessFlag = false) {
-                my_shouldSwapEndiannessFlag = shouldSwapEndiannessFlag;
-                //do_generate();
+            void do_init(void) {
+                my_shouldSwapEndiannessFlag = false;
             }
         };
     }

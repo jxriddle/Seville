@@ -12,6 +12,11 @@ namespace seville
             do_init();
         }
 
+        // void MainWindow::on_currentClientWidgetBackgroundImageDidLoad(void)
+        // {
+        //     adjustSize();
+        // }
+
         void MainWindow::on_topLevelDidChange(bool shouldBeVisibleFlag)
         {
             my_logWidgetPtr->setChatLineEditIsVisible(shouldBeVisibleFlag);
@@ -28,12 +33,10 @@ namespace seville
 
         void MainWindow::on_closeConnectionWasRequested(void)
         {
-            auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
-            if (palaceClientPtr == nullptr)
-                return;
-
+            auto palaceClientPtr =
+                    do_currentPalaceClientWidgetPtr()->palaceClientPtr();
             if (palaceClientPtr->connectionState() ==
-                seville::palace::ConnectionState::kDisconnectedState)
+                    seville::palace::ConnectionState::kDisconnectedState)
             return;
 
             palaceClientPtr->disconnectFromHost();
@@ -52,319 +55,336 @@ namespace seville
          //msgBox->setText("MainWindow resize called");
          //msgBox->open();
          //msgBox->exec();
-        //}
+      //}
 
-        void MainWindow::on_connectionStateDidChange(
-                QWidget* senderPtr,
-                const palace::ConnectionState connectionState)
-        {
-            if (senderPtr == nullptr)
-                return;
+      void MainWindow::on_currentClientConnectionStateDidChange(
+            //QWidget* senderPtr,
+            const palace::ConnectionState connectionState)
+      {
+         //auto currentPalaceClientWidgetPtr = my_tabWidgetPtr->currentWidget();
 
-            auto currentPalaceClientWidgetPtr = my_tabWidgetPtr->currentWidget();
-            if (currentPalaceClientWidgetPtr == nullptr)
-                return;
-
-            if (senderPtr == currentPalaceClientWidgetPtr) {
-                // auto isDisconnected =
-                //       connectionState == palace::ConnectionState::kDisconnectedState;
-                switch (connectionState) {
-                case palace::ConnectionState::kConnectedState:
-                    my_openHostConnectionActionPtr->setEnabled(false);
-                    my_closeHostConnectionActionPtr->setEnabled(true);
-                    break;
-                case palace::ConnectionState::kHandshakingState:
-                    my_openHostConnectionActionPtr->setEnabled(false);
-                    my_closeHostConnectionActionPtr->setEnabled(false);
-                    break;
-                default:
-                    my_openHostConnectionActionPtr->setEnabled(true);
-                    my_closeHostConnectionActionPtr->setEnabled(false);
-                }
-            }
+//         if (senderPtr != nullptr &&
+//             currentPalaceClientWidgetPtr != nullptr &&
+//             senderPtr == currentPalaceClientWidgetPtr) {
+            // auto isDisconnected =
+            //       connectionState == palace::ConnectionState::kDisconnectedState;
+        switch (connectionState) {
+        case palace::ConnectionState::kConnectedState:
+           my_openHostConnectionActionPtr->setEnabled(false);
+           my_closeHostConnectionActionPtr->setEnabled(true);
+           break;
+        case palace::ConnectionState::kHandshakingState:
+           my_openHostConnectionActionPtr->setEnabled(false);
+           my_closeHostConnectionActionPtr->setEnabled(false);
+           break;
+        default:
+           my_openHostConnectionActionPtr->setEnabled(true);
+           my_closeHostConnectionActionPtr->setEnabled(false);
         }
+//         }
+      }
 
-        void MainWindow::on_quitAppWasRequested(void)
-        {
-            QApplication::quit();
-        }
+      void MainWindow::on_quitAppWasRequested(void)
+      {
+         do_deinit();
+         QApplication::quit();
+      }
 
-        //void on_palRoomWidgetClicked(void);
-        //void on_tabWidgetTabBarClicked(int index);
-        //void on_lineEditAddressReturnPressed(void);
-        //void on_tabWidgetTabCloseRequested(int index);
-        /*
-        void MainWindow::doOnTabWidgetTabBarClicked(int index)
-        {
-         // New tab
-         if (index == tabWidget_->count() - 1) {
-            //QMessageBox::information(this, "New Tab", "New tab");
-            QWidget *tabPage = new QWidget(tabWidget_);
-            myTabWidget->insertTab(myTabWidget->count() - 1, tabPage, tr("New Tab"));
-         }
-        }
+      //void on_palRoomWidgetClicked(void);
+      //void on_tabWidgetTabBarClicked(int index);
+      //void on_lineEditAddressReturnPressed(void);
+      //void on_tabWidgetTabCloseRequested(int index);
 
-        void MainWindow::doOnLineEditAddressReturnPressed()
-        {
-         // connect(
-        }
+//      void MainWindow::on_tabWidgetTabBarClicked(int index)
+//      {
+//         // New tab
+//         if (index == my_tabWidgetPtr->count() - 1) {
+//            //QMessageBox::information(this, "New Tab", "New tab");
+//            QWidget *tabPage = new QWidget(my_tabWidgetPtr);
+//            my_tabWidgetPtr->insertTab(my_tabWidgetPtr->count() - 1, tabPage, tr("New Tab"));
+//         }
+//        }
 
-        void MainWindow::doOnTabWidgetTabCloseRequested(int index)
-        {
-         (void)index;
-         if (index == myTabWidget->count() - 1) {
-            myTabWidget->setCurrentIndex(myTabWidget->count() - 2);
-         }
-        }
-        */
+//        void MainWindow::on_lineEditAddressReturnPressed()
+//        {
+//         // connect(
+//        }
 
-        void MainWindow::on_aboutAppWasRequested(void)
-        {
-            auto dialog_about = new AboutDialog(this);
-            dialog_about->exec();
-        }
+//        void MainWindow::on_tabWidgetTabCloseRequested(int index)
+//        {
+//         (void)index;
+//         if (index == my_tabWidgetPtr->count() - 1) {
+//            my_tabWidgetPtr->setCurrentIndex(my_tabWidgetPtr->count() - 2);
+//         }
+//      }
 
-        void MainWindow::on_logWindowWasToggled(void)
-        {
-            my_logWidgetPtr->setVisible(!my_logWidgetPtr->isVisible());
-            //if (!my_mainLogWidgetPtr->isVisible())
-            //   my_mainLogWidgetPtr->show();
-            //else
-            //   my_mainLogWidgetPtr->hide();
-        }
+      void MainWindow::on_aboutAppWasRequested(void)
+      {
+         auto dialog_about = new AboutDialog(this);
+         dialog_about->exec();
+      }
 
-        void MainWindow::on_newTabRequested(void)
-        {
-            auto palaceClientWidgetPtr = new PalaceClientWidget(my_tabBarPtr);
-            connect(palaceClientWidgetPtr,
-                    &seville::view::PalaceClientWidget::
-                    connectionStateDidChangeEvent,
-                    this,
-                    &seville::view::MainWindow::on_connectionStateDidChange);
+      void MainWindow::on_logWindowWasToggled(void)
+      {
+         my_logWidgetPtr->setVisible(!my_logWidgetPtr->isVisible());
+         //if (!my_mainLogWidgetPtr->isVisible())
+         //   my_mainLogWidgetPtr->show();
+         //else
+         //   my_mainLogWidgetPtr->hide();
+      }
 
-            my_tabWidgetPtr->addNewTab(palaceClientWidgetPtr);
-        }
+      void MainWindow::on_newTabRequested(void)
+      {
+         //auto tabBar = my_tabBarPtr;
+         //auto palaceClientWidgetPtr = new PalaceClientWidget();
+         //palaceClientWidgetPtr->setParent(tabBar);
+         // connect(palaceClientWidgetPtr,
+         //         &seville::view::PalaceClientWidget::connectionStateDidChangeEvent,
+         //         this, &seville::view::MainWindow::on_currentClientConnectionStateDidChange);
 
-        void MainWindow::on_closeTabRequested(void)
-        {
-            // my_tabWidgetPtr->closeCurrentTab();
-            my_tabWidgetPtr->removeTab(my_tabWidgetPtr->currentIndex());
-        }
+         //my_tabWidgetPtr->addNewTab(palaceClientWidgetPtr);
+         my_tabWidgetPtr->addNewTab();
+      }
 
-        void MainWindow::on_tabWasAddedWithClientWidgetPtr(
+      void MainWindow::on_closeTabRequested(void)
+      {
+          disconnect(my_currentPalaceClientWidgetPtr->palaceClientPtr(),
+                     &seville::palace::Client::connectionStateDidChangeEvent,
+                     this, &seville::view::MainWindow::on_currentClientConnectionStateDidChange);
+
+          // my_tabWidgetPtr->closeCurrentTab();
+          my_tabWidgetPtr->removeTab(my_tabWidgetPtr->currentIndex());
+      }
+
+      void MainWindow::on_tabWasAddedWithClientWidgetPtr(
             PalaceClientWidget* palaceClientWidgetPtr)
-        {
-            if (palaceClientWidgetPtr == nullptr)
-                return;
+      {
+         // auto palaceClientWidgetPtr = new PalaceClientWidget(my_tabBarPtr);
+         connect(palaceClientWidgetPtr,
+                 &seville::view::PalaceClientWidget::
+                 connectionStateDidChangeEvent,
+                 this, &seville::view::MainWindow::on_currentClientConnectionStateDidChange);
 
-            // auto palaceClientWidgetPtr = new PalaceClientWidget(my_tabBarPtr);
-            connect(palaceClientWidgetPtr,
-                    &seville::view::PalaceClientWidget::
-                    connectionStateDidChangeEvent,
-                    this,
-                    &seville::view::MainWindow::on_connectionStateDidChange);
+         my_tabWidgetPtr->addNewTab(palaceClientWidgetPtr);
+         // connect(palaceClientWidgetPtr,
+         //         &PalaceClientWidget::widgetBackgroundDidChangeEvent,
+         //         my_tabWidgetPtr, &TabWidget::on_widgetBackgroundDidChange);
+         // auto palaceClientPtr = palaceClientWidgetPtr->palaceClientPtr();
 
-            my_tabWidgetPtr->addNewTab(palaceClientWidgetPtr);
-            // connect(palaceClientWidgetPtr,
-            //         &PalaceClientWidget::widgetBackgroundDidChangeEvent,
-            //         my_tabWidgetPtr, &TabWidget::on_widgetBackgroundDidChange);
-            // auto palaceClientPtr = palaceClientWidgetPtr->palaceClientPtr();
+         // connect(palaceClientPtr,
+         //         &seville::palace::Client::connectionStateDidChangeEvent,
+         //         this, &seville::view::MainWindow::on_connectionStateDidChange);
 
-            // connect(palaceClientPtr,
-            //         &seville::palace::Client::connectionStateDidChangeEvent,
-            //         this, &seville::view::MainWindow::on_connectionStateDidChange);
+         //my_tabWidgetPtr->setWidget
+      }
 
-            //my_tabWidgetPtr->setWidget
-        }
+      // void MainWindow::on_tabWasRemovedWithClientWidgetPtr(
+      //       PalaceClientWidget* palaceClientWidgetPtr)
+      // {
+      //    (void)palaceClientWidgetPtr;
+         // disconnect(palaceClientWidgetPtr,
+         //            &PalaceClientWidget::widgetBackgroundDidChangeEvent,
+         //            my_tabWidgetPtr, &TabWidget::on_widgetBackgroundDidChange);
+         // auto palaceClientPtr = palaceClientWidgetPtr->palaceClientPtr();
 
-        void MainWindow::on_tabWasRemovedWithClientWidgetPtr(
-            PalaceClientWidget* palaceClientWidgetPtr)
-        {
-            if (palaceClientWidgetPtr == nullptr)
-                return;
+         // disconnect(
+         //       palaceClientPtr,
+         //       &seville::palace::Client::connectionStateDidChangeEvent,
+         //       this, &seville::view::MainWindow::on_connectionStateDidChange);
+      // }
 
-            (void)palaceClientWidgetPtr;
-            // disconnect(palaceClientWidgetPtr,
-            //            &PalaceClientWidget::widgetBackgroundDidChangeEvent,
-            //            my_tabWidgetPtr, &TabWidget::on_widgetBackgroundDidChange);
-            // auto palaceClientPtr = palaceClientWidgetPtr->palaceClientPtr();
+      void MainWindow::on_currentTabDidChange(int index)
+      {
+          (void)index;
+         auto newCurrentPalaceClientWidgetPtr =
+                 do_currentPalaceClientWidgetPtr();
+               //qobject_cast<seville::view::PalaceClientWidget*>(
+               //   my_tabWidgetPtr->widget(index));
 
-            // disconnect(
-            //       palaceClientPtr,
-            //       &seville::palace::Client::connectionStateDidChangeEvent,
-            //       this, &seville::view::MainWindow::on_connectionStateDidChange);
-        }
+         auto newCurrentPalaceClientPtr = static_cast<seville::palace::Client*>(nullptr);
+         if (newCurrentPalaceClientWidgetPtr == nullptr) {
+             return;
+         }
 
-        void MainWindow::on_currentTabDidChange(int index)
-        {
-            auto currentPalaceClientWidgetPtr =
-                    qobject_cast<seville::view::PalaceClientWidget*>(
-                        my_tabWidgetPtr->widget(index));
+         auto currentPalaceClientPtr = my_currentPalaceClientWidgetPtr->palaceClientPtr();
+         my_currentPalaceClientWidgetPtr = newCurrentPalaceClientWidgetPtr;
 
-            if (currentPalaceClientWidgetPtr == nullptr)
-                return;
+         newCurrentPalaceClientPtr = newCurrentPalaceClientWidgetPtr->palaceClientPtr();
+         if (newCurrentPalaceClientPtr == nullptr) {
+             return;
+         }
 
-            if (my_currentPalaceClientWidgetPtr == currentPalaceClientWidgetPtr)
-                return;
+          //disconnect(my_currentPalaceClientWidgetPtr->palaceClientPtr(),
+         disconnect(currentPalaceClientPtr,
+                     &seville::palace::Client::connectionStateDidChangeEvent,
+                     this, &seville::view::MainWindow::on_currentClientConnectionStateDidChange);
 
-            my_currentPalaceClientWidgetPtr = currentPalaceClientWidgetPtr;
-            // do_updateMenus();
+         //connect(my_currentPalaceClientWidgetPtr->palaceClientPtr(),
+         connect(newCurrentPalaceClientPtr,
+                 &seville::palace::Client::connectionStateDidChangeEvent,
+                 this, &seville::view::MainWindow::on_currentClientConnectionStateDidChange);
 
-            auto currentPalaceClientPtr =
-               my_currentPalaceClientWidgetPtr->palaceClientPtr();
+//             auto currentPalaceClientPtr =
+//                   my_currentPalaceClientWidgetPtr->palaceClientPtr();
 
-            my_logWidgetPtr->setPalaceClientPtr(currentPalaceClientPtr);
-        }
+         //my_logWidgetPtr->setPalaceClientPtr(my_currentPalaceClientWidgetPtr->palaceClientPtr());
+         do_updateMenus();
+         my_tabWidgetPtr->adjustSize();
+         adjustSize();
+         my_logWidgetPtr->setPalaceClientPtr(newCurrentPalaceClientPtr);
+      }
 
-        //      void MainWindow::on_viewNeedsUpdating(void)
-        //      {
-        //         do_updateView();
-        //      }
+//      void MainWindow::on_viewNeedsUpdating(void)
+//      {
+//         do_updateView();
+//      }
 
-        void MainWindow::do_setupWindow(void)
-        {
-            setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-            setUnifiedTitleAndToolBarOnMac(true);
-            // setContentsMargins(0, 0, 0, 0);
-            //            auto primary_screen_ptr = QGuiApplication::primaryScreen();
-            //            auto screen = primary_screen_ptr->geometry();
-            //            auto default_window_size = QSize(
-            //                     static_cast<int>(.67*screen.width()),
-            //                     static_cast<int>(.67*screen.height()));
+      void MainWindow::do_setupWindow(void)
+      {
+         setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+         setUnifiedTitleAndToolBarOnMac(true);
+         // setContentsMargins(0, 0, 0, 0);
+//            auto primary_screen_ptr = QGuiApplication::primaryScreen();
+//            auto screen = primary_screen_ptr->geometry();
+//            auto default_window_size = QSize(
+//                     static_cast<int>(.67*screen.width()),
+//                     static_cast<int>(.67*screen.height()));
 
-            //            setGeometry(QStyle::alignedRect(
-            //                           Qt::LeftToRight,
-            //                           Qt::AlignCenter,
-            //                           default_window_size,
-            //                           primary_screen_ptr->geometry()));
-        }
+//            setGeometry(QStyle::alignedRect(
+//                           Qt::LeftToRight,
+//                           Qt::AlignCenter,
+//                           default_window_size,
+//                           primary_screen_ptr->geometry()));
+      }
 
-        void MainWindow::do_setupView(void)
-        {
-            // Set Main Window to Tab Widget
-            setCentralWidget(my_tabWidgetPtr);
+      void MainWindow::do_setupView(void)
+      {
+         my_currentPalaceClientWidgetPtr = do_currentPalaceClientWidgetPtr();
 
-            //my_mainLayoutPtr = this->layout();
+         // Set Main Window to Tab Widget
+         setCentralWidget(my_tabWidgetPtr);
 
-            //setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-            //setMinimumSize(10, 10);
+         //my_mainLayoutPtr = this->layout();
 
-            //setContentsMargins(0, menuBar_->height(), 0, 0); // left, top, right, bottom
-            //my_mainLayoutPtr = new QVBoxLayout(this);
-            //mainLayout_ = new QVBoxLayout; //(this);
-            //mainLayout_->setMenuBar(menuBar_);
-            //mainLayout_->addWidget(menuBar_, 0, 0);
-            //my_toolBarPtr->addWidget(comboBox);
+         //setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+         //setMinimumSize(10, 10);
 
-            //my_tabWidgetPtr->setGeometry(0, 0, width(), height()); // x, y, w, h
+         //setContentsMargins(0, menuBar_->height(), 0, 0); // left, top, right, bottom
+         //my_mainLayoutPtr = new QVBoxLayout(this);
+         //mainLayout_ = new QVBoxLayout; //(this);
+         //mainLayout_->setMenuBar(menuBar_);
+         //mainLayout_->addWidget(menuBar_, 0, 0);
+         //my_toolBarPtr->addWidget(comboBox);
 
-            //my_mainLayoutPtr = layout();
-            //my_mainLayoutPtr->addWidget(my_toolBarPtr);
-            //addToolBar(my_toolBarPtr);
+         //my_tabWidgetPtr->setGeometry(0, 0, width(), height()); // x, y, w, h
 
-            //my_mainLayoutPtr->addWidget(my_toolBarPtr);
-            //layout()->addWidget(my_tabWidget_ptr);
-            //auto clientWidget_ptr = new view::PalaceClientWidget(this);
-            //connect(palRoomWidget, )
-            //my_tabWidgetPtr->addNewTab(clientWidget_ptr);
+         //my_mainLayoutPtr = layout();
+         //my_mainLayoutPtr->addWidget(my_toolBarPtr);
+         //addToolBar(my_toolBarPtr);
 
-            //mainLayout_->setSpacing(0);
-            //mainLayout_->addWidget(tabWidget_, 1);
+         //my_mainLayoutPtr->addWidget(my_toolBarPtr);
+         //layout()->addWidget(my_tabWidget_ptr);
+         //auto clientWidget_ptr = new view::PalaceClientWidget(this);
+         //connect(palRoomWidget, )
+         //my_tabWidgetPtr->addNewTab(clientWidget_ptr);
 
-            //setLayout(mainLayout_);
-            //mainLayout_->setSizeConstraint(QLayout::SetMinimumSize);
+         //mainLayout_->setSpacing(0);
+         //mainLayout_->addWidget(tabWidget_, 1);
 
-            //setStatusBar(my_pStatusBar);
-            //my_pStatusBar->showMessage(tr("Ready"));
-            //layout()->addWidget(my_pStatusBar);
+         //setLayout(mainLayout_);
+         //mainLayout_->setSizeConstraint(QLayout::SetMinimumSize);
 
-            //QSettings settings;
-            //restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
-            //restoreState(settings.value("mainWindowState").toByteArray());
-        }
+         //setStatusBar(my_pStatusBar);
+         //my_pStatusBar->showMessage(tr("Ready"));
+         //layout()->addWidget(my_pStatusBar);
 
-        void MainWindow::do_setupActions(void)
-        {
-            // Assign Action Shortcut Keys
-            my_openHostConnectionActionPtr->setShortcut(QKeySequence::New);
-            my_closeHostConnectionActionPtr->setShortcut(Qt::CTRL | Qt::Key_W);
-            my_closeHostConnectionActionPtr->setEnabled(false);
-            my_quitAppActionPtr->setShortcut(QKeySequence::Quit);
-            my_undoContentActionPtr->setShortcut(QKeySequence::Undo);
-            my_redoContentActionPtr->setShortcut(QKeySequence::Redo);
-            my_cutContentActionPtr->setShortcut(QKeySequence::Cut);
-            my_copyContentActionPtr->setShortcut(QKeySequence::Copy);
-            my_pasteContentActionPtr->setShortcut(QKeySequence::Paste);
-            my_toggleLogActionPtr->setShortcut(Qt::CTRL | Qt::Key_L);
-        }
+         //QSettings settings;
+         //restoreGeometry(settings.value("mainWindowGeometry").toByteArray());
+         //restoreState(settings.value("mainWindowState").toByteArray());
+      }
 
-        void MainWindow::do_setupMenus(void)
-        {
-            // Create Menu Bar
-            //my_menuBarPtr = new QMenuBar(this);
-            my_menuBarPtr = this->menuBar();
+      void MainWindow::do_setupActions(void)
+      {
+         // Assign Action Shortcut Keys
+         my_openHostConnectionActionPtr->setShortcut(QKeySequence::New);
+         my_closeHostConnectionActionPtr->setShortcut(Qt::CTRL | Qt::Key_W);
+         my_closeHostConnectionActionPtr->setEnabled(false);
+         my_quitAppActionPtr->setShortcut(QKeySequence::Quit);
+         my_undoContentActionPtr->setShortcut(QKeySequence::Undo);
+         my_redoContentActionPtr->setShortcut(QKeySequence::Redo);
+         my_cutContentActionPtr->setShortcut(QKeySequence::Cut);
+         my_copyContentActionPtr->setShortcut(QKeySequence::Copy);
+         my_pasteContentActionPtr->setShortcut(QKeySequence::Paste);
+         my_toggleLogActionPtr->setShortcut(Qt::CTRL | Qt::Key_L);
+      }
 
-            my_fileMenuPtr = my_menuBarPtr->addMenu(tr("&File"));
-            my_editMenuPtr = my_menuBarPtr->addMenu(tr("&Edit"));
-            my_windowMenuPtr = my_menuBarPtr->addMenu(tr("&Window"));
-            my_helpMenuPtr = my_menuBarPtr->addMenu(tr("&Help"));
+      void MainWindow::do_setupMenus(void)
+      {
+         // Create Menu Bar
+         //my_menuBarPtr = new QMenuBar(this);
+         my_menuBarPtr = this->menuBar();
 
-            // File Menu
-            my_fileMenuPtr->addAction(my_openHostConnectionActionPtr);
-            my_fileMenuPtr->addAction(my_closeHostConnectionActionPtr);
-            my_fileMenuPtr->addSeparator();
-            my_fileMenuPtr->addAction(my_newTabActionPtr);
-            my_fileMenuPtr->addAction(my_closeTabActionPtr);
-            my_fileMenuPtr->addSeparator();
-            my_fileMenuPtr->addAction(my_quitAppActionPtr);
+         my_fileMenuPtr = my_menuBarPtr->addMenu(tr("&File"));
+         my_editMenuPtr = my_menuBarPtr->addMenu(tr("&Edit"));
+         my_windowMenuPtr = my_menuBarPtr->addMenu(tr("&Window"));
+         my_helpMenuPtr = my_menuBarPtr->addMenu(tr("&Help"));
 
-            // Edit Menu
-            my_editMenuPtr->addAction(my_undoContentActionPtr);
-            my_editMenuPtr->addAction(my_redoContentActionPtr);
-            my_editMenuPtr->addSeparator();
-            my_editMenuPtr->addAction(my_cutContentActionPtr);
-            my_editMenuPtr->addAction(my_copyContentActionPtr);
-            my_editMenuPtr->addAction(my_pasteContentActionPtr);
-            my_editMenuPtr->addSeparator();
+         // File Menu
+         my_fileMenuPtr->addAction(my_openHostConnectionActionPtr);
+         my_fileMenuPtr->addAction(my_closeHostConnectionActionPtr);
+         my_fileMenuPtr->addSeparator();
+         my_fileMenuPtr->addAction(my_newTabActionPtr);
+         my_fileMenuPtr->addAction(my_closeTabActionPtr);
+         my_fileMenuPtr->addSeparator();
+         my_fileMenuPtr->addAction(my_quitAppActionPtr);
 
-            // Window Menu
-            my_windowMenuPtr->addAction(my_toggleLogActionPtr);
-            //my_windowMenuPtr->addAction(
-            //         my_logDockWidgetPtr->toggleViewAction());
+         // Edit Menu
+         my_editMenuPtr->addAction(my_undoContentActionPtr);
+         my_editMenuPtr->addAction(my_redoContentActionPtr);
+         my_editMenuPtr->addSeparator();
+         my_editMenuPtr->addAction(my_cutContentActionPtr);
+         my_editMenuPtr->addAction(my_copyContentActionPtr);
+         my_editMenuPtr->addAction(my_pasteContentActionPtr);
+         my_editMenuPtr->addSeparator();
 
-            // About Menu
-            my_helpMenuPtr->addSeparator();
-            my_helpMenuPtr->addAction(my_aboutAppActionPtr);
+         // Window Menu
+         my_windowMenuPtr->addAction(my_toggleLogActionPtr);
+         //my_windowMenuPtr->addAction(
+         //         my_logDockWidgetPtr->toggleViewAction());
 
-            //         auto comboBoxPtr = new QComboBox(my_fileMenuPtr);
-            //         comboBoxPtr->addItem("Test1");
-            //         comboBoxPtr->addItem("Test2");
-            //         comboBoxPtr->addItem("Test3");
-            //         auto checkableActionPtr = new QWidgetAction(my_fileMenuPtr);
-            //         checkableActionPtr->setDefaultWidget(comboBoxPtr);
-            //         my_fileMenuPtr->addAction(checkableActionPtr);
+         // About Menu
+         my_helpMenuPtr->addSeparator();
+         my_helpMenuPtr->addAction(my_aboutAppActionPtr);
 
-            //setMenuBar(my_menuBarPtr);
-            auto layoutPtr = this->layout();
-            layoutPtr->addWidget(my_menuBarPtr);
-        }
+//         auto comboBoxPtr = new QComboBox(my_fileMenuPtr);
+//         comboBoxPtr->addItem("Test1");
+//         comboBoxPtr->addItem("Test2");
+//         comboBoxPtr->addItem("Test3");
+//         auto checkableActionPtr = new QWidgetAction(my_fileMenuPtr);
+//         checkableActionPtr->setDefaultWidget(comboBoxPtr);
+//         my_fileMenuPtr->addAction(checkableActionPtr);
 
-        void MainWindow::do_setupToolbars(void)
-        {
-            //my_toolBarPtr->setStyleSheet("border: 1px solid red");
-            //my_toolBarPtr->setMovable(false);
-            //my_toolBarPtr->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+         //setMenuBar(my_menuBarPtr);
+         auto layoutPtr = this->layout();
+         layoutPtr->addWidget(my_menuBarPtr);
+      }
 
-            //         auto comboBoxPtr = new QComboBox; //(my_toolBarPtr);
-            //         comboBoxPtr->addItem("Test1");
-            //         comboBoxPtr->addItem("Test2");
-            //         comboBoxPtr->addItem("Test3");
-            //         my_toolBarPtr->addWidget(comboBoxPtr);
-        }
+      void MainWindow::do_setupToolbars(void)
+      {
+         //my_toolBarPtr->setStyleSheet("border: 1px solid red");
+         //my_toolBarPtr->setMovable(false);
+         //my_toolBarPtr->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
 
-        void MainWindow::do_setupDocks(void)
-        {
-            auto palaceClientWidgetPtr =
+//         auto comboBoxPtr = new QComboBox; //(my_toolBarPtr);
+//         comboBoxPtr->addItem("Test1");
+//         comboBoxPtr->addItem("Test2");
+//         comboBoxPtr->addItem("Test3");
+//         my_toolBarPtr->addWidget(comboBoxPtr);
+      }
+
+      void MainWindow::do_setupDocks(void)
+      {
+         auto palaceClientWidgetPtr =
                static_cast<PalaceClientWidget *>(
                   my_tabWidgetPtr->currentWidget());
 
@@ -390,40 +410,51 @@ namespace seville
         {
             // Connect Action Signals to Slots
             connect(my_logDockWidgetPtr, &QDockWidget::topLevelChanged,
-                 this, &seville::view::MainWindow::on_topLevelDidChange);
+                    this, &seville::view::MainWindow::on_topLevelDidChange);
 
             connect(my_openHostConnectionActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_openConnectionWasRequested);
+                    this, &seville::view::MainWindow::on_openConnectionWasRequested);
 
             connect(my_closeHostConnectionActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_closeConnectionWasRequested);
+                    this, &seville::view::MainWindow::on_closeConnectionWasRequested);
 
             connect(my_newTabActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_newTabRequested);
+                    this, &seville::view::MainWindow::on_newTabRequested);
 
             connect(my_closeTabActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_closeTabRequested);
+                    this, &seville::view::MainWindow::on_closeTabRequested);
 
             connect(my_quitAppActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_quitAppWasRequested);
+                    this, &seville::view::MainWindow::on_quitAppWasRequested);
 
             connect(my_aboutAppActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_aboutAppWasRequested);
+                    this, &seville::view::MainWindow::on_aboutAppWasRequested);
 
             connect(my_toggleLogActionPtr, &QAction::triggered,
-                 this, &seville::view::MainWindow::on_logWindowWasToggled);
+                    this, &seville::view::MainWindow::on_logWindowWasToggled);
 
             connect(my_tabWidgetPtr, &seville::view::TabWidget::currentChanged,
-                 this, &seville::view::MainWindow::on_currentTabDidChange);
+                    this, &seville::view::MainWindow::on_currentTabDidChange);
 
             connect(my_tabWidgetPtr,
-                 &seville::view::TabWidget::tabWasAddedWithWidgetPtrEvent,
-                 this, &seville::view::MainWindow::on_tabWasAddedWithClientWidgetPtr);
+                    &seville::view::TabWidget::tabWasAddedWithWidgetPtrEvent,
+                    this,
+                    &seville::view::MainWindow::on_tabWasAddedWithClientWidgetPtr);
 
-            connect(my_tabWidgetPtr,
-                 &seville::view::TabWidget::tabWasRemovedWithWidgetPtrEvent,
-                 this,
-                 &seville::view::MainWindow::on_tabWasRemovedWithClientWidgetPtr);
+            // connect(my_tabWidgetPtr,
+            //         &seville::view::TabWidget::tabWasRemovedWithWidgetPtrEvent,
+            //         this,
+            //         &seville::view::MainWindow::on_tabWasRemovedWithClientWidgetPtr);
+
+            connect(// my_tabWidgetPtr->currentPalaceClientPtr(),
+                    do_currentPalaceClientWidgetPtr()->palaceClientPtr(),
+                    &seville::palace::Client::connectionStateDidChangeEvent,
+                    this, &seville::view::MainWindow::on_currentClientConnectionStateDidChange);
+
+            // auto currentPalaceClientWidgetPtr = do_currentPalaceClientWidgetPtr();
+            // connect(currentPalaceClientWidgetPtr,
+            //         &seville::view::PalaceClientWidget::widgetBackgroundDidChangeEvent,
+            //         this, &seville::view::MainWindow::on_currentClientWidgetBackgroundImageDidLoad);
 
             // auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
             // auto palaceClient0Ptr = qobject_cast<view::PalaceClientWidget*>(
@@ -435,25 +466,33 @@ namespace seville
             //            this,
             //            &seville::view::MainWindow::on_connectionStateDidChange);
             // }
-        }
+          }
 
-        void MainWindow::do_teardownEvents(void)
-        {
-            // Disconnect Action Signals from Slots
+          void MainWindow::do_teardownEvents(void)
+          {
+             // Disconnect Action Signals from Slots
 
-            // auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
-            // disconnect(palaceClientPtr,
-            //         &seville::view::PalaceClientWidget::
-            //            connectionStateDidChangeEvent,
-            //         this, &seville::view::MainWindow::on_connectionStateDidChange);
+             // auto palaceClientPtr = my_tabWidgetPtr->currentPalaceClientPtr();
+             // disconnect(palaceClientPtr,
+             //         &seville::view::PalaceClientWidget::
+             //            connectionStateDidChangeEvent,
+             //         this, &seville::view::MainWindow::on_connectionStateDidChange);
+             // disconnect(my_currentPalaceClientWidgetPtr,
+             //          &seville::view::PalaceClientWidget::widgetBackgroundDidChangeEvent,
+             //          this, &seville::view::MainWindow::on_currentClientWidgetBackgroundImageDidLoad);
 
-            disconnect(my_logDockWidgetPtr, &QDockWidget::topLevelChanged,
-                 this, &seville::view::MainWindow::on_topLevelDidChange);
+             //disconnect(my_tabWidgetPtr->currentPalaceClientPtr(),
+             disconnect(do_currentPalaceClientWidgetPtr()->palaceClientPtr(),
+                      &seville::palace::Client::connectionStateDidChangeEvent,
+                      this, &seville::view::MainWindow::on_currentClientConnectionStateDidChange);
 
-            disconnect(my_tabWidgetPtr,
-                    &seville::view::TabWidget::tabWasRemovedWithWidgetPtrEvent,
-                    this,
-                    &seville::view::MainWindow::on_tabWasRemovedWithClientWidgetPtr);
+             disconnect(my_logDockWidgetPtr, &QDockWidget::topLevelChanged,
+                     this, &seville::view::MainWindow::on_topLevelDidChange);
+
+             // disconnect(my_tabWidgetPtr,
+             //            &seville::view::TabWidget::tabWasRemovedWithWidgetPtrEvent,
+             //            this,
+             //            &seville::view::MainWindow::on_tabWasRemovedWithClientWidgetPtr);
 
             disconnect(my_tabWidgetPtr,
                     &seville::view::TabWidget::tabWasAddedWithWidgetPtrEvent,
@@ -610,99 +649,108 @@ namespace seville
             }
             */
 
-            if (my_openHostConnectionActionPtr != nullptr) {
-                delete my_openHostConnectionActionPtr;
-                my_openHostConnectionActionPtr = nullptr;
-            }
+//         if (my_openHostConnectionActionPtr != nullptr) {
+//            delete my_openHostConnectionActionPtr;
+//            my_openHostConnectionActionPtr = nullptr;
+//         }
 
-            if (my_closeHostConnectionActionPtr != nullptr) {
-                delete my_closeHostConnectionActionPtr;
-                my_closeHostConnectionActionPtr = nullptr;
-            }
+//         if (my_closeHostConnectionActionPtr != nullptr) {
+//            delete my_closeHostConnectionActionPtr;
+//            my_closeHostConnectionActionPtr = nullptr;
+//         }
 
-            if (my_newTabActionPtr != nullptr) {
-                delete my_newTabActionPtr;
-                my_newTabActionPtr = nullptr;
-            }
+//         if (my_newTabActionPtr != nullptr) {
+//            delete my_newTabActionPtr;
+//            my_newTabActionPtr = nullptr;
+//         }
 
-            if (my_closeTabActionPtr != nullptr) {
-                delete my_closeTabActionPtr;
-                my_closeTabActionPtr = nullptr;
-            }
+//         if (my_closeTabActionPtr != nullptr) {
+//            delete my_closeTabActionPtr;
+//            my_closeTabActionPtr = nullptr;
+//         }
 
-            if (my_quitAppActionPtr != nullptr) {
-                delete my_quitAppActionPtr;
-                my_quitAppActionPtr = nullptr;
-            }
+//         if (my_quitAppActionPtr != nullptr) {
+//            delete my_quitAppActionPtr;
+//            my_quitAppActionPtr = nullptr;
+//         }
 
-            if (my_undoContentActionPtr != nullptr) {
-                delete my_undoContentActionPtr;
-                my_undoContentActionPtr = nullptr;
-            }
+//         if (my_undoContentActionPtr != nullptr) {
+//            delete my_undoContentActionPtr;
+//            my_undoContentActionPtr = nullptr;
+//         }
 
-            if (my_redoContentActionPtr != nullptr) {
-                delete my_redoContentActionPtr;
-                my_redoContentActionPtr = nullptr;
-            }
+//         if (my_redoContentActionPtr != nullptr) {
+//            delete my_redoContentActionPtr;
+//            my_redoContentActionPtr = nullptr;
+//         }
 
-            if (my_cutContentActionPtr != nullptr) {
-                delete my_cutContentActionPtr;
-                my_cutContentActionPtr = nullptr;
-            }
+//         if (my_cutContentActionPtr != nullptr) {
+//            delete my_cutContentActionPtr;
+//            my_cutContentActionPtr = nullptr;
+//         }
 
-            if (my_copyContentActionPtr != nullptr) {
-                delete my_copyContentActionPtr;
-                my_copyContentActionPtr = nullptr;
-            }
+//         if (my_copyContentActionPtr != nullptr) {
+//            delete my_copyContentActionPtr;
+//            my_copyContentActionPtr = nullptr;
+//         }
 
-            if (my_pasteContentActionPtr != nullptr) {
-                delete my_pasteContentActionPtr;
-                my_pasteContentActionPtr = nullptr;
-            }
+//         if (my_pasteContentActionPtr != nullptr) {
+//            delete my_pasteContentActionPtr;
+//            my_pasteContentActionPtr = nullptr;
+//         }
 
-            if (my_aboutAppActionPtr != nullptr) {
-                delete my_aboutAppActionPtr;
-                my_aboutAppActionPtr = nullptr;
-            }
+//         if (my_aboutAppActionPtr != nullptr) {
+//            delete my_aboutAppActionPtr;
+//            my_aboutAppActionPtr = nullptr;
+//         }
 
-            if (my_toggleLogActionPtr != nullptr) {
-                delete my_toggleLogActionPtr;
-                my_toggleLogActionPtr = nullptr;
-            }
+//         if (my_toggleLogActionPtr != nullptr) {
+//            delete my_toggleLogActionPtr;
+//            my_toggleLogActionPtr = nullptr;
+//         }
 
-            if (my_toolBarPtr != nullptr) {
-                delete my_toolBarPtr;
-                my_toolBarPtr = nullptr;
-            }
+//         if (my_toolBarPtr != nullptr) {
+//            delete my_toolBarPtr;
+//            my_toolBarPtr = nullptr;
+//         }
 
-            if (my_logWidgetPtr != nullptr) {
-                delete my_logWidgetPtr;
-                my_logWidgetPtr = nullptr;
-            }
+//         if (my_logWidgetPtr != nullptr) {
+//            delete my_logWidgetPtr;
+//            my_logWidgetPtr = nullptr;
+//         }
 
-            if (my_logDockWidgetPtr != nullptr) {
-                delete my_logDockWidgetPtr;
-                my_logDockWidgetPtr = nullptr;
-            }
+//         if (my_logDockWidgetPtr != nullptr) {
+//            delete my_logDockWidgetPtr;
+//            my_logDockWidgetPtr = nullptr;
+//         }
 
-            if (my_tabWidgetPtr != nullptr) {
-                delete my_tabWidgetPtr;
-                my_tabWidgetPtr = nullptr;
-            }
+//         if (my_tabWidgetPtr != nullptr) {
+//            delete my_tabWidgetPtr;
+//            my_tabWidgetPtr = nullptr;
+//         }
 
-            if (my_statusBarPtr != nullptr) {
-                delete my_statusBarPtr;
-                my_statusBarPtr = nullptr;
-            }
-        }
+//         if (my_statusBarPtr != nullptr) {
+//            delete my_statusBarPtr;
+//            my_statusBarPtr = nullptr;
+//         }
+      }
 
-        void MainWindow::closeEvent(QCloseEvent* closeEventPtr)
-        {
-            (void)closeEventPtr;
-            QSettings settings;
-            settings.setValue("mainWindowGeometry", saveGeometry());
-            settings.setValue("mainWindowState", saveState());
-            QApplication::quit();
-        }
-    }
+      PalaceClientWidget* MainWindow::do_currentPalaceClientWidgetPtr(void)
+      {
+          auto palaceClientWidgetPtr =
+                static_cast<PalaceClientWidget *>(
+                   my_tabWidgetPtr->currentWidget());
+          return palaceClientWidgetPtr;
+      }
+
+      void MainWindow::closeEvent(QCloseEvent* closeEventPtr)
+      {
+         (void)closeEventPtr;
+         QSettings settings;
+         settings.setValue("mainWindowGeometry", saveGeometry());
+         settings.setValue("mainWindowState", saveState());
+         do_deinit();
+         QApplication::quit();
+      }
+   }
 }

@@ -25,7 +25,7 @@ namespace seville
         //      }
 
         void LogWidget::on_messageLoggedEvent(
-            const seville::palace::LogEntry& logEntry)
+                const seville::palace::LogEntry& logEntry)
         {
             if (logEntry.kind() == seville::palace::LogEntryKind::kChatKind) {
                 my_logTextEditPtr->append(
@@ -65,7 +65,10 @@ namespace seville
             }
 
             for (auto& logEntry: *logEntriesPtr) {
-                my_logTextEditPtr->append(logEntry.message());
+                my_logTextEditPtr->append(
+                         QString("%1: %2")
+                         .arg(logEntry.fromUsername())
+                         .arg(logEntry.message()));
             }
         }
 
